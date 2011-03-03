@@ -28,5 +28,12 @@ namespace SimpleJsonTests
 
             Assert.AreEqual(@"""bed7f4ea-1a96-11d2-8f08-00a0c9a6186d""", json);
         }
+
+        [TestMethod]
+        public void SerializeEnum()
+        {
+            string json = SimpleJson.JsonEncode(StringComparison.CurrentCultureIgnoreCase);
+            Assert.AreEqual("1", json);
+        }
     }
 }

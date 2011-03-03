@@ -1056,6 +1056,12 @@ namespace SimpleJson
             return true;
         }
 
+        private static bool SerializeEnum(Enum p, StringBuilder builder)
+        {
+            builder.AppendFormat(p.ToString("D"));
+            return true;
+        }
+
         protected static bool SerializeNonPrimitiveType(object value, StringBuilder builder)
         {
             if (value is DateTime)
@@ -1065,6 +1071,10 @@ namespace SimpleJson
             else if (value is Guid)
             {
                 return SerializeGuid((Guid)value, builder);
+            }
+            else if (value is Enum)
+            {
+                return SerializeEnum((Enum)value, builder);
             }
 
             // todo: implement caching for types
