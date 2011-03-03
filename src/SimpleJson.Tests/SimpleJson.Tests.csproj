@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JsonArrayTests.cs" />
+    <Compile Include="JsonDecodeTests.cs" />
     <Compile Include="JsonEncodeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleJsonTests.cs" />

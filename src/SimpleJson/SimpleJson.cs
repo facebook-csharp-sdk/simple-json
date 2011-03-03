@@ -29,6 +29,20 @@ namespace SimpleJson
 #endif
  class JsonArray : List<object>
     {
+        public JsonArray()
+        {
+        }
+
+        public JsonArray(IEnumerable<object> collection)
+            : base(collection)
+        {
+        }
+
+        public JsonArray(int capacity)
+            : base(capacity)
+        {
+        }
+
         public override string ToString()
         {
             return SimpleJson.JsonEncode(this) ?? string.Empty;
@@ -80,11 +94,11 @@ namespace SimpleJson
             }
 
             int i = 0;
-            foreach (var o in obj)
+            foreach (KeyValuePair<string, object> o in obj)
             {
                 if (i++ == index)
                 {
-                    return o;
+                    return o.Value;
                 }
             }
 
@@ -647,7 +661,6 @@ namespace SimpleJson
             bool complete = false;
             while (!complete)
             {
-
                 if (index == json.Length)
                 {
                     break;
@@ -725,13 +738,11 @@ namespace SimpleJson
                             break;
                         }
                     }
-
                 }
                 else
                 {
                     s.Append(c);
                 }
-
             }
 
             if (!complete)
