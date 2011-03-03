@@ -3,9 +3,8 @@
 // NOTE: uncomment the following line to make simple json classes internal.
 //#define SIMPLE_JSON_INTERNAL
 
-#if !NET35 && !WINDOWS_PHONE
-    #define SIMPLE_JSON_DYNAMIC
-#endif
+// NOTE: uncomment the following line to enable dynamic support.
+//#define SIMPLE_JSON_DYNAMIC
 
 namespace SimpleJson
 {
@@ -16,7 +15,6 @@ namespace SimpleJson
     using System.Dynamic;
 #endif
     using System.Globalization;
-    using System.Linq;
     using System.Text;
 
     #region JsonArray
@@ -62,8 +60,32 @@ namespace SimpleJson
         {
             get
             {
-                return this.members.ToList()[index];
+                return GetAtIndex(this.members, index);
             }
+        }
+
+        internal static object GetAtIndex(IDictionary<string, object> obj, int index)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException("obj");
+            }
+
+            if (index >= obj.Count)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+
+            int i = 0;
+            foreach (var o in obj)
+            {
+                if (i++ == index)
+                {
+                    return o;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -380,7 +402,10 @@ namespace SimpleJson
         /// </returns>
         public override IEnumerable<string> GetDynamicMemberNames()
         {
-            return this.members.Keys.AsEnumerable();
+            foreach (var key in Keys)
+            {
+                yield return key;
+            }
         }
 #endif
     }
