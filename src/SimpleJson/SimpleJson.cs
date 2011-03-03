@@ -694,8 +694,13 @@ namespace SimpleJson
                             {
                                 return "";
                             }
+
                             // convert the integer codepoint to a unicode char and add to string
+#if SILVERLIGHT
+                            s.Append(ConvertFromUtf32((int)codePoint));
+#else
                             s.Append(Char.ConvertFromUtf32((int)codePoint));
+#endif
                             // skip 4 chars
                             index += 4;
                         }
@@ -721,6 +726,23 @@ namespace SimpleJson
 
             return s.ToString();
         }
+
+#if SILVERLIGHT
+        private static string ConvertFromUtf32(int utf32)
+        {
+            // http://www.java2s.com/Open-Source/CSharp/2.6.4-mono-.net-core/System/System/Char.cs.htm
+            if (utf32 < 0 || utf32 > 0x10FFFF)
+                throw new ArgumentOutOfRangeException("utf32", "The argument must be from 0 to 0x10FFFF.");
+            if (0xD800 <= utf32 && utf32 <= 0xDFFF)
+                throw new ArgumentOutOfRangeException("utf32", "The argument must not be in surrogate pair range.");
+            if (utf32 < 0x10000)
+                return new string((char)utf32, 1);
+            utf32 -= 0x10000;
+            return new string(
+                new char[] {(char) ((utf32 >> 10) + 0xD800),
+                (char) (utf32 % 0x0400 + 0xDC00)});
+        }
+#endif
 
         protected static double ParseNumber(char[] json, ref int index, ref bool success)
         {
