@@ -1044,16 +1044,30 @@ namespace SimpleJson
             return true;
         }
 
+        protected static bool SerializeGuid(Guid guid, StringBuilder builder)
+        {
+            builder.AppendFormat("\"{0}\"", guid.ToString("D", CultureInfo.InvariantCulture));
+            return true;
+        }
+
+        protected static bool SerializeDateTime(DateTime dateTime, StringBuilder builder)
+        {
+            builder.AppendFormat("\"{0}\"", dateTime.ToString("o"));
+            return true;
+        }
+
         protected static bool SerializeNonPrimitiveType(object value, StringBuilder builder)
         {
-            // todo: implement caching for types
-
             if (value is DateTime)
             {
-                builder.AppendFormat("\"{0}\"", ((DateTime)value).ToString("o"));
-                return true;
+                return SerializeDateTime((DateTime)value, builder);
+            }
+            else if (value is Guid)
+            {
+                return SerializeGuid((Guid)value, builder);
             }
 
+            // todo: implement caching for types
             var type = value.GetType();
             System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
