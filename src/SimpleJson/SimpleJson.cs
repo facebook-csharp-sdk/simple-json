@@ -1,3 +1,6 @@
+// SimpleJson http://simplejson.codeplex.com/
+// http://bit.ly/simplejson
+// License: Apache License 2.0 (Apache)
 // original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 
 // NOTE: uncomment the following line to make simple json classes internal.
