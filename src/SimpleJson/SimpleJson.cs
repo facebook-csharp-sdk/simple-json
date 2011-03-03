@@ -450,31 +450,44 @@ namespace SimpleJson
         /// <returns>An IList&lt;object>, a IDictionary&lt;string,object>, a double, a string, null, true, or false</returns>
         public static object JsonDecode(string json)
         {
-            bool success = true;
-
-            return JsonDecode(json, ref success);
+            object @object;
+            if (TryJsonDecode(json, out @object))
+            {
+                return @object;
+            }
+            else
+            {
+                throw new System.Runtime.Serialization.SerializationException("Invalid JSON string");
+            }
         }
 
         /// <summary>
-        /// Parses the string json into a value; and fills 'success' with the successfullness of the parse.
+        /// Try parsing the json string into a value.
         /// </summary>
-        /// <param name="json">A JSON string.</param>
-        /// <param name="success">Successful parse?</param>
-        /// <returns>An IList&lt;object>, a IDictionary&lt;string,object>, a double, a string, null, true, or false</returns>
-        public static object JsonDecode(string json, ref bool success)
+        /// <param name="json">
+        /// A JSON string.
+        /// </param>
+        /// <param name="object">
+        /// The object.
+        /// </param>
+        /// <returns>
+        /// Returns true if successfull otherwise false.
+        /// </returns>
+        public static bool TryJsonDecode(string json, out object @object)
         {
-            success = true;
+            bool success = true;
             if (json != null)
             {
                 char[] charArray = json.ToCharArray();
                 int index = 0;
-                object value = ParseValue(charArray, ref index, ref success);
-                return value;
+                @object = ParseValue(charArray, ref index, ref success);
             }
             else
             {
-                return null;
+                @object = null;
             }
+
+            return success;
         }
 
         /// <summary>
