@@ -1,7 +1,7 @@
 // original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
-// license: MIT
 
-#define SIMPLE_JSON_INTERNAL
+// NOTE: uncomment the following line to make simple json classes internal.
+//#define SIMPLE_JSON_INTERNAL
 
 #if !NET35 && !WINDOWS_PHONE
     #define SIMPLE_JSON_DYNAMIC
@@ -30,7 +30,7 @@ namespace SimpleJson
     {
         public override string ToString()
         {
-            return Json.JsonEncode(this) ?? string.Empty;
+            return SimpleJson.JsonEncode(this) ?? string.Empty;
         }
     }
 
@@ -240,7 +240,7 @@ namespace SimpleJson
         /// </returns>
         public override string ToString()
         {
-            return Json.JsonEncode(this);
+            return SimpleJson.JsonEncode(this);
         }
 
 #if SIMPLE_JSON_DYNAMIC
@@ -401,7 +401,7 @@ namespace SimpleJson
 #else
     public
 #endif
- class Json
+ class SimpleJson
     {
         public const int TOKEN_NONE = 0;
         public const int TOKEN_CURLY_OPEN = 1;
