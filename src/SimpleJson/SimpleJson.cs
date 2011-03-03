@@ -901,9 +901,9 @@ namespace SimpleJson
             {
                 success = SerializeObject((IDictionary<string, object>)value, builder);
             }
-            else if (value is JsonArray)
+            else if (value is IEnumerable)
             {
-                success = SerializeArray((JsonArray)value, builder);
+                success = SerializeArray((IEnumerable)value, builder);
             }
             else if (IsNumeric(value))
             {
@@ -959,18 +959,17 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeArray(JsonArray anArray, StringBuilder builder)
+        protected static bool SerializeArray(IEnumerable anArray, StringBuilder builder)
         {
             builder.Append("[");
 
             bool first = true;
-            for (int i = 0; i < anArray.Count; i++)
-            {
-                object value = anArray[i];
 
+            foreach (var value in anArray)
+            {
                 if (!first)
                 {
-                    builder.Append(", ");
+                    builder.Append(",");
                 }
 
                 if (!SerializeValue(value, builder))

@@ -64,6 +64,8 @@ namespace JsonViewer
                 {
                     node.Nodes.Add(obj.ToString());
                 }
+
+                node.ExpandAll();
             }
         }
 

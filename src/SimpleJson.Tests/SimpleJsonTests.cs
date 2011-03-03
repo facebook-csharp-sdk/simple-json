@@ -179,6 +179,50 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
+        public void CanSerializeArrays()
+        {
+            const string expected = "[1,2,3]";
+
+            var data = new[] { 1, 2, 3 };
+            var serialized = SimpleJson.JsonEncode(data);
+
+            Assert.AreEqual(expected, serialized);
+        }
+
+        [TestMethod]
+        public void CanSerializeEmptyArray()
+        {
+            const string expected = "[]";
+
+            var data = new int[0];
+            var serialized = SimpleJson.JsonEncode(data);
+
+            Assert.AreEqual(expected, serialized);
+        }
+
+        [TestMethod]
+        public void CanSerializeNullArray()
+        {
+            const string expected = "null";
+
+            int[] data = null;
+            var serialized = SimpleJson.JsonEncode(data);
+
+            Assert.AreEqual(expected, serialized);
+        }
+
+        [TestMethod]
+        public void CanSerializeList()
+        {
+            const string expected = "[\"a\",\"b\",\"c\"]";
+
+            var data = new List<string> { "a", "b", "c" };
+            var serialized = SimpleJson.JsonEncode(data);
+
+            Assert.AreEqual(expected, serialized);
+        }
+
+        [TestMethod]
         public void CanIgnoreSolidusInStringLiterals()
         {
             const string expected = @"What is the phone #/digits?";
