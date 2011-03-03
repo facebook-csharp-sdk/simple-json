@@ -863,8 +863,18 @@ namespace SimpleJson
             }
             else
             {
-                success = false;
+                var type = value.GetType();
+
+                if (type.FullName != null && type.FullName.Contains("__AnonymousType"))
+                {
+                    success = SerializeAnonymousType(value, builder);
+                }
+                else
+                {
+                    success = false;
+                }
             }
+
             return success;
         }
 
@@ -982,6 +992,22 @@ namespace SimpleJson
         {
             builder.Append(Convert.ToString(number, CultureInfo.InvariantCulture));
             return true;
+        }
+
+        protected static bool SerializeAnonymousType(object value, StringBuilder builder)
+        {
+            // todo: implement caching for anonymous types
+            var type = value.GetType();
+            System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+            IDictionary<string, object> anonymousObject = new JsonObject();
+            foreach (var info in properties)
+            {
+                var v = info.GetValue(value, null);
+                anonymousObject.Add(info.Name, v);
+            }
+
+            return SerializeValue(anonymousObject, builder);
         }
 
         /// <summary>
