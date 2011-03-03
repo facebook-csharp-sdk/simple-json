@@ -776,7 +776,7 @@ namespace SimpleJson
         {
             for (; index < json.Length; index++)
             {
-                if (" \t\n\r".IndexOf(json[index]) == -1)
+                if (" \t\n\r\b\f".IndexOf(json[index]) == -1)
                 {
                     break;
                 }
