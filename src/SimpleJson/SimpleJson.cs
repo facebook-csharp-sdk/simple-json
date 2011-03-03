@@ -929,7 +929,7 @@ namespace SimpleJson
 
                 if (!first)
                 {
-                    builder.Append(", ");
+                    builder.Append(",");
                 }
 
                 SerializeString(key, builder);

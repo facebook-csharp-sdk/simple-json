@@ -127,7 +127,7 @@ namespace SimpleJsonTests
         public void CanSerializeAnonymousObjectWithNumbers()
         {
             // todo: make json encode smaller by removing spaces after ,
-            const string expected = @"{""quantity"":8902, ""cost"":45.33, ""value"":-0.01063}";
+            const string expected = @"{""quantity"":8902,""cost"":45.33,""value"":-0.01063}";
             var instance = new
             {
                 quantity = 8902,
@@ -142,7 +142,7 @@ namespace SimpleJsonTests
         [TestMethod]
         public void CanSerializeWithAnonymousTypes()
         {
-            const string expected = @"{""array"":{""quantity"":8902, ""cost"":45.33, ""value"":-0.01063}}";
+            const string expected = @"{""array"":{""quantity"":8902,""cost"":45.33,""value"":-0.01063}}";
             var instance = new
             {
                 array = new { quantity = 8902, cost = 45.33, value = -1.063E-02 }
