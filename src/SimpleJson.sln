@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-SL4", "SimpleJso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-WP7", "SimpleJson\SimpleJson-WP7.csproj", "{A1116A6E-B599-4AB0-87ED-ED0F3452A7F6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AEDAD4B4-9F2C-4992-8CD6-A43DFDFF7172}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson.Tests", "SimpleJson.Tests\SimpleJson.Tests.csproj", "{A8993045-3923-488D-BCD5-F7C1F81ACDED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,8 +47,15 @@ Global
 		{A1116A6E-B599-4AB0-87ED-ED0F3452A7F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1116A6E-B599-4AB0-87ED-ED0F3452A7F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1116A6E-B599-4AB0-87ED-ED0F3452A7F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8993045-3923-488D-BCD5-F7C1F81ACDED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8993045-3923-488D-BCD5-F7C1F81ACDED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8993045-3923-488D-BCD5-F7C1F81ACDED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8993045-3923-488D-BCD5-F7C1F81ACDED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A8993045-3923-488D-BCD5-F7C1F81ACDED} = {AEDAD4B4-9F2C-4992-8CD6-A43DFDFF7172}
 	EndGlobalSection
 EndGlobal
