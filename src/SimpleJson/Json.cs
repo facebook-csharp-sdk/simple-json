@@ -36,7 +36,7 @@ namespace SimpleJson
 
     #endregion
 
-    #region JsonArray
+    #region JsonObject
 
 #if SIMPLE_JSON_INTERNAL
     internal
@@ -45,7 +45,7 @@ namespace SimpleJson
 #endif
  class JsonObject :
 #if SIMPLE_JSON_DYNAMIC
- DynamicObject, IDynamicMetaObjectProvider,
+ DynamicObject,
 #endif
  IDictionary<string, object>
     {
@@ -393,7 +393,7 @@ namespace SimpleJson
     /// This class encodes and decodes JSON strings.
     /// Spec. details, see http://www.json.org/
     /// 
-    /// JSON uses Arrays and Objects. These correspond here to the datatypes ArrayList and Hashtable.
+    /// JSON uses Arrays and Objects. These correspond here to the datatypes JsonArray(IList&lt;object>) and JsonObject(IDictionary&lt;string,object>).
     /// All numbers are parsed to doubles.
     /// </summary>
 #if SIMPLE_JSON_INTERNAL
@@ -422,7 +422,7 @@ namespace SimpleJson
         /// Parses the string json into a value
         /// </summary>
         /// <param name="json">A JSON string.</param>
-        /// <returns>An ArrayList, a Hashtable, a double, a string, null, true, or false</returns>
+        /// <returns>An IList&lt;object>, a IDictionary&lt;string,object>, a double, a string, null, true, or false</returns>
         public static object JsonDecode(string json)
         {
             bool success = true;
@@ -435,7 +435,7 @@ namespace SimpleJson
         /// </summary>
         /// <param name="json">A JSON string.</param>
         /// <param name="success">Successful parse?</param>
-        /// <returns>An ArrayList, a Hashtable, a double, a string, null, true, or false</returns>
+        /// <returns>An IList&lt;object>, a IDictionary&lt;string,object>, a double, a string, null, true, or false</returns>
         public static object JsonDecode(string json, ref bool success)
         {
             success = true;
@@ -453,9 +453,9 @@ namespace SimpleJson
         }
 
         /// <summary>
-        /// Converts a Hashtable / ArrayList object into a JSON string
+        /// Converts a IDictionary&lt;string,object> / IList&lt;object> object into a JSON string
         /// </summary>
-        /// <param name="json">A Hashtable / ArrayList</param>
+        /// <param name="json">A IDictionary&lt;string,object> / IList&lt;object></param>
         /// <returns>A JSON encoded string, or null if object 'json' is not serializable</returns>
         public static string JsonEncode(object json)
         {
@@ -464,9 +464,9 @@ namespace SimpleJson
             return (success ? builder.ToString() : null);
         }
 
-        protected static Hashtable ParseObject(char[] json, ref int index, ref bool success)
+        protected static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
         {
-            Hashtable table = new Hashtable();
+            IDictionary<string, object> table = new JsonObject();
             int token;
 
             // {
@@ -524,9 +524,9 @@ namespace SimpleJson
             return table;
         }
 
-        protected static ArrayList ParseArray(char[] json, ref int index, ref bool success)
+        protected static JsonArray ParseArray(char[] json, ref int index, ref bool success)
         {
-            ArrayList array = new ArrayList();
+            JsonArray array = new JsonArray();
 
             // [
             NextToken(json, ref index);
@@ -837,13 +837,13 @@ namespace SimpleJson
             {
                 success = SerializeString((string)value, builder);
             }
-            else if (value is Hashtable)
+            else if (value is IDictionary<string, object>)
             {
-                success = SerializeObject((Hashtable)value, builder);
+                success = SerializeObject((IDictionary<string, object>)value, builder);
             }
-            else if (value is ArrayList)
+            else if (value is JsonArray)
             {
-                success = SerializeArray((ArrayList)value, builder);
+                success = SerializeArray((JsonArray)value, builder);
             }
             else if (IsNumeric(value))
             {
@@ -868,16 +868,16 @@ namespace SimpleJson
             return success;
         }
 
-        protected static bool SerializeObject(Hashtable anObject, StringBuilder builder)
+        protected static bool SerializeObject(IDictionary<string, object> anObject, StringBuilder builder)
         {
             builder.Append("{");
 
-            IDictionaryEnumerator e = anObject.GetEnumerator();
+            IEnumerator<KeyValuePair<string, object>> e = anObject.GetEnumerator();
             bool first = true;
             while (e.MoveNext())
             {
-                string key = e.Key.ToString();
-                object value = e.Value;
+                string key = e.Current.Key;
+                object value = e.Current.Value;
 
                 if (!first)
                 {
@@ -898,7 +898,7 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeArray(ArrayList anArray, StringBuilder builder)
+        protected static bool SerializeArray(JsonArray anArray, StringBuilder builder)
         {
             builder.Append("[");
 
