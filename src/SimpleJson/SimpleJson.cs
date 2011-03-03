@@ -428,18 +428,18 @@ namespace SimpleJson
 #endif
  class SimpleJson
     {
-        public const int TOKEN_NONE = 0;
-        public const int TOKEN_CURLY_OPEN = 1;
-        public const int TOKEN_CURLY_CLOSE = 2;
-        public const int TOKEN_SQUARED_OPEN = 3;
-        public const int TOKEN_SQUARED_CLOSE = 4;
-        public const int TOKEN_COLON = 5;
-        public const int TOKEN_COMMA = 6;
-        public const int TOKEN_STRING = 7;
-        public const int TOKEN_NUMBER = 8;
-        public const int TOKEN_TRUE = 9;
-        public const int TOKEN_FALSE = 10;
-        public const int TOKEN_NULL = 11;
+        private const int TOKEN_NONE = 0;
+        private const int TOKEN_CURLY_OPEN = 1;
+        private const int TOKEN_CURLY_CLOSE = 2;
+        private const int TOKEN_SQUARED_OPEN = 3;
+        private const int TOKEN_SQUARED_CLOSE = 4;
+        private const int TOKEN_COLON = 5;
+        private const int TOKEN_COMMA = 6;
+        private const int TOKEN_STRING = 7;
+        private const int TOKEN_NUMBER = 8;
+        private const int TOKEN_TRUE = 9;
+        private const int TOKEN_FALSE = 10;
+        private const int TOKEN_NULL = 11;
 
         private const int BUILDER_CAPACITY = 2000;
 
