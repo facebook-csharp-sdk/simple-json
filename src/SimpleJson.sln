@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-Net35", "SimpleJ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-SL3", "SimpleJson\SimpleJson-SL3.csproj", "{20FBB849-3BE0-48AB-BDB3-1A48F64A8077}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-SL4", "SimpleJson\SimpleJson-SL4.csproj", "{4A93FDBA-28DD-4737-B0DF-72CF0C42D962}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{20FBB849-3BE0-48AB-BDB3-1A48F64A8077}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20FBB849-3BE0-48AB-BDB3-1A48F64A8077}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20FBB849-3BE0-48AB-BDB3-1A48F64A8077}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A93FDBA-28DD-4737-B0DF-72CF0C42D962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A93FDBA-28DD-4737-B0DF-72CF0C42D962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A93FDBA-28DD-4737-B0DF-72CF0C42D962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A93FDBA-28DD-4737-B0DF-72CF0C42D962}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
