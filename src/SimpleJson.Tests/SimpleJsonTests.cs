@@ -104,7 +104,7 @@ namespace SimpleJsonTests
         [TestMethod]
         public void CanSerializeClassInstanceExample()
         {
-            const string expected = @"{""name"":""spot""}";
+            const string expected = @"{""Name"":""spot""}";
             var dog = new Dog { Name = "spot" };
 
             var json = SimpleJson.JsonEncode(dog);

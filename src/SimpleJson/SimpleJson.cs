@@ -910,16 +910,7 @@ namespace SimpleJson
             }
             else
             {
-                var type = value.GetType();
-
-                if (type.FullName != null && type.FullName.Contains("__AnonymousType"))
-                {
-                    success = SerializeAnonymousType(value, builder);
-                }
-                else
-                {
-                    success = false;
-                }
+                success = SerializeNonPrimitiveType(value, builder);
             }
 
             return success;
@@ -1041,20 +1032,39 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeAnonymousType(object value, StringBuilder builder)
+        protected static bool SerializeNonPrimitiveType(object value, StringBuilder builder)
         {
-            // todo: implement caching for anonymous types
+            // todo: implement caching for types
+
+            if (value is DateTime)
+            {
+                builder.AppendFormat("\"{0}\"", ((DateTime)value).ToString("o"));
+                return true;
+            }
+
             var type = value.GetType();
             System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
-            IDictionary<string, object> anonymousObject = new JsonObject();
-            foreach (var info in properties)
+            if (type.FullName == null)
             {
-                var v = info.GetValue(value, null);
-                anonymousObject.Add(info.Name, v);
+                return false;
             }
 
-            return SerializeValue(anonymousObject, builder);
+            var anonymous = type.FullName.Contains("__AnonymousType");
+
+            IDictionary<string, object> obj = new JsonObject();
+            foreach (var info in properties)
+            {
+                if (!info.CanRead && !anonymous)
+                {
+                    continue;
+                }
+
+                var v = info.GetValue(value, null);
+                obj.Add(info.Name, v);
+            }
+
+            return SerializeValue(obj, builder);
         }
 
         /// <summary>
