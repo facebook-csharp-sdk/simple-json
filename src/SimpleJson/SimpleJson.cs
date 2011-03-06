@@ -445,7 +445,7 @@ namespace SimpleJson
 #else
     public
 #endif
-    class SimpleJson
+ class SimpleJson
     {
         private const int TOKEN_NONE = 0;
         private const int TOKEN_CURLY_OPEN = 1;
@@ -509,6 +509,25 @@ namespace SimpleJson
             return success;
         }
 
+        public static object JsonDecode(string json, Type type)
+        {
+            var jsonObject = JsonDecode(json);
+
+            if (type == null)
+            {
+                return jsonObject;
+            }
+            else
+            {
+                return CopyValue(jsonObject, type);
+            }
+        }
+
+        public static T JsonDecode<T>(string json)
+        {
+            return (T)JsonDecode(json, typeof(T));
+        }
+
         /// <summary>
         /// Converts a IDictionary&lt;string,object> / IList&lt;object> object into a JSON string
         /// </summary>
@@ -519,6 +538,105 @@ namespace SimpleJson
             StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
             bool success = SerializeValue(json, builder);
             return (success ? builder.ToString() : null);
+        }
+
+        private static object CopyValue(object value, Type type)
+        {
+            if (value is string || value is bool || value is double)
+            {
+                return value;
+            }
+            else if (value == null)
+            {
+                return null;
+            }
+
+            object obj = null;
+
+            if (value is IDictionary<string, object>)
+            {
+                var jsonObject = (IDictionary<string, object>)value;
+                obj = Activator.CreateInstance(type);
+
+                System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                foreach (var info in properties)
+                {
+                    if (!info.CanWrite)
+                    {
+                        continue;
+                    }
+
+                    var jsonKey = info.Name;
+
+                    if (jsonObject.ContainsKey(jsonKey))
+                    {
+                        var jsonValue = CopyValue(jsonObject[jsonKey], info.PropertyType);
+                        info.SetValue(obj, jsonValue, null);
+                    }
+                }
+
+                foreach (var info in fields)
+                {
+                    var jsonKey = info.Name;
+
+                    if (jsonObject.ContainsKey(jsonKey))
+                    {
+                        var jsonValue = CopyValue(jsonObject[jsonKey], info.FieldType);
+                        info.SetValue(obj, jsonValue);
+                    }
+                }
+            }
+            else if (value is IList<object>)
+            {
+                var jsonObject = (IList<object>)value;
+                IList list = null;
+
+                if (type.IsArray)
+                {
+                    list = (IList)Activator.CreateInstance(type, jsonObject.Count);
+                    int i = 0;
+                    foreach (var o in jsonObject)
+                    {
+                        list[i++] = CopyValue(o, type);
+                    }
+                }
+                else if (typeof(IList).IsAssignableFrom(type))
+                {
+                    list = (IList)Activator.CreateInstance(type);
+                    foreach (var o in jsonObject)
+                    {
+                        list.Add(CopyValue(o, type));
+                    }
+                }
+                else if (IsTypeGenericeCollectionInterface(type))
+                {
+                    Type innerType = type.GetGenericArguments()[0];
+                    Type genericType = typeof(List<>).MakeGenericType(innerType);
+                    list = (IList)Activator.CreateInstance(genericType);
+                    foreach (var o in jsonObject)
+                    {
+                        list.Add(CopyValue(o, type));
+                    }
+                }
+
+                obj = list;
+            }
+
+            return obj;
+        }
+
+        private static bool IsTypeGenericeCollectionInterface(Type type)
+        {
+            if (!type.IsGenericType)
+                return false;
+
+            Type genericDefinition = type.GetGenericTypeDefinition();
+
+            return (genericDefinition == typeof(IList<>)
+                    || genericDefinition == typeof(ICollection<>)
+                    || genericDefinition == typeof(IEnumerable<>));
         }
 
         protected static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
@@ -1094,7 +1212,7 @@ namespace SimpleJson
             {
                 return SerializeGuid((Guid)value, builder);
             }
-            else if(value is Uri)
+            else if (value is Uri)
             {
                 return SerializeUri((Uri)value, builder);
             }
@@ -1115,7 +1233,7 @@ namespace SimpleJson
 
             var anonymous = type.FullName.Contains("__AnonymousType");
             IDictionary<string, object> obj = new JsonObject();
-            
+
 #if SIMPLE_JSON_DATACONTRACT
             bool hasDataContract = GetAttribute(type, typeof(System.Runtime.Serialization.DataContractAttribute)) != null;
             if (hasDataContract)
@@ -1177,7 +1295,7 @@ namespace SimpleJson
 #else
         private
 #endif
-        static Attribute GetAttribute(Type objectType, Type attributeType)
+ static Attribute GetAttribute(Type objectType, Type attributeType)
         {
             foreach (var attr in objectType.GetCustomAttributes(attributeType, true))
             {
@@ -1195,7 +1313,7 @@ namespace SimpleJson
 #else
         private
 #endif
-        static Attribute GetAttribute(System.Reflection.MemberInfo memberInfo, Type attributeType)
+ static Attribute GetAttribute(System.Reflection.MemberInfo memberInfo, Type attributeType)
         {
             foreach (var attr in memberInfo.GetCustomAttributes(attributeType, true))
             {
@@ -1237,7 +1355,7 @@ namespace SimpleJson
 #else
         private
 #endif
-        static void Add(System.Reflection.MemberInfo info, object value, IDictionary<string, object> jsonObject)
+ static void Add(System.Reflection.MemberInfo info, object value, IDictionary<string, object> jsonObject)
         {
             if (GetAttribute(info, typeof(System.Runtime.Serialization.IgnoreDataMemberAttribute)) != null)
             {

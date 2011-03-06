@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="JsonArrayTests.cs" />
     <Compile Include="JsonDecodeTests.cs" />
+    <Compile Include="JsonDecodeTypeTests.cs" />
     <Compile Include="JsonEncodeDataContractTests.cs" />
     <Compile Include="JsonEncodeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

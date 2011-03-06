@@ -163,11 +163,5 @@ namespace SimpleJsonTests
             var attr = SimpleJson.GetAttribute(propertyInfo, typeof(DataMemberAttribute));
             Assert.IsNull(attr);
         }
-
-        [TestMethod]
-        public void methodname()
-        {
-            var json = SimpleJson.JsonEncode(this.dataContractClass);
-        }
     }
 }
