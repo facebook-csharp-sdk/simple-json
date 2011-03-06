@@ -9,6 +9,8 @@
 // NOTE: uncomment the following line to enable dynamic support.
 //#define SIMPLE_JSON_DYNAMIC
 
+//#define SIMPLE_JSON_DATACONTRACT
+
 namespace SimpleJson
 {
     using System;
@@ -443,7 +445,7 @@ namespace SimpleJson
 #else
     public
 #endif
- class SimpleJson
+    class SimpleJson
     {
         private const int TOKEN_NONE = 0;
         private const int TOKEN_CURLY_OPEN = 1;
@@ -1093,6 +1095,7 @@ namespace SimpleJson
 
             // todo: implement caching for types
             var type = value.GetType();
+            System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
             if (type.FullName == null)
@@ -1101,17 +1104,44 @@ namespace SimpleJson
             }
 
             var anonymous = type.FullName.Contains("__AnonymousType");
-
             IDictionary<string, object> obj = new JsonObject();
-            foreach (var info in properties)
+            
+#if SIMPLE_JSON_DATACONTRACT
+            bool hasDataContract = GetAttribute(type, typeof(System.Runtime.Serialization.DataContractAttribute)) != null;
+            if (hasDataContract)
             {
-                if (!info.CanRead && !anonymous)
+                foreach (var info in properties)
                 {
-                    continue;
+                    if (!info.CanRead && !anonymous)
+                    {
+                        continue;
+                    }
+
+                    Add(info, info.GetValue(value, null), obj);
                 }
 
-                var v = info.GetValue(value, null);
-                obj.Add(info.Name, v);
+                foreach (var info in fields)
+                {
+                    Add(info, info.GetValue(value), obj);
+                }
+            }
+            else
+#endif
+            {
+                foreach (var info in properties)
+                {
+                    if (!info.CanRead && !anonymous)
+                    {
+                        continue;
+                    }
+
+                    obj.Add(info.Name, info.GetValue(value, null));
+                }
+
+                foreach (var info in fields)
+                {
+                    obj.Add(info.Name, info.GetValue(value));
+                }
             }
 
             return SerializeValue(obj, builder);
@@ -1129,6 +1159,98 @@ namespace SimpleJson
 
             return (o == null) ? false : Double.TryParse(o.ToString(), out result);
         }
+
+#if SIMPLE_JSON_DATACONTRACT
+
+#if SIMPLE_JSON_TESTS
+        internal
+#else
+        private
+#endif
+        static Attribute GetAttribute(Type objectType, Type attributeType)
+        {
+            foreach (var attr in objectType.GetCustomAttributes(attributeType, true))
+            {
+                if (AreSame(attr.GetType(), attributeType))
+                {
+                    return (Attribute)attr;
+                }
+            }
+
+            return null;
+        }
+
+#if SIMPLE_JSON_TESTS
+        internal
+#else
+        private
+#endif
+        static Attribute GetAttribute(System.Reflection.MemberInfo memberInfo, Type attributeType)
+        {
+            foreach (var attr in memberInfo.GetCustomAttributes(attributeType, true))
+            {
+                if (AreSame(attr.GetType(), attributeType))
+                {
+                    return (Attribute)attr;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool AreSame(Type a, Type b)
+        {
+            // http://stackoverflow.com/questions/708205/c-object-type-comparison
+            if (a == b)
+            {
+                // either both are null or they are the same type
+                return true;
+            }
+
+            if (a == null || b == null)
+            {
+                return false;
+            }
+
+            if (a.IsSubclassOf(b) || b.IsSubclassOf(a))
+            {
+                // one inherits from the other
+                return true;
+            }
+
+            // they have same immediate parent
+            return a.BaseType == b.BaseType;
+        }
+
+#if SIMPLE_JSON_TESTS
+        internal
+#else
+        private
+#endif
+        static void Add(System.Reflection.MemberInfo info, object value, IDictionary<string, object> jsonObject)
+        {
+            if (GetAttribute(info, typeof(System.Runtime.Serialization.IgnoreDataMemberAttribute)) != null)
+            {
+                return;
+            }
+
+            string jsonKey;
+
+            System.Runtime.Serialization.DataMemberAttribute dataMemberAttribute = (System.Runtime.Serialization.DataMemberAttribute)GetAttribute(info, typeof(System.Runtime.Serialization.DataMemberAttribute));
+
+            if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
+            {
+                jsonKey = dataMemberAttribute.Name;
+            }
+            else
+            {
+                jsonKey = info.Name;
+            }
+
+            jsonObject.Add(jsonKey, value);
+        }
+
+#endif
     }
 
     #endregion

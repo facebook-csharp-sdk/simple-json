@@ -29,7 +29,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\SL4\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;SIMPLE_JSON_DYNAMIC</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_DATACONTRACT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -39,7 +39,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\SL4\Release\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT;SIMPLE_JSON_DYNAMIC</DefineConstants>
+    <DefineConstants>TRACE;SILVERLIGHT;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_DATACONTRACT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -48,6 +48,7 @@
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="system" />
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

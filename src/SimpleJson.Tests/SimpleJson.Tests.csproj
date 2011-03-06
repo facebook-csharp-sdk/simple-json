@@ -43,23 +43,25 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JsonArrayTests.cs" />
     <Compile Include="JsonDecodeTests.cs" />
+    <Compile Include="JsonEncodeDataContractTests.cs" />
     <Compile Include="JsonEncodeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleJsonTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleJson\SimpleJson-Net40.csproj">
       <Project>{4EE1BC6A-D96B-4BD6-A6F3-2E2135AA9B99}</Project>
       <Name>SimpleJson-Net40</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -29,7 +29,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\SL3\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;SIMPLE_JSON_DATACONTRACT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -39,7 +39,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\SL3\Release\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;SILVERLIGHT;SIMPLE_JSON_DATACONTRACT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -47,12 +47,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <Reference Include="System.Windows" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
