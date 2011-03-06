@@ -52,7 +52,7 @@ namespace SimpleJsonTests
 
             [IgnoreDataMember]
             private readonly string PrivateReadOnlyFieldIgnore = "private readonly ignore";
-            
+
             [DataMember]
             public string PropertyGetSetDataMemberWithoutName { get; set; }
 
@@ -162,6 +162,13 @@ namespace SimpleJsonTests
 
             var attr = SimpleJson.GetAttribute(propertyInfo, typeof(DataMemberAttribute));
             Assert.IsNull(attr);
+        }
+
+        [TestMethod]
+        public void DataContractTests()
+        {
+            var result = SimpleJson.JsonEncode(this.dataContractClass);
+
         }
     }
 }

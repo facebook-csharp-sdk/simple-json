@@ -1223,8 +1223,8 @@ namespace SimpleJson
 
             // todo: implement caching for types
             var type = value.GetType();
-            System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             if (type.FullName == null)
             {
@@ -1362,18 +1362,14 @@ namespace SimpleJson
                 return;
             }
 
-            string jsonKey;
-
             System.Runtime.Serialization.DataMemberAttribute dataMemberAttribute = (System.Runtime.Serialization.DataMemberAttribute)GetAttribute(info, typeof(System.Runtime.Serialization.DataMemberAttribute));
 
-            if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
+            if (dataMemberAttribute == null)
             {
-                jsonKey = dataMemberAttribute.Name;
+                return;
             }
-            else
-            {
-                jsonKey = info.Name;
-            }
+
+            string jsonKey = !string.IsNullOrEmpty(dataMemberAttribute.Name) ? dataMemberAttribute.Name : info.Name;
 
             jsonObject.Add(jsonKey, value);
         }
