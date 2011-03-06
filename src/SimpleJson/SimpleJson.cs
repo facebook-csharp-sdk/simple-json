@@ -1072,6 +1072,12 @@ namespace SimpleJson
             return true;
         }
 
+        protected static bool SerializeUri(Uri uri, StringBuilder builder)
+        {
+            builder.AppendFormat("\"{0}\"", uri);
+            return true;
+        }
+
         private static bool SerializeEnum(Enum p, StringBuilder builder)
         {
             builder.AppendFormat(p.ToString("D"));
@@ -1087,6 +1093,10 @@ namespace SimpleJson
             else if (value is Guid)
             {
                 return SerializeGuid((Guid)value, builder);
+            }
+            else if(value is Uri)
+            {
+                return SerializeUri((Uri)value, builder);
             }
             else if (value is Enum)
             {
