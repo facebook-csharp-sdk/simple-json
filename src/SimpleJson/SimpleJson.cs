@@ -1223,9 +1223,7 @@ namespace SimpleJson
 
             // todo: implement caching for types
             var type = value.GetType();
-            System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
+            
             if (type.FullName == null)
             {
                 return false;
@@ -1238,6 +1236,9 @@ namespace SimpleJson
             bool hasDataContract = GetAttribute(type, typeof(System.Runtime.Serialization.DataContractAttribute)) != null;
             if (hasDataContract)
             {
+                System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
                 foreach (var info in properties)
                 {
                     if (!info.CanRead && !anonymous)
@@ -1256,6 +1257,9 @@ namespace SimpleJson
             else
 #endif
             {
+                System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
                 foreach (var info in properties)
                 {
                     if (!info.CanRead && !anonymous)
