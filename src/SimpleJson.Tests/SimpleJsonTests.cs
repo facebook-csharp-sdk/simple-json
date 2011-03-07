@@ -26,7 +26,7 @@ namespace SimpleJsonTests
         {
             const string json = @"{ ""name"" : ""spot"" }";
 
-            var result = (IDictionary<string, object>)SimpleJson.JsonDecode(json);
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
             Assert.AreEqual("spot", result["name"]);
             Assert.IsInstanceOf<string>(result["name"]);
@@ -37,7 +37,7 @@ namespace SimpleJsonTests
         {
             const string json = "{ \"literal\": \"\\u03a0\", \"symbol\": \"\x3a0\" }";
 
-            var result = (IDictionary<string, object>)SimpleJson.JsonDecode(json);
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(result["literal"], result["symbol"]);
@@ -48,7 +48,7 @@ namespace SimpleJsonTests
         {
             const string json = "[\t\r\b\f\n{\"color\": \"red\",\"value\": \"#f00\"}]";
 
-            var result = (IList<object>)SimpleJson.JsonDecode(json);
+            var result = (IList<object>)SimpleJson.DeserializeObject(json);
 
             Assert.IsNotNull(result);
         }
@@ -58,7 +58,7 @@ namespace SimpleJsonTests
         {
             const string json = @"[{""color"": ""red"",""value"": ""#f00""}]";
 
-            var result = (IList<object>)SimpleJson.JsonDecode(json);
+            var result = (IList<object>)SimpleJson.DeserializeObject(json);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
@@ -74,7 +74,7 @@ namespace SimpleJsonTests
         {
             const string json = @"{ ""yay"" : true, ""nay"": false, ""nada"": null }";
 
-            var result = (IDictionary<string, object>)SimpleJson.JsonDecode(json);
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(true, result["yay"]);
@@ -87,7 +87,7 @@ namespace SimpleJsonTests
         {
             const string json = @"{""quantity"":8902,""cost"":45.33,""value"":-1.063E-02}";
 
-            var result = (IDictionary<string, object>)SimpleJson.JsonDecode(json);
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
             Assert.IsNotNull(result);
 
@@ -107,7 +107,7 @@ namespace SimpleJsonTests
             const string expected = @"{""Name"":""spot""}";
             var dog = new Dog { Name = "spot" };
 
-            var json = SimpleJson.JsonEncode(dog);
+            var json = SimpleJson.SerializeObject(dog);
 
             Assert.AreEqual(expected, json);
         }
@@ -118,7 +118,7 @@ namespace SimpleJsonTests
             const string expected = @"{""name"":""spot""}";
             var instance = new { name = "spot" };
 
-            var json = SimpleJson.JsonEncode(instance);
+            var json = SimpleJson.SerializeObject(instance);
 
             Assert.AreEqual(expected, json);
         }
@@ -135,7 +135,7 @@ namespace SimpleJsonTests
                 value = -1.063E-02
             };
 
-            var json = SimpleJson.JsonEncode(instance);
+            var json = SimpleJson.SerializeObject(instance);
             Assert.AreEqual(expected, json);
         }
 
@@ -148,7 +148,7 @@ namespace SimpleJsonTests
                 array = new { quantity = 8902, cost = 45.33, value = -1.063E-02 }
             };
 
-            var json = SimpleJson.JsonEncode(instance);
+            var json = SimpleJson.SerializeObject(instance);
             Assert.AreEqual(expected, json);
         }
 
@@ -160,7 +160,7 @@ namespace SimpleJsonTests
                 now = DateTime.UtcNow
             };
 
-            var json = SimpleJson.JsonEncode(instance);
+            var json = SimpleJson.SerializeObject(instance);
             Assert.IsNotNull(json);
         }
 
@@ -169,11 +169,11 @@ namespace SimpleJsonTests
         {
             var dog = new { Name = "Ăbbey" };
 
-            var serialized = SimpleJson.JsonEncode(dog);
+            var serialized = SimpleJson.SerializeObject(dog);
 
             Console.WriteLine(serialized);
 
-            var deserialized = (IDictionary<string, object>)SimpleJson.JsonDecode(serialized);
+            var deserialized = (IDictionary<string, object>)SimpleJson.DeserializeObject(serialized);
 
             Assert.AreEqual(dog.Name, deserialized["Name"]);
         }
@@ -184,7 +184,7 @@ namespace SimpleJsonTests
             const string expected = "[1,2,3]";
 
             var data = new[] { 1, 2, 3 };
-            var serialized = SimpleJson.JsonEncode(data);
+            var serialized = SimpleJson.SerializeObject(data);
 
             Assert.AreEqual(expected, serialized);
         }
@@ -195,7 +195,7 @@ namespace SimpleJsonTests
             const string expected = "[]";
 
             var data = new int[0];
-            var serialized = SimpleJson.JsonEncode(data);
+            var serialized = SimpleJson.SerializeObject(data);
 
             Assert.AreEqual(expected, serialized);
         }
@@ -206,7 +206,7 @@ namespace SimpleJsonTests
             const string expected = "null";
 
             int[] data = null;
-            var serialized = SimpleJson.JsonEncode(data);
+            var serialized = SimpleJson.SerializeObject(data);
 
             Assert.AreEqual(expected, serialized);
         }
@@ -217,7 +217,7 @@ namespace SimpleJsonTests
             const string expected = "[\"a\",\"b\",\"c\"]";
 
             var data = new List<string> { "a", "b", "c" };
-            var serialized = SimpleJson.JsonEncode(data);
+            var serialized = SimpleJson.SerializeObject(data);
 
             Assert.AreEqual(expected, serialized);
         }
@@ -227,13 +227,13 @@ namespace SimpleJsonTests
         {
             const string expected = @"What is the phone #/digits?";
 
-            var serialized = SimpleJson.JsonEncode(
+            var serialized = SimpleJson.SerializeObject(
                 new
                     {
                         Value = @"What is the phone #\/digits?"
                     });
 
-            var actual = (IDictionary<string, object>)SimpleJson.JsonDecode(serialized);
+            var actual = (IDictionary<string, object>)SimpleJson.DeserializeObject(serialized);
 
             Assert.AreEqual(expected, actual["Value"]);
         }

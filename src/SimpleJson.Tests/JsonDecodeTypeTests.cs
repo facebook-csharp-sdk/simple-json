@@ -43,14 +43,14 @@ namespace SimpleJsonTests
         [TestMethod]
         public void NullStringTests()
         {
-            var result = SimpleJson.JsonDecode(null, typeof(Person));
+            var result = SimpleJson.DeserializeObject(null, typeof(Person));
             Assert.IsNull(result);
         }
 
         [TestMethod]
         public void NullStringGenericTests()
         {
-            var result = SimpleJson.JsonDecode<Person>(null);
+            var result = SimpleJson.DeserializeObject<Person>(null);
             Assert.IsNull(result);
         }
 
@@ -58,7 +58,7 @@ namespace SimpleJsonTests
         public void BooleanTrueTests()
         {
             var json = "true";
-            var result = SimpleJson.JsonDecode<bool>(json);
+            var result = SimpleJson.DeserializeObject<bool>(json);
 
             Assert.IsTrue(result);
         }
@@ -67,7 +67,7 @@ namespace SimpleJsonTests
         public void BooleanFalseTests()
         {
             var json = "false";
-            var result = SimpleJson.JsonDecode<bool>(json);
+            var result = SimpleJson.DeserializeObject<bool>(json);
 
             Assert.IsFalse(result);
         }
@@ -76,7 +76,7 @@ namespace SimpleJsonTests
         public void NullTests()
         {
             var json = "null";
-            var result = SimpleJson.JsonDecode<object>(json);
+            var result = SimpleJson.DeserializeObject<object>(json);
 
             Assert.IsNull(result);
         }
@@ -85,7 +85,7 @@ namespace SimpleJsonTests
         public void StringTests()
         {
             var json = "\"hello world\"";
-            var result = SimpleJson.JsonDecode<string>(json);
+            var result = SimpleJson.DeserializeObject<string>(json);
 
             Assert.AreEqual("hello world", result);
         }
@@ -103,8 +103,8 @@ namespace SimpleJsonTests
                 Nothing = new[] { "nothing" }
             };
 
-            var json = SimpleJson.JsonEncode(obj);
-            var result = SimpleJson.JsonDecode<Person>(json);
+            var json = SimpleJson.SerializeObject(obj);
+            var result = SimpleJson.DeserializeObject<Person>(json);
         }
     }
 }

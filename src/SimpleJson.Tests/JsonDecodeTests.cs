@@ -31,7 +31,7 @@ namespace SimpleJsonTests
     ""500 gigabyte hard drive""
   ]
 }";
-            object obj = SimpleJson.JsonDecode(input);
+            object obj = SimpleJson.DeserializeObject(input);
 
             Assert.IsInstanceOf<IDictionary<string, object>>(obj);
             Assert.IsInstanceOf<JsonObject>(obj);
@@ -62,13 +62,13 @@ namespace SimpleJsonTests
         [ExpectedException(typeof(SerializationException), ExpectedMessage = "Invalid JSON string")]
         public void UnexpectedEndOfString()
         {
-            var result = SimpleJson.JsonDecode("hi");
+            var result = SimpleJson.DeserializeObject("hi");
         }
 
         [TestMethod]
         public void ReadNullTerminiatorString()
         {
-            var result = SimpleJson.JsonDecode("\"h\0i\"");
+            var result = SimpleJson.DeserializeObject("\"h\0i\"");
 
             Assert.AreEqual("h\0i", result);
         }
@@ -77,27 +77,27 @@ namespace SimpleJsonTests
         [ExpectedException(typeof(SerializationException), ExpectedMessage = "Invalid JSON string")]
         public void UnexpectedEndOfHex()
         {
-            var result = SimpleJson.JsonDecode(@"'h\u006");
+            var result = SimpleJson.DeserializeObject(@"'h\u006");
         }
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException), ExpectedMessage = "Invalid JSON string")]
         public void UnexpectedEndOfControlCharacter()
         {
-            var result = SimpleJson.JsonDecode(@"'h\");
+            var result = SimpleJson.DeserializeObject(@"'h\");
         }
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException), ExpectedMessage = "Invalid JSON string")]
         public void UnexpectedEndWhenParsingUnquotedProperty()
         {
-            var result = SimpleJson.JsonDecode(@"{aww");
+            var result = SimpleJson.DeserializeObject(@"{aww");
         }
 
         [TestMethod]
         public void ParsingQuotedPropertyWithControlCharacters()
         {
-            var result = SimpleJson.JsonDecode("{\"hi\r\nbye\":1}");
+            var result = SimpleJson.DeserializeObject("{\"hi\r\nbye\":1}");
 
             Assert.IsInstanceOf<IDictionary<string, object>>(result);
             Assert.IsInstanceOf<JsonObject>(result);
@@ -122,7 +122,7 @@ bye", pair.Key);
   ]
 }" + '\n';
 
-            object o = SimpleJson.JsonDecode(input);
+            object o = SimpleJson.DeserializeObject(input);
             Assert.IsNotNull(o);
 
             Assert.IsInstanceOf<IDictionary<string, object>>(o);
@@ -139,7 +139,7 @@ bye", pair.Key);
   Infinity,
   -Infinity
 ]";
-            var o = SimpleJson.JsonDecode(input);
+            var o = SimpleJson.DeserializeObject(input);
         }
 
         [TestMethod]
@@ -148,7 +148,7 @@ bye", pair.Key);
             int length = 20000;
             string json = @"[""" + new string(' ', length) + @"""]";
 
-            var o = SimpleJson.JsonDecode(json);
+            var o = SimpleJson.DeserializeObject(json);
 
             var a = (IList<object>)o;
 
@@ -161,7 +161,7 @@ bye", pair.Key);
         {
             string json = @"[""\u003c"",""\u5f20""]";
 
-            var o = SimpleJson.JsonDecode(json);
+            var o = SimpleJson.DeserializeObject(json);
 
             Assert.IsInstanceOf<List<object>>(o);
 
@@ -182,7 +182,7 @@ bye", pair.Key);
     ""C"" : ""bye""
 }";
 
-            var o = SimpleJson.JsonDecode(json);
+            var o = SimpleJson.DeserializeObject(json);
         }
 
         [TestMethod]
@@ -190,7 +190,7 @@ bye", pair.Key);
         {
             var json = @"[0372, 0xFA, 0XFA]";
 
-            var o = SimpleJson.JsonDecode(json);
+            var o = SimpleJson.DeserializeObject(json);
         }
 
         [TestMethod]
@@ -198,7 +198,7 @@ bye", pair.Key);
         {
             string json = @"{""Message"":""Hi,I\u0092ve send you smth""}";
 
-            var o = SimpleJson.JsonDecode(json);
+            var o = SimpleJson.DeserializeObject(json);
 
             Assert.IsInstanceOf<IDictionary<string, object>>(o);
             Assert.IsInstanceOf<JsonObject>(o);
@@ -213,14 +213,14 @@ bye", pair.Key);
         {
             string json = @"{""text"":0xabcdef12345}";
 
-            var o = SimpleJson.JsonDecode(json);
+            var o = SimpleJson.DeserializeObject(json);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException), ExpectedMessage = "Invalid JSON string")]
         public void ParseIncompleteArray()
         {
-            var o = SimpleJson.JsonDecode("[1");
+            var o = SimpleJson.DeserializeObject("[1");
         }
     }
 }

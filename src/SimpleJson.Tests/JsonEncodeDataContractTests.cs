@@ -31,7 +31,7 @@ namespace SimpleJsonTests
                 PrivatePropertyGetSetIgnore = "ignore";
             }
 
-            public readonly string ReadOnlyFieldWihtoutDataMember = "public readonly without datamember";
+            public readonly string ReadOnlyFieldWithoutDataMember = "public readonly without datamember";
 
             [DataMember]
             public readonly string ReadOnlyFieldDataMemberWithoutName = "public readonly data member without name";
@@ -47,7 +47,7 @@ namespace SimpleJsonTests
             [DataMember]
             private readonly string PrivateReadOnlyFieldDataMemberWithoutName = "private readonly data member without name";
 
-            [DataMember(Name = "private field_name")]
+            [DataMember(Name = "private_field_name")]
             private readonly string PrivateReadOnlyFieldDataMemberWithName = "private readonly data member with name";
 
             [IgnoreDataMember]
@@ -165,10 +165,83 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
-        public void DataContractTests()
+        public void PublicReadOnlyFieldWithoutDataMemberShouldNotBePresent()
         {
-            var result = SimpleJson.JsonEncode(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
 
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsFalse(result.ContainsKey("ReadOnlyFieldWithoutDataMember"));
+        }
+
+        [TestMethod]
+        public void ReadOnlyFieldDataMemberWithoutNameShouldBePresent()
+        {
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
+
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsTrue(result.ContainsKey("ReadOnlyFieldDataMemberWithoutName"));
+        }
+
+        [TestMethod]
+        public void ReadOnlyFieldDataMemberWithNameShouldBePresent()
+        {
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
+
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsTrue(result.ContainsKey("field_name"));
+        }
+
+        [TestMethod]
+        public void ReadOnlyFieldIgnoreShouldNotBePresent()
+        {
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
+
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsFalse(result.ContainsKey("ReadOnlyFieldIgnore"));
+        }
+
+        [TestMethod]
+        public void PrivateReadOnlyFieldWihtoutDataMemberShouldNotBePresent()
+        {
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
+
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsFalse(result.ContainsKey("PrivateReadOnlyFieldWihtoutDataMember"));
+        }
+            
+        [TestMethod]
+        public void PrivateReadOnlyFieldDataMemberWithoutNameShouldBePresent()
+        {
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
+
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsTrue(result.ContainsKey("PrivateReadOnlyFieldDataMemberWithoutName"));
+        }
+
+        [TestMethod]
+        public void PrivateReadOnlyFieldDataMemberWithNameShouldBePresent()
+        {
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
+
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsTrue(result.ContainsKey("private_field_name"));
+        }
+
+        [TestMethod]
+        public void PrivateReadOnlyFieldIgnoreShouldNotBePresent()
+        {
+            var json = SimpleJson.SerializeObject(this.dataContractClass);
+
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.IsFalse(result.ContainsKey("PrivateReadOnlyFieldIgnore"));
         }
     }
 }

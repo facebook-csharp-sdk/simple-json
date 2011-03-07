@@ -47,7 +47,7 @@ namespace SimpleJson
 
         public override string ToString()
         {
-            return SimpleJson.JsonEncode(this) ?? string.Empty;
+            return SimpleJson.SerializeObject(this) ?? string.Empty;
         }
     }
 
@@ -281,7 +281,7 @@ namespace SimpleJson
         /// </returns>
         public override string ToString()
         {
-            return SimpleJson.JsonEncode(this);
+            return SimpleJson.SerializeObject(this);
         }
 
 #if SIMPLE_JSON_DYNAMIC
@@ -467,10 +467,10 @@ namespace SimpleJson
         /// </summary>
         /// <param name="json">A JSON string.</param>
         /// <returns>An IList&lt;object>, a IDictionary&lt;string,object>, a double, a string, null, true, or false</returns>
-        public static object JsonDecode(string json)
+        public static object DeserializeObject(string json)
         {
             object @object;
-            if (TryJsonDecode(json, out @object))
+            if (TryDeserializeObject(json, out @object))
             {
                 return @object;
             }
@@ -492,7 +492,7 @@ namespace SimpleJson
         /// <returns>
         /// Returns true if successfull otherwise false.
         /// </returns>
-        public static bool TryJsonDecode(string json, out object @object)
+        public static bool TryDeserializeObject(string json, out object @object)
         {
             bool success = true;
             if (json != null)
@@ -509,9 +509,9 @@ namespace SimpleJson
             return success;
         }
 
-        public static object JsonDecode(string json, Type type)
+        public static object DeserializeObject(string json, Type type)
         {
-            var jsonObject = JsonDecode(json);
+            var jsonObject = DeserializeObject(json);
 
             if (type == null)
             {
@@ -523,9 +523,9 @@ namespace SimpleJson
             }
         }
 
-        public static T JsonDecode<T>(string json)
+        public static T DeserializeObject<T>(string json)
         {
-            return (T)JsonDecode(json, typeof(T));
+            return (T)DeserializeObject(json, typeof(T));
         }
 
         /// <summary>
@@ -533,7 +533,7 @@ namespace SimpleJson
         /// </summary>
         /// <param name="json">A IDictionary&lt;string,object> / IList&lt;object></param>
         /// <returns>A JSON encoded string, or null if object 'json' is not serializable</returns>
-        public static string JsonEncode(object json)
+        public static string SerializeObject(object json)
         {
             StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
             bool success = SerializeValue(json, builder);
