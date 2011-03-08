@@ -29,7 +29,7 @@ namespace JsonViewer
         {
             object obj;
             tvJson.Nodes.Clear();
-            if (SimpleJson.SimpleJson.TryJsonDecode(txtJson.Text, out obj))
+            if (SimpleJson.SimpleJson.TryDeserializeObject(txtJson.Text, out obj))
             {
                 var rootNode = new TreeNode("JSON");
                 tvJson.Nodes.Add(rootNode);

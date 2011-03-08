@@ -114,7 +114,7 @@ namespace SimpleJsonTests
                                              PropertyGetSetIgnore = "ignored"
                                          };
         }
-
+        /*
         [TestMethod]
         public void ContainsDataContractAttribute()
         {
@@ -163,7 +163,7 @@ namespace SimpleJsonTests
             var attr = SimpleJson.GetAttribute(propertyInfo, typeof(DataMemberAttribute));
             Assert.IsNull(attr);
         }
-
+        */
         [TestMethod]
         public void PublicReadOnlyFieldWithoutDataMemberShouldNotBePresent()
         {

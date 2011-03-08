@@ -20,6 +20,8 @@ namespace SimpleJson
     using System.Dynamic;
 #endif
     using System.Globalization;
+    using System.Reflection;
+    using System.Runtime.Serialization;
     using System.Text;
 
     #region JsonArray
@@ -509,7 +511,7 @@ namespace SimpleJson
             return success;
         }
 
-        public static object DeserializeObject(string json, Type type)
+        public static object DeserializeObject(string json, Type type, IJsonSerializerStrategy jsonSerializerStrategy)
         {
             var jsonObject = DeserializeObject(json);
 
@@ -519,13 +521,23 @@ namespace SimpleJson
             }
             else
             {
-                return CopyValue(jsonObject, type);
+                return (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(jsonObject, type);
             }
+        }
+
+        public static object DeserializeObject(string json, Type type)
+        {
+            return DeserializeObject(json, type, null);
+        }
+
+        public static T DeserializeObject<T>(string json, IJsonSerializerStrategy jsonSerializerStrategy)
+        {
+            return (T)DeserializeObject(json, typeof(T), jsonSerializerStrategy);
         }
 
         public static T DeserializeObject<T>(string json)
         {
-            return (T)DeserializeObject(json, typeof(T));
+            return (T)DeserializeObject(json, typeof(T), null);
         }
 
         /// <summary>
@@ -533,110 +545,16 @@ namespace SimpleJson
         /// </summary>
         /// <param name="json">A IDictionary&lt;string,object> / IList&lt;object></param>
         /// <returns>A JSON encoded string, or null if object 'json' is not serializable</returns>
-        public static string SerializeObject(object json)
+        public static string SerializeObject(object json, IJsonSerializerStrategy jsonSerializerStrategy)
         {
             StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
-            bool success = SerializeValue(json, builder);
+            bool success = SerializeValue(jsonSerializerStrategy, json, builder);
             return (success ? builder.ToString() : null);
         }
 
-        private static object CopyValue(object value, Type type)
+        public static string SerializeObject(object json)
         {
-            if (value is string || value is bool || value is double)
-            {
-                return value;
-            }
-            else if (value == null)
-            {
-                return null;
-            }
-
-            object obj = null;
-
-            if (value is IDictionary<string, object>)
-            {
-                var jsonObject = (IDictionary<string, object>)value;
-                obj = Activator.CreateInstance(type);
-
-                System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-                foreach (var info in properties)
-                {
-                    if (!info.CanWrite)
-                    {
-                        continue;
-                    }
-
-                    var jsonKey = info.Name;
-
-                    if (jsonObject.ContainsKey(jsonKey))
-                    {
-                        var jsonValue = CopyValue(jsonObject[jsonKey], info.PropertyType);
-                        info.SetValue(obj, jsonValue, null);
-                    }
-                }
-
-                foreach (var info in fields)
-                {
-                    var jsonKey = info.Name;
-
-                    if (jsonObject.ContainsKey(jsonKey))
-                    {
-                        var jsonValue = CopyValue(jsonObject[jsonKey], info.FieldType);
-                        info.SetValue(obj, jsonValue);
-                    }
-                }
-            }
-            else if (value is IList<object>)
-            {
-                var jsonObject = (IList<object>)value;
-                IList list = null;
-
-                if (type.IsArray)
-                {
-                    list = (IList)Activator.CreateInstance(type, jsonObject.Count);
-                    int i = 0;
-                    foreach (var o in jsonObject)
-                    {
-                        list[i++] = CopyValue(o, type);
-                    }
-                }
-                else if (typeof(IList).IsAssignableFrom(type))
-                {
-                    list = (IList)Activator.CreateInstance(type);
-                    foreach (var o in jsonObject)
-                    {
-                        list.Add(CopyValue(o, type));
-                    }
-                }
-                else if (IsTypeGenericeCollectionInterface(type))
-                {
-                    Type innerType = type.GetGenericArguments()[0];
-                    Type genericType = typeof(List<>).MakeGenericType(innerType);
-                    list = (IList)Activator.CreateInstance(genericType);
-                    foreach (var o in jsonObject)
-                    {
-                        list.Add(CopyValue(o, type));
-                    }
-                }
-
-                obj = list;
-            }
-
-            return obj;
-        }
-
-        private static bool IsTypeGenericeCollectionInterface(Type type)
-        {
-            if (!type.IsGenericType)
-                return false;
-
-            Type genericDefinition = type.GetGenericTypeDefinition();
-
-            return (genericDefinition == typeof(IList<>)
-                    || genericDefinition == typeof(ICollection<>)
-                    || genericDefinition == typeof(IEnumerable<>));
+            return SerializeObject(json, SimpleJson.CurrentJsonSerializerStrategy);
         }
 
         protected static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
@@ -1023,7 +941,7 @@ namespace SimpleJson
             return TOKEN_NONE;
         }
 
-        protected static bool SerializeValue(object value, StringBuilder builder)
+        protected static bool SerializeValue(IJsonSerializerStrategy jsonSerializerStrategy, object value, StringBuilder builder)
         {
             bool success = true;
 
@@ -1033,11 +951,11 @@ namespace SimpleJson
             }
             else if (value is IDictionary<string, object>)
             {
-                success = SerializeObject((IDictionary<string, object>)value, builder);
+                success = SerializeObject(jsonSerializerStrategy, (IDictionary<string, object>)value, builder);
             }
             else if (value is IEnumerable)
             {
-                success = SerializeArray((IEnumerable)value, builder);
+                success = SerializeArray(jsonSerializerStrategy, (IEnumerable)value, builder);
             }
             else if (IsNumeric(value))
             {
@@ -1057,13 +975,18 @@ namespace SimpleJson
             }
             else
             {
-                success = SerializeNonPrimitiveType(value, builder);
+                object serializedObject;
+                success = jsonSerializerStrategy.SerializeNonPrimitiveObject(value, out serializedObject);
+                if (success)
+                {
+                    SerializeValue(jsonSerializerStrategy, serializedObject, builder);
+                }
             }
 
             return success;
         }
 
-        protected static bool SerializeObject(IDictionary<string, object> anObject, StringBuilder builder)
+        protected static bool SerializeObject(IJsonSerializerStrategy jsonSerializerStrategy, IDictionary<string, object> anObject, StringBuilder builder)
         {
             builder.Append("{");
 
@@ -1081,7 +1004,7 @@ namespace SimpleJson
 
                 SerializeString(key, builder);
                 builder.Append(":");
-                if (!SerializeValue(value, builder))
+                if (!SerializeValue(jsonSerializerStrategy, value, builder))
                 {
                     return false;
                 }
@@ -1093,7 +1016,7 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeArray(IEnumerable anArray, StringBuilder builder)
+        protected static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
         {
             builder.Append("[");
 
@@ -1106,7 +1029,7 @@ namespace SimpleJson
                     builder.Append(",");
                 }
 
-                if (!SerializeValue(value, builder))
+                if (!SerializeValue(jsonSerializerStrategy, value, builder))
                 {
                     return false;
                 }
@@ -1178,107 +1101,6 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeGuid(Guid guid, StringBuilder builder)
-        {
-            builder.AppendFormat("\"{0}\"", guid.ToString("D", CultureInfo.InvariantCulture));
-            return true;
-        }
-
-        protected static bool SerializeDateTime(DateTime dateTime, StringBuilder builder)
-        {
-            builder.AppendFormat("\"{0}\"", dateTime.ToString("o"));
-            return true;
-        }
-
-        protected static bool SerializeUri(Uri uri, StringBuilder builder)
-        {
-            builder.AppendFormat("\"{0}\"", uri);
-            return true;
-        }
-
-        private static bool SerializeEnum(Enum p, StringBuilder builder)
-        {
-            builder.AppendFormat(p.ToString("D"));
-            return true;
-        }
-
-        protected static bool SerializeNonPrimitiveType(object value, StringBuilder builder)
-        {
-            if (value is DateTime)
-            {
-                return SerializeDateTime((DateTime)value, builder);
-            }
-            else if (value is Guid)
-            {
-                return SerializeGuid((Guid)value, builder);
-            }
-            else if (value is Uri)
-            {
-                return SerializeUri((Uri)value, builder);
-            }
-            else if (value is Enum)
-            {
-                return SerializeEnum((Enum)value, builder);
-            }
-
-            // todo: implement caching for types
-            var type = value.GetType();
-            
-            if (type.FullName == null)
-            {
-                return false;
-            }
-
-            var anonymous = type.FullName.Contains("__AnonymousType");
-            IDictionary<string, object> obj = new JsonObject();
-
-#if SIMPLE_JSON_DATACONTRACT
-            bool hasDataContract = GetAttribute(type, typeof(System.Runtime.Serialization.DataContractAttribute)) != null;
-            if (hasDataContract)
-            {
-                System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-                foreach (var info in properties)
-                {
-                    if (!info.CanRead && !anonymous)
-                    {
-                        continue;
-                    }
-
-                    Add(info, info.GetValue(value, null), obj);
-                }
-
-                foreach (var info in fields)
-                {
-                    Add(info, info.GetValue(value), obj);
-                }
-            }
-            else
-#endif
-            {
-                System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-                foreach (var info in properties)
-                {
-                    if (!info.CanRead && !anonymous)
-                    {
-                        continue;
-                    }
-
-                    obj.Add(info.Name, info.GetValue(value, null));
-                }
-
-                foreach (var info in fields)
-                {
-                    obj.Add(info.Name, info.GetValue(value));
-                }
-            }
-
-            return SerializeValue(obj, builder);
-        }
-
         /// <summary>
         /// Determines if a given object is numeric in any way
         /// (can be integer, double, null, etc). 
@@ -1292,14 +1114,318 @@ namespace SimpleJson
             return (o == null) ? false : Double.TryParse(o.ToString(), out result);
         }
 
+        private static IJsonSerializerStrategy currentJsonSerializerStrategy;
+        public static IJsonSerializerStrategy CurrentJsonSerializerStrategy
+        {
+            get
+            {
+                // todo: implement locking mechanism.
+                return currentJsonSerializerStrategy ??
+                    (currentJsonSerializerStrategy =
+#if SIMPLE_JSON_DATACONTRACT
+ DataContractJsonSerializerStrategy
+#else
+                        PocoJsonSerializerStrategy
+#endif
+);
+            }
+
+            set
+            {
+                currentJsonSerializerStrategy = value;
+            }
+        }
+
+        private static PocoJsonSerializerStrategy pocoJsonSerializerStrategy;
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static PocoJsonSerializerStrategy PocoJsonSerializerStrategy
+        {
+            get
+            {
+                // todo: implement locking mechanism.
+                return pocoJsonSerializerStrategy ?? (pocoJsonSerializerStrategy = new PocoJsonSerializerStrategy());
+            }
+        }
+
 #if SIMPLE_JSON_DATACONTRACT
 
-#if SIMPLE_JSON_TESTS
-        internal
-#else
-        private
+        private static DataContractJsonSerializerStrategy dataContractJsonSerializerStrategy;
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static DataContractJsonSerializerStrategy DataContractJsonSerializerStrategy
+        {
+            get
+            {
+                // todo: implement locking mechanism.
+                return dataContractJsonSerializerStrategy ?? (dataContractJsonSerializerStrategy = new DataContractJsonSerializerStrategy());
+            }
+        }
+
 #endif
- static Attribute GetAttribute(Type objectType, Type attributeType)
+    }
+
+    #endregion
+
+    #region Simple Json Serializer Strategies
+
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ interface IJsonSerializerStrategy
+    {
+        bool SerializeNonPrimitiveObject(object input, out object output);
+
+        object DeserializeObject(object value, Type type);
+    }
+
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ class PocoJsonSerializerStrategy : IJsonSerializerStrategy
+    {
+        public virtual bool SerializeNonPrimitiveObject(object input, out object output)
+        {
+            return TrySerializeKnownTypes(input, out output) || TrySerializeUnknownTypes(input, out output);
+        }
+
+        public virtual object DeserializeObject(object value, Type type)
+        {
+            if (value is string || value is bool || value is double)
+            {
+                return value;
+            }
+            else if (value == null)
+            {
+                return null;
+            }
+
+            object obj = null;
+
+            if (value is IDictionary<string, object>)
+            {
+                var jsonObject = (IDictionary<string, object>)value;
+
+                obj = Activator.CreateInstance(type);
+
+                FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (var info in properties)
+                {
+                    if (!info.CanWrite)
+                    {
+                        continue;
+                    }
+
+                    var jsonKey = info.Name;
+
+                    if (jsonObject.ContainsKey(jsonKey))
+                    {
+                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.PropertyType);
+                        info.SetValue(obj, jsonValue, null);
+                    }
+                }
+
+                foreach (var info in fields)
+                {
+                    var jsonKey = info.Name;
+
+                    if (jsonObject.ContainsKey(jsonKey))
+                    {
+                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.FieldType);
+                        info.SetValue(obj, jsonValue);
+                    }
+                }
+            }
+            else if (value is IList<object>)
+            {
+                var jsonObject = (IList<object>)value;
+                IList list = null;
+
+                if (type.IsArray)
+                {
+                    list = (IList)Activator.CreateInstance(type, jsonObject.Count);
+                    int i = 0;
+                    foreach (var o in jsonObject)
+                    {
+                        list[i++] = DeserializeObject(o, type);
+                    }
+                }
+                else if (typeof(IList).IsAssignableFrom(type))
+                {
+                    list = (IList)Activator.CreateInstance(type);
+                    foreach (var o in jsonObject)
+                    {
+                        list.Add(DeserializeObject(o, type));
+                    }
+                }
+                else if (IsTypeGenericeCollectionInterface(type))
+                {
+                    Type innerType = type.GetGenericArguments()[0];
+                    Type genericType = typeof(List<>).MakeGenericType(innerType);
+                    list = (IList)Activator.CreateInstance(genericType);
+                    foreach (var o in jsonObject)
+                    {
+                        list.Add(DeserializeObject(o, type));
+                    }
+                }
+
+                obj = list;
+            }
+
+            return obj;
+        }
+
+        protected virtual object SerializeEnum(Enum p)
+        {
+            return Convert.ToDouble(p);
+        }
+
+        protected virtual bool TrySerializeKnownTypes(object input, out object output)
+        {
+            bool returnValue = true;
+            if (input is DateTime)
+            {
+                output = ((DateTime)input).ToString("o");
+            }
+            else if (input is Guid)
+            {
+                output = ((Guid)input).ToString("D");
+            }
+            else if (input is Uri)
+            {
+                output = input.ToString();
+            }
+            else if (input is Enum)
+            {
+                output = SerializeEnum((Enum)input);
+            }
+            //else if(Convert.IsDBNull(input))
+            //{
+            //    output = null;
+            //}
+            else
+            {
+                returnValue = false;
+                output = null;
+            }
+
+            return returnValue;
+        }
+
+        protected virtual bool TrySerializeUnknownTypes(object input, out object output)
+        {
+            output = null;
+
+            // todo: implement caching for types
+            var type = input.GetType();
+
+            if (type.FullName == null)
+            {
+                return false;
+            }
+
+            var anonymous = type.FullName.Contains("__AnonymousType");
+            IDictionary<string, object> obj = new JsonObject();
+
+            FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var info in properties)
+            {
+                if (!info.CanRead && !anonymous)
+                {
+                    continue;
+                }
+
+                obj.Add(info.Name, info.GetValue(input, null));
+            }
+
+            foreach (var info in fields)
+            {
+                obj.Add(info.Name, info.GetValue(input));
+            }
+
+            output = obj;
+            return true;
+        }
+
+        protected static bool IsTypeGenericeCollectionInterface(Type type)
+        {
+            if (!type.IsGenericType)
+                return false;
+
+            Type genericDefinition = type.GetGenericTypeDefinition();
+
+            return (genericDefinition == typeof(IList<>)
+                    || genericDefinition == typeof(ICollection<>)
+                    || genericDefinition == typeof(IEnumerable<>));
+        }
+    }
+
+#if SIMPLE_JSON_DATACONTRACT
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ class DataContractJsonSerializerStrategy : PocoJsonSerializerStrategy
+    {
+        protected override bool TrySerializeUnknownTypes(object input, out object output)
+        {
+            output = null;
+
+            // todo: implement caching for types
+            var type = input.GetType();
+
+            if (type.FullName == null)
+            {
+                return false;
+            }
+
+            bool hasDataContract = GetAttribute(type, typeof(DataContractAttribute)) != null;
+            if (hasDataContract)
+            {
+                var anonymous = type.FullName.Contains("__AnonymousType");
+                IDictionary<string, object> obj = new JsonObject();
+
+                FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                // todo implement sorting
+                foreach (var info in properties)
+                {
+                    if (!info.CanRead && !anonymous)
+                    {
+                        continue;
+                    }
+
+                    Add(info, info.GetValue(input, null), obj);
+                }
+
+                foreach (var info in fields)
+                {
+                    Add(info, info.GetValue(input), obj);
+                }
+
+                output = obj;
+                return true;
+            }
+            else
+            {
+                return base.TrySerializeUnknownTypes(input, out output);
+            }
+        }
+
+        public override object DeserializeObject(object value, Type type)
+        {
+            return base.DeserializeObject(value, type);
+        }
+
+        protected static Attribute GetAttribute(Type objectType, Type attributeType)
         {
             foreach (var attr in objectType.GetCustomAttributes(attributeType, true))
             {
@@ -1312,12 +1438,7 @@ namespace SimpleJson
             return null;
         }
 
-#if SIMPLE_JSON_TESTS
-        internal
-#else
-        private
-#endif
- static Attribute GetAttribute(System.Reflection.MemberInfo memberInfo, Type attributeType)
+        protected static Attribute GetAttribute(MemberInfo memberInfo, Type attributeType)
         {
             foreach (var attr in memberInfo.GetCustomAttributes(attributeType, true))
             {
@@ -1330,7 +1451,7 @@ namespace SimpleJson
             return null;
         }
 
-        private static bool AreSame(Type a, Type b)
+        protected static bool AreSame(Type a, Type b)
         {
             // http://stackoverflow.com/questions/708205/c-object-type-comparison
             if (a == b)
@@ -1354,19 +1475,14 @@ namespace SimpleJson
             return a.BaseType == b.BaseType;
         }
 
-#if SIMPLE_JSON_TESTS
-        internal
-#else
-        private
-#endif
- static void Add(System.Reflection.MemberInfo info, object value, IDictionary<string, object> jsonObject)
+        protected static void Add(MemberInfo info, object value, IDictionary<string, object> jsonObject)
         {
-            if (GetAttribute(info, typeof(System.Runtime.Serialization.IgnoreDataMemberAttribute)) != null)
+            if (GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
             {
                 return;
             }
 
-            System.Runtime.Serialization.DataMemberAttribute dataMemberAttribute = (System.Runtime.Serialization.DataMemberAttribute)GetAttribute(info, typeof(System.Runtime.Serialization.DataMemberAttribute));
+            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)GetAttribute(info, typeof(DataMemberAttribute));
 
             if (dataMemberAttribute == null)
             {
@@ -1378,8 +1494,8 @@ namespace SimpleJson
             jsonObject.Add(jsonKey, value);
         }
 
-#endif
     }
+#endif
 
     #endregion
 }

@@ -19,7 +19,7 @@ namespace SimpleJsonTests
     using SimpleJson;
 
     [TestClass]
-    public class JsonDecodeTests
+    public class DeserializeObjectTests
     {
         [TestMethod]
         public void ReadIndented()
@@ -132,6 +132,7 @@ bye", pair.Key);
         }
 
         [TestMethod]
+        [Ignore("not part of the json standard.")]
         public void FloatingPointNonFiniteNumber()
         {
             string input = @"[
@@ -186,6 +187,7 @@ bye", pair.Key);
         }
 
         [TestMethod]
+        [Ignore("not part of the json standard.")]
         public void ReadOcatalNumber()
         {
             var json = @"[0372, 0xFA, 0XFA]";
@@ -209,6 +211,7 @@ bye", pair.Key);
         }
 
         [TestMethod]
+        [Ignore("not part of the json standard.")]
         public void ReadHexidecimalWithAllLetters()
         {
             string json = @"{""text"":0xabcdef12345}";

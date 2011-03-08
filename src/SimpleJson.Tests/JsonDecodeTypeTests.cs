@@ -1,8 +1,7 @@
 namespace SimpleJsonTests
 {
-    using System;
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
+    using System.Linq;
 
 #if NUNIT
     using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -18,7 +17,7 @@ namespace SimpleJsonTests
 
     using SimpleJson;
 
-    public class JsonDecodeTypeTests
+    public class DeserializeObjectTypeTests
     {
         private class Person
         {
@@ -28,9 +27,13 @@ namespace SimpleJsonTests
 
             public AddressInfo Address { get; set; }
 
-            private string[] Langauges;
+            public string[] Langauges;
 
-            private IEnumerable<string> Hobby;
+            public IEnumerable<string> Hobby;
+
+            private string[] _nothing;
+
+            public string[] Nothing { get { return _nothing; } }
         }
 
         private class AddressInfo
@@ -91,7 +94,7 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
-        public void methodname()
+        public void ArrayAndListDeserializationTests()
         {
             var obj = new
             {
@@ -105,6 +108,21 @@ namespace SimpleJsonTests
 
             var json = SimpleJson.SerializeObject(obj);
             var result = SimpleJson.DeserializeObject<Person>(json);
+
+            Assert.AreEqual(obj.FirstName, result.FirstName);
+            Assert.AreEqual(obj.Address.Country, result.Address.Country);
+
+            Assert.AreEqual(obj.Langauges.Length, result.Langauges.Length);
+            Assert.AreEqual(obj.Langauges[0], result.Langauges[0]);
+            Assert.AreEqual(obj.Langauges[1], result.Langauges[1]);
+
+            var hobies = result.Hobby.ToList();
+            Assert.AreEqual(obj.Hobby.Length, hobies.Count);
+            Assert.AreEqual(obj.Hobby[0], hobies[0]);
+            Assert.AreEqual(obj.Hobby[1], hobies[1]);
+            Assert.AreEqual(obj.Hobby[2], hobies[2]);
+
+            Assert.IsNull(result.Nothing);
         }
     }
 }
