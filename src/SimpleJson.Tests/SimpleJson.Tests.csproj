@@ -47,10 +47,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataContractTests\DataContractSampleClassess.cs" />
+    <Compile Include="DataContractTests\PrivateFieldsSerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateGetterSettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateGettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateReadonlySerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateSettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicFieldsSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicGetterSettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicGettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicReadonlySerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicSettersSerializeTests.cs" />
     <Compile Include="JsonArrayTests.cs" />
     <Compile Include="DeserializeObjectTests.cs" />
     <Compile Include="JsonDecodeTypeTests.cs" />
-    <Compile Include="JsonEncodeDataContractTests.cs" />
+    <Compile Include="JsonDataContractSerializeObjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializeObject.KnownNonPrimitive.Tests.cs" />
     <Compile Include="SerializeObject.Primitive.Tests.cs" />

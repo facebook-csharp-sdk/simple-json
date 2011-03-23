@@ -1,6 +1,5 @@
 namespace SimpleJsonTests
 {
-    using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
@@ -18,7 +17,7 @@ namespace SimpleJsonTests
 
     using SimpleJson;
 
-    public class JsonEncodeDataContractTests
+    public class JsonDataContractSerializeObjectTests
     {
         [DataContract]
         private class DataContractClass
@@ -104,7 +103,7 @@ namespace SimpleJsonTests
 
         private DataContractClass dataContractClass;
 
-        public JsonEncodeDataContractTests()
+        public JsonDataContractSerializeObjectTests()
         {
             this.dataContractClass = new DataContractClass
                                          {
@@ -164,10 +163,11 @@ namespace SimpleJsonTests
             Assert.IsNull(attr);
         }
         */
+
         [TestMethod]
         public void PublicReadOnlyFieldWithoutDataMemberShouldNotBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
@@ -177,7 +177,7 @@ namespace SimpleJsonTests
         [TestMethod]
         public void ReadOnlyFieldDataMemberWithoutNameShouldBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
@@ -187,7 +187,7 @@ namespace SimpleJsonTests
         [TestMethod]
         public void ReadOnlyFieldDataMemberWithNameShouldBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
@@ -197,7 +197,7 @@ namespace SimpleJsonTests
         [TestMethod]
         public void ReadOnlyFieldIgnoreShouldNotBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
@@ -207,17 +207,17 @@ namespace SimpleJsonTests
         [TestMethod]
         public void PrivateReadOnlyFieldWihtoutDataMemberShouldNotBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
             Assert.IsFalse(result.ContainsKey("PrivateReadOnlyFieldWihtoutDataMember"));
         }
-            
+
         [TestMethod]
         public void PrivateReadOnlyFieldDataMemberWithoutNameShouldBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
@@ -227,7 +227,7 @@ namespace SimpleJsonTests
         [TestMethod]
         public void PrivateReadOnlyFieldDataMemberWithNameShouldBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
@@ -237,7 +237,7 @@ namespace SimpleJsonTests
         [TestMethod]
         public void PrivateReadOnlyFieldIgnoreShouldNotBePresent()
         {
-            var json = SimpleJson.SerializeObject(this.dataContractClass);
+            var json = SimpleJson.SerializeObject(this.dataContractClass, SimpleJson.DataContractJsonSerializerStrategy);
 
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 

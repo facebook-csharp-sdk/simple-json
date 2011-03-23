@@ -1123,7 +1123,7 @@ namespace SimpleJson
                 return currentJsonSerializerStrategy ??
                     (currentJsonSerializerStrategy =
 #if SIMPLE_JSON_DATACONTRACT
- DataContractJsonSerializerStrategy
+                        DataContractJsonSerializerStrategy
 #else
                         PocoJsonSerializerStrategy
 #endif
