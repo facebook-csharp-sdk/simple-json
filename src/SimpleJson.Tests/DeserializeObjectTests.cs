@@ -191,7 +191,7 @@ bye", pair.Key);
         public void ReadOcatalNumber()
         {
             var json = @"[0372, 0xFA, 0XFA]";
-
+            
             var o = SimpleJson.DeserializeObject(json);
         }
 
