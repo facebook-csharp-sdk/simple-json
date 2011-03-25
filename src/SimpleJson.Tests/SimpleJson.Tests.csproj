@@ -54,6 +54,7 @@
     <Compile Include="DataContractTests\PrivateReadonlySerializeTests.cs" />
     <Compile Include="DataContractTests\PrivateSettersSerializeTests.cs" />
     <Compile Include="DataContractTests\PublicFieldsSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicGetterSetterDeserializeTests.cs" />
     <Compile Include="DataContractTests\PublicGetterSettersSerializeTests.cs" />
     <Compile Include="DataContractTests\PublicGettersSerializeTests.cs" />
     <Compile Include="DataContractTests\PublicReadonlySerializeTests.cs" />

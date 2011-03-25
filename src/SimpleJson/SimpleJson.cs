@@ -1123,7 +1123,7 @@ namespace SimpleJson
                 return currentJsonSerializerStrategy ??
                     (currentJsonSerializerStrategy =
 #if SIMPLE_JSON_DATACONTRACT
-                        DataContractJsonSerializerStrategy
+ DataContractJsonSerializerStrategy
 #else
                         PocoJsonSerializerStrategy
 #endif
@@ -1422,7 +1422,115 @@ namespace SimpleJson
 
         public override object DeserializeObject(object value, Type type)
         {
-            return base.DeserializeObject(value, type);
+            bool hasDataContract = GetAttribute(type, typeof(DataContractAttribute)) != null;
+            if (!hasDataContract)
+            {
+                return base.DeserializeObject(value, type);
+            }
+
+            if (value is string || value is bool || value is double)
+            {
+                return value;
+            }
+            else if (value == null)
+            {
+                return null;
+            }
+
+            object obj = null;
+
+            if (value is IDictionary<string, object>)
+            {
+                var jsonObject = (IDictionary<string, object>)value;
+
+                obj = Activator.CreateInstance(type);
+
+                FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                foreach (var info in properties)
+                {
+                    if (!info.CanWrite)
+                    {
+                        continue;
+                    }
+
+                    var jsonKey = GetKey(info);
+
+                    if (jsonObject.ContainsKey(jsonKey))
+                    {
+                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.PropertyType);
+                        info.SetValue(obj, jsonValue, null);
+                    }
+                }
+
+                foreach (var info in fields)
+                {
+                    var jsonKey = GetKey(info);
+
+                    if (jsonObject.ContainsKey(jsonKey))
+                    {
+                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.FieldType);
+                        info.SetValue(obj, jsonValue);
+                    }
+                }
+            }
+            else if (value is IList<object>)
+            {
+                var jsonObject = (IList<object>)value;
+                IList list = null;
+
+                if (type.IsArray)
+                {
+                    list = (IList)Activator.CreateInstance(type, jsonObject.Count);
+                    int i = 0;
+                    foreach (var o in jsonObject)
+                    {
+                        list[i++] = DeserializeObject(o, type);
+                    }
+                }
+                else if (typeof(IList).IsAssignableFrom(type))
+                {
+                    list = (IList)Activator.CreateInstance(type);
+                    foreach (var o in jsonObject)
+                    {
+                        list.Add(DeserializeObject(o, type));
+                    }
+                }
+                else if (IsTypeGenericeCollectionInterface(type))
+                {
+                    Type innerType = type.GetGenericArguments()[0];
+                    Type genericType = typeof(List<>).MakeGenericType(innerType);
+                    list = (IList)Activator.CreateInstance(genericType);
+                    foreach (var o in jsonObject)
+                    {
+                        list.Add(DeserializeObject(o, type));
+                    }
+                }
+
+                obj = list;
+            }
+
+            return obj;
+        }
+
+        private string GetKey(MemberInfo info)
+        {
+            if (GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
+            {
+                return info.Name;
+            }
+
+            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)GetAttribute(info, typeof(DataMemberAttribute));
+
+            if (dataMemberAttribute == null)
+            {
+                return info.Name;
+            }
+
+            string jsonKey = !string.IsNullOrEmpty(dataMemberAttribute.Name) ? dataMemberAttribute.Name : info.Name;
+
+            return jsonKey;
         }
 
         protected static Attribute GetAttribute(Type objectType, Type attributeType)
