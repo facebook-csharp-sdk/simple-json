@@ -113,7 +113,7 @@ end
 
 Rake::Task["configure"].invoke
 
-task :default => [:build]
+task :default => [:build,:tests]
 
 desc "Build"
 msbuild :build => [:clean] do |msb|
@@ -133,4 +133,10 @@ task :clean => [:clean_build] do
    FileUtils.rm_rf build_config[:paths][:output]
    FileUtils.rm_rf build_config[:paths][:working]
    FileUtils.rm_rf build_config[:paths][:dist]
+end
+
+nunit :tests => [:build] do |nunit|
+    nunit.command    = build_config[:paths][:nunit][:x86_console_path]
+    nunit.assemblies = ["#{build_config[:paths][:src]}SimpleJson.Tests/bin/Release/SimpleJson.Tests.dll"]
+    nunit.options = ["/xml=#{build_config[:paths][:output]}/Tests.nunit.xml"]
 end
