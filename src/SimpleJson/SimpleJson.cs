@@ -11,6 +11,8 @@
 
 //#define SIMPLE_JSON_DATACONTRACT
 
+using System.Threading;
+
 namespace SimpleJson
 {
     using System;
@@ -1606,4 +1608,150 @@ namespace SimpleJson
 #endif
 
     #endregion
+
+    sealed class Cache<TKey, TValue>
+    {
+        private readonly Dictionary<TKey, object> entries;
+        private int owner;
+
+        #region Constructors
+        public Cache()
+        {
+            entries = new Dictionary<TKey, object>();
+        }
+        public Cache(IEqualityComparer<TKey> equalityComparer)
+        {
+            entries = new Dictionary<TKey, object>(equalityComparer);
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Returns the number of entries currently stored in the cache. Accessing this property
+        /// causes a check of all entries in the cache to ensure collected entries are not counted.
+        /// </summary>
+        public int Count
+        {
+            get { return ClearCollected(); }
+        }
+        #endregion
+
+        #region Indexers
+        /// <summary>
+        /// Indexer for accessing or adding cache entries.
+        /// </summary>
+        public TValue this[TKey key]
+        {
+            get { return Get(key); }
+            set { Insert(key, value); }
+        }
+
+        #endregion
+
+        #region Insert Methods
+
+        /// <summary>
+        /// Insert an object into the cache using the specified cache strategy (lifetime management).
+        /// </summary>
+        /// <param name="key">The cache key used to reference the item.</param>
+        /// <param name="value">The object to be inserted into the cache.</param>
+        public void Insert(TKey key, TValue value)
+        {
+            object entry = new WeakReference(value);
+            int current = Thread.CurrentThread.ManagedThreadId;
+            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
+            entries[key] = entry;
+            if (current != Interlocked.Exchange(ref owner, 0))
+                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
+        }
+        #endregion
+
+        #region GetValue Methods
+        /// <summary>
+        /// Retrieves an entry from the cache using the given key.
+        /// </summary>
+        /// <param name="key">The cache key of the item to retrieve.</param>
+        /// <returns>The retrieved cache item or null if not found.</returns>
+        public TValue Get(TKey key)
+        {
+            int current = Thread.CurrentThread.ManagedThreadId;
+            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
+            object entry;
+            entries.TryGetValue(key, out entry);
+            if (current != Interlocked.Exchange(ref owner, 0))
+                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
+            var wr = entry as WeakReference;
+            return (TValue)(wr != null ? wr.Target : entry);
+        }
+        #endregion
+
+        #region Remove Methods
+        /// <summary>
+        /// Removes the object associated with the given key from the cache.
+        /// </summary>
+        /// <param name="key">The cache key of the item to remove.</param>
+        /// <returns>True if an item removed from the cache and false otherwise.</returns>
+        public bool Remove(TKey key)
+        {
+            int current = Thread.CurrentThread.ManagedThreadId;
+            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
+            bool found = entries.Remove(key);
+            if (current != Interlocked.Exchange(ref owner, 0))
+                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
+            return found;
+        }
+        #endregion
+
+        #region Clear Methods
+        /// <summary>
+        /// Removes all entries from the cache.
+        /// </summary>
+        public void Clear()
+        {
+            int current = Thread.CurrentThread.ManagedThreadId;
+            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
+            entries.Clear();
+            if (current != Interlocked.Exchange(ref owner, 0))
+                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
+        }
+
+        /// <summary>
+        /// Process all entries in the cache and remove entries that refer to collected entries.
+        /// </summary>
+        /// <returns>The number of live cache entries still in the cache.</returns>
+        private int ClearCollected()
+        {
+            int current = Thread.CurrentThread.ManagedThreadId;
+            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
+            //IList<TKey> keys = entries.Where(kvp => kvp.Value is WeakReference && !(kvp.Value as WeakReference).IsAlive).Select(kvp => kvp.Key).ToList();
+            IList<TKey> keys = new List<TKey>();
+            foreach (var entry in entries)
+            {
+                if (entry.Value is WeakReference && !(entry.Value as WeakReference).IsAlive)
+                {
+                    keys.Add(entry.Key);
+                }
+            }
+            foreach (var k in keys)
+            {
+                entries.Remove(k);
+            }
+            int count = entries.Count;
+            if (current != Interlocked.Exchange(ref owner, 0))
+                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
+            return count;
+        }
+        #endregion
+
+        #region ToString
+        /// <summary>
+        /// This method returns a string with information on the cache contents (number of contained objects).
+        /// </summary>
+        public override string ToString()
+        {
+            int count = ClearCollected();
+            return count > 0 ? String.Format("Cache contains {0} live objects.", count) : "Cache is empty.";
+        }
+        #endregion
+    }
 }
