@@ -13,8 +13,6 @@
 
 //#define SIMPLE_JSON_CONCURRENTDICTIONARY
 
-using System.Reflection.Emit;
-using System.Threading;
 using SimpleJson.Reflection;
 
 namespace SimpleJson
@@ -1192,7 +1190,25 @@ namespace SimpleJson
 #endif
  class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
-        internal Reflection.ResolverCache ResolverCache = new ResolverCache();
+        internal Reflection.ResolverCache ResolverCache;
+
+        public PocoJsonSerializerStrategy()
+        {
+            ResolverCache = new ResolverCache(BuildMap);
+        }
+
+        protected virtual void BuildMap(Type type, IDictionary<string, MemberMap> map)
+        {
+            foreach (PropertyInfo info in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            {
+                map.Add(info.Name, new MemberMap(info));
+            }
+
+            foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                map.Add(info.Name, new MemberMap(info));
+            }
+        }
 
         public virtual bool SerializeNonPrimitiveObject(object input, out object output)
         {
@@ -1217,34 +1233,21 @@ namespace SimpleJson
                 var jsonObject = (IDictionary<string, object>)value;
 
                 obj = ResolverCache.LoadFactory(type).Ctor();
+                var maps = ResolverCache.LoadMaps(type);
 
-                FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                foreach (var info in properties)
+                foreach (KeyValuePair<string, MemberMap> keyValuePair in maps)
                 {
-                    if (!info.CanWrite)
+                    var v = keyValuePair.Value;
+                    if (!v.CanWrite)
                     {
                         continue;
                     }
 
-                    var jsonKey = info.Name;
-
+                    var jsonKey = keyValuePair.Key;
                     if (jsonObject.ContainsKey(jsonKey))
                     {
-                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.PropertyType);
-                        info.SetValue(obj, jsonValue, null);
-                    }
-                }
-
-                foreach (var info in fields)
-                {
-                    var jsonKey = info.Name;
-
-                    if (jsonObject.ContainsKey(jsonKey))
-                    {
-                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.FieldType);
-                        info.SetValue(obj, jsonValue);
+                        var jsonValue = DeserializeObject(jsonObject[jsonKey], v.Type);
+                        v.Setter(obj, jsonValue);
                     }
                 }
             }
@@ -1270,7 +1273,7 @@ namespace SimpleJson
                         list.Add(DeserializeObject(o, type));
                     }
                 }
-                else if (IsTypeGenericeCollectionInterface(type))
+                else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type))
                 {
                     Type innerType = type.GetGenericArguments()[0];
                     Type genericType = typeof(List<>).MakeGenericType(innerType);
@@ -1336,41 +1339,20 @@ namespace SimpleJson
                 return false;
             }
 
-            var anonymous = type.FullName.Contains("__AnonymousType");
             IDictionary<string, object> obj = new JsonObject();
 
-            FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var maps = ResolverCache.LoadMaps(type);
 
-            foreach (var info in properties)
+            foreach (KeyValuePair<string, MemberMap> keyValuePair in maps)
             {
-                if (!info.CanRead && !anonymous)
+                if (keyValuePair.Value.CanRead)
                 {
-                    continue;
+                    obj.Add(keyValuePair.Key, keyValuePair.Value.Getter(input));
                 }
-
-                obj.Add(info.Name, info.GetValue(input, null));
-            }
-
-            foreach (var info in fields)
-            {
-                obj.Add(info.Name, info.GetValue(input));
             }
 
             output = obj;
             return true;
-        }
-
-        protected static bool IsTypeGenericeCollectionInterface(Type type)
-        {
-            if (!type.IsGenericType)
-                return false;
-
-            Type genericDefinition = type.GetGenericTypeDefinition();
-
-            return (genericDefinition == typeof(IList<>)
-                    || genericDefinition == typeof(ICollection<>)
-                    || genericDefinition == typeof(IEnumerable<>));
         }
     }
 
@@ -1382,184 +1364,60 @@ namespace SimpleJson
 #endif
  class DataContractJsonSerializerStrategy : PocoJsonSerializerStrategy
     {
-        protected override bool TrySerializeUnknownTypes(object input, out object output)
+        public DataContractJsonSerializerStrategy()
         {
-            output = null;
+            ResolverCache = new ResolverCache(BuildMap);
+        }
 
-            // todo: implement caching for types
-            var type = input.GetType();
+        protected override void BuildMap(Type type, IDictionary<string, MemberMap> map)
+        {
+            bool hasDataContract = ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
+            if (!hasDataContract)
+            {
+                base.BuildMap(type, map);
+                return;
+            }
 
-            if (type.FullName == null)
+            string jsonKey;
+
+            foreach (PropertyInfo info in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (CanAdd(info, out jsonKey))
+                {
+                    map.Add(jsonKey, new MemberMap(info));
+                }
+            }
+
+            foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (CanAdd(info, out jsonKey))
+                {
+                    map.Add(jsonKey, new MemberMap(info));
+                }
+            }
+
+            // todo implement sorting for DATACONTRACT.
+        }
+
+        private static bool CanAdd(MemberInfo info, out string jsonKey)
+        {
+            jsonKey = null;
+
+            if (ReflectionUtils.GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
             {
                 return false;
             }
 
-            bool hasDataContract = Reflection.ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
-            if (hasDataContract)
-            {
-                var anonymous = type.FullName.Contains("__AnonymousType");
-                IDictionary<string, object> obj = new JsonObject();
-
-                FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-                // todo implement sorting
-                foreach (var info in properties)
-                {
-                    if (!info.CanRead && !anonymous)
-                    {
-                        continue;
-                    }
-
-                    Add(info, info.GetValue(input, null), obj);
-                }
-
-                foreach (var info in fields)
-                {
-                    Add(info, info.GetValue(input), obj);
-                }
-
-                output = obj;
-                return true;
-            }
-            else
-            {
-                return base.TrySerializeUnknownTypes(input, out output);
-            }
-        }
-
-        public override object DeserializeObject(object value, Type type)
-        {
-            bool hasDataContract = Reflection.ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
-            if (!hasDataContract)
-            {
-                return base.DeserializeObject(value, type);
-            }
-
-            if (value is string || value is bool || value is double)
-            {
-                return value;
-            }
-            else if (value == null)
-            {
-                return null;
-            }
-
-            object obj = null;
-
-            if (value is IDictionary<string, object>)
-            {
-                var jsonObject = (IDictionary<string, object>)value;
-
-                obj = ResolverCache.LoadFactory(type).Ctor();
-
-                FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-                foreach (var info in properties)
-                {
-                    if (!info.CanWrite)
-                    {
-                        continue;
-                    }
-
-                    var jsonKey = GetKey(info);
-
-                    if (jsonObject.ContainsKey(jsonKey))
-                    {
-                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.PropertyType);
-                        info.SetValue(obj, jsonValue, null);
-                    }
-                }
-
-                foreach (var info in fields)
-                {
-                    var jsonKey = GetKey(info);
-
-                    if (jsonObject.ContainsKey(jsonKey))
-                    {
-                        var jsonValue = DeserializeObject(jsonObject[jsonKey], info.FieldType);
-                        info.SetValue(obj, jsonValue);
-                    }
-                }
-            }
-            else if (value is IList<object>)
-            {
-                var jsonObject = (IList<object>)value;
-                IList list = null;
-
-                if (type.IsArray)
-                {
-                    list = (IList)Activator.CreateInstance(type, jsonObject.Count);
-                    int i = 0;
-                    foreach (var o in jsonObject)
-                    {
-                        list[i++] = DeserializeObject(o, type);
-                    }
-                }
-                else if (typeof(IList).IsAssignableFrom(type))
-                {
-                    list = (IList)ResolverCache.LoadFactory(type).Ctor();
-                    foreach (var o in jsonObject)
-                    {
-                        list.Add(DeserializeObject(o, type));
-                    }
-                }
-                else if (IsTypeGenericeCollectionInterface(type))
-                {
-                    Type innerType = type.GetGenericArguments()[0];
-                    Type genericType = typeof(List<>).MakeGenericType(innerType);
-                    list = (IList)Activator.CreateInstance(genericType);
-                    foreach (var o in jsonObject)
-                    {
-                        list.Add(DeserializeObject(o, type));
-                    }
-                }
-
-                obj = list;
-            }
-
-            return obj;
-        }
-
-        private string GetKey(MemberInfo info)
-        {
-            if (Reflection.ReflectionUtils.GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
-            {
-                return info.Name;
-            }
-
-            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)Reflection.ReflectionUtils.GetAttribute(info, typeof(DataMemberAttribute));
+            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)ReflectionUtils.GetAttribute(info, typeof(DataMemberAttribute));
 
             if (dataMemberAttribute == null)
             {
-                return info.Name;
+                return false;
             }
 
-            string jsonKey = !string.IsNullOrEmpty(dataMemberAttribute.Name) ? dataMemberAttribute.Name : info.Name;
-
-            return jsonKey;
+            jsonKey = string.IsNullOrEmpty(dataMemberAttribute.Name) ? info.Name : dataMemberAttribute.Name;
+            return true;
         }
-
-        protected static void Add(MemberInfo info, object value, IDictionary<string, object> jsonObject)
-        {
-            if (Reflection.ReflectionUtils.GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
-            {
-                return;
-            }
-
-            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)Reflection.ReflectionUtils.GetAttribute(info, typeof(DataMemberAttribute));
-
-            if (dataMemberAttribute == null)
-            {
-                return;
-            }
-
-            string jsonKey = !string.IsNullOrEmpty(dataMemberAttribute.Name) ? dataMemberAttribute.Name : info.Name;
-
-            jsonObject.Add(jsonKey, value);
-        }
-
     }
 #endif
 
@@ -1569,7 +1427,7 @@ namespace SimpleJson
 
     namespace Reflection
     {
-        class ReflectionUtils
+        public class ReflectionUtils
         {
             public static Attribute GetAttribute(MemberInfo info, Type type)
             {
@@ -1581,7 +1439,7 @@ namespace SimpleJson
                 return Attribute.GetCustomAttribute(info, type);
             }
 
-            protected static Attribute GetAttribute(Type objectType, Type attributeType)
+            public static Attribute GetAttribute(Type objectType, Type attributeType)
             {
                 if (objectType == null || attributeType == null || !Attribute.IsDefined(objectType, attributeType))
                 {
@@ -1590,6 +1448,18 @@ namespace SimpleJson
 
                 return Attribute.GetCustomAttribute(objectType, attributeType);
             }
+
+            public static bool IsTypeGenericeCollectionInterface(Type type)
+            {
+                if (!type.IsGenericType)
+                    return false;
+
+                Type genericDefinition = type.GetGenericTypeDefinition();
+
+                return (genericDefinition == typeof(IList<>)
+                        || genericDefinition == typeof(ICollection<>)
+                        || genericDefinition == typeof(IEnumerable<>));
+            }
         }
 
         /// <summary>
@@ -1597,29 +1467,33 @@ namespace SimpleJson
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        delegate object FactoryDelegate(params object[] args);
-
-        /// <summary>
-        /// Generalized delegate for invoking a method
-        /// </summary>
-        /// <param name="target">the instance object</param>
-        /// <param name="args">the method parameters</param>
-        /// <returns></returns>
-        delegate object ProxyDelegate(object target, params object[] args);
+        public delegate object FactoryDelegate(params object[] args);
 
         /// <summary>
         /// Generalized delegate for getting a field or property value
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        delegate object GetterDelegate(object target);
+        public delegate object GetterDelegate(object target);
 
         /// <summary>
         /// Generalized delegate for setting a field or property value
         /// </summary>
         /// <param name="target"></param>
         /// <param name="value"></param>
-        delegate void SetterDelegate(object target, object value);
+        public delegate void SetterDelegate(object target, object value);
+
+        /// <summary>
+        /// Delegate represnting Action&lt;T1,T2>
+        /// </summary>
+        /// <typeparam name="TArg1"></typeparam>
+        /// <typeparam name="TArg2"></typeparam>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <remarks>
+        /// Since .net 2.0 doesn't support Action taking 2 parameters we need this delegate.
+        /// </remarks>
+        public delegate void Action<TArg1, TArg2>(TArg1 arg1, TArg2 arg2);
 
         /// <summary>
         /// Generates delegates for getting/setting properties and field and invoking constructors
@@ -1779,7 +1653,7 @@ namespace SimpleJson
             #endregion Type Factory Generators
         }
 
-        sealed class FactoryMap
+        public sealed class FactoryMap
         {
             public readonly FactoryDelegate Ctor;
 
@@ -1799,7 +1673,7 @@ namespace SimpleJson
             }
         }
 
-        sealed class MemberMap
+        public sealed class MemberMap
         {
             /// <summary>
             /// The original member info
@@ -1821,12 +1695,18 @@ namespace SimpleJson
             /// </summary>
             public readonly SetterDelegate Setter;
 
+            public readonly bool CanWrite;
+
+            public readonly bool CanRead;
+
             public MemberMap(PropertyInfo propertyInfo)
             {
                 MemberInfo = propertyInfo;
                 Type = propertyInfo.PropertyType;
                 Getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
                 Setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
+                CanWrite = propertyInfo.CanWrite;
+                CanRead = propertyInfo.CanRead;
             }
 
             public MemberMap(FieldInfo fieldInfo)
@@ -1835,16 +1715,28 @@ namespace SimpleJson
                 Type = fieldInfo.FieldType;
                 Getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
                 Setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+                CanWrite = true;
+                CanRead = true;
             }
         }
 
-        class ResolverCache
+        public class ResolverCache
         {
+            private readonly Action<Type, IDictionary<string, MemberMap>> _memberMapsCreator;
+
 #if SIMPLE_JSON_CONCURRENTDICTIONARY
         private readonly IDictionary<Type, FactoryMap> _factories = new System.Collections.Concurrent.ConcurrentDictionary<Type, FactoryMap>();
+        private readonly IDictionary<Type, IDictionary<string, MemberMap>> _memberMaps = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, MemberMap>>();
 #else
             private readonly IDictionary<Type, FactoryMap> _factories = new Dictionary<Type, FactoryMap>();
+            private readonly IDictionary<Type, IDictionary<string, MemberMap>> _memberMaps = new Dictionary<Type, IDictionary<string, MemberMap>>();
 #endif
+
+            public ResolverCache(Action<Type, IDictionary<string, MemberMap>> memberMapsCreator)
+            {
+                _memberMapsCreator = memberMapsCreator;
+            }
+
             public FactoryMap LoadFactory(Type type)
             {
                 if (type == null || type == typeof(object))
@@ -1875,9 +1767,44 @@ namespace SimpleJson
                     return (_factories[type] = map);
                 }
             }
+
+            public IDictionary<string, MemberMap> LoadMaps(Type type)
+            {
+                if (type == null || type == typeof(object))
+                {
+                    return null;
+                }
+
+                IDictionary<string, MemberMap> maps;
+
+#if !SIMPLE_JSON_CONCURRENTDICTIONARY
+                lock (_memberMaps)
+#endif
+                {
+                    if (_memberMaps.TryGetValue(type, out maps))
+                    {
+                        return maps;
+                    }
+                }
+
+#if !SIMPLE_JSON_CONCURRENTDICTIONARY
+                maps = new Dictionary<string, MemberMap>();
+#else
+                maps = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, MemberMap>>();
+#endif
+
+                _memberMapsCreator(type, maps);
+
+#if !SIMPLE_JSON_CONCURRENTDICTIONARY
+                lock (_memberMaps)
+#endif
+                {
+                    // store in cache for future requests.
+                    return (_memberMaps[type] = maps);
+                }
+            }
         }
     }
-
 
     #endregion
 
