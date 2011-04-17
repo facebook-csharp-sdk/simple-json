@@ -1560,7 +1560,6 @@ namespace SimpleJson
 
     #endregion
 
-
     #region Reflection helpers
 
     namespace Reflection
@@ -1586,6 +1585,193 @@ namespace SimpleJson
 
                 return Attribute.GetCustomAttribute(objectType, attributeType);
             }
+        }
+
+        /// <summary>
+        /// Generalized delegate for invoking a constructor
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        delegate object FactoryDelegate(params object[] args);
+
+        /// <summary>
+        /// Generalized delegate for invoking a method
+        /// </summary>
+        /// <param name="target">the instance object</param>
+        /// <param name="args">the method parameters</param>
+        /// <returns></returns>
+        delegate object ProxyDelegate(object target, params object[] args);
+
+        /// <summary>
+        /// Generalized delegate for getting a field or property value
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        delegate object GetterDelegate(object target);
+
+        /// <summary>
+        /// Generalized delegate for setting a field or property value
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="value"></param>
+        delegate void SetterDelegate(object target, object value);
+
+        /// <summary>
+        /// Generates delegates for getting/setting properties and field and invoking constructors
+        /// </summary>
+#if NET20
+	[System.Security.SecurityTreatAsSafe]
+	[System.Security.SecurityCritical]
+#else
+        [System.Security.SecuritySafeCritical]
+#endif
+        static class DynamicMethodGenerator
+        {
+            #region Getter / Setter Generators
+
+            /// <summary>
+            /// Creates a property getter delegate for the specified property
+            /// </summary>
+            /// <param name="propertyInfo"></param>
+            /// <returns>GetterDelegate if property CanRead, otherwise null</returns>
+            /// <remarks>
+            /// Note: use with caution this method will expose private and protected constructors without safety checks.
+            /// </remarks>
+            public static GetterDelegate GetPropertyGetter(PropertyInfo propertyInfo)
+            {
+                if (!propertyInfo.CanRead)
+                {
+                    return null;
+                }
+
+                MethodInfo methodInfo = propertyInfo.GetGetMethod(true);
+                if (methodInfo == null)
+                {
+                    return null;
+                }
+
+                return delegate(object instance)
+                {
+                    return methodInfo.Invoke(instance, Type.EmptyTypes);
+                };
+            }
+
+            /// <summary>
+            /// Creates a property setter delegate for the specified property
+            /// </summary>
+            /// <param name="propertyInfo"></param>
+            /// <returns>GetterDelegate if property CanWrite, otherwise null</returns>
+            /// <remarks>
+            /// Note: use with caution this method will expose private and protected constructors without safety checks.
+            /// </remarks>
+            public static SetterDelegate GetPropertySetter(PropertyInfo propertyInfo)
+            {
+                if (!propertyInfo.CanWrite)
+                {
+                    return null;
+                }
+
+                MethodInfo methodInfo = propertyInfo.GetSetMethod(true);
+                if (methodInfo == null)
+                {
+                    return null;
+                }
+
+                return delegate(object instance, object value)
+                {
+                    methodInfo.Invoke(instance, new object[] { value });
+                };
+            }
+
+            /// <summary>
+            /// Creates a field getter delegate for the specified field
+            /// </summary>
+            /// <param name="fieldInfo"></param>
+            /// <returns>GetterDelegate which returns field unless is enum in which will return enum value</returns>
+            /// <remarks>
+            /// Note: use with caution this method will expose private and protected constructors without safety checks.
+            /// </remarks>
+            public static GetterDelegate GetFieldGetter(FieldInfo fieldInfo)
+            {
+                return delegate(object instance)
+                {
+                    return fieldInfo.GetValue(instance);
+                };
+            }
+
+            /// <summary>
+            /// Creates a field setter delegate for the specified field
+            /// </summary>
+            /// <param name="fieldInfo"></param>
+            /// <returns>SetterDelegate unless field IsInitOnly then returns null</returns>
+            /// <remarks>
+            /// Note: use with caution this method will expose private and protected constructors without safety checks.
+            /// </remarks>
+            public static SetterDelegate GetFieldSetter(FieldInfo fieldInfo)
+            {
+                if (fieldInfo.IsInitOnly ||
+                    fieldInfo.IsLiteral)
+                {
+                    return null;
+                }
+
+                return delegate(object instance, object value)
+                {
+                    fieldInfo.SetValue(instance, value);
+                };
+            }
+
+            #endregion Getter / Setter Generators
+
+            #region Type Factory Generators
+
+            /// <summary>
+            /// Creates a default constructor delegate
+            /// </summary>
+            /// <param name="type">type to be created</param>
+            /// <returns>FactoryDelegate or null if default constructor not found</returns>
+            /// <remarks>
+            /// Note: use with caution this method will expose private and protected constructors without safety checks.
+            /// </remarks>
+            public static FactoryDelegate GetTypeFactory(Type type)
+            {
+                if (type == null)
+                {
+                    throw new ArgumentNullException("type");
+                }
+
+                ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null);
+                if (ctor == null)
+                {
+                    return null;
+                }
+
+                return DynamicMethodGenerator.GetTypeFactory(ctor);
+            }
+
+            /// <summary>
+            /// Creates a constructor delegate accepting specified arguments
+            /// </summary>
+            /// <param name="type">type to be created</param>
+            /// <param name="args">constructor arguments type list</param>
+            /// <returns>FactoryDelegate or null if constructor not found</returns>
+            /// <remarks>
+            /// Note: use with caution this method will expose private and protected constructors without safety checks.
+            /// </remarks>
+            public static FactoryDelegate GetTypeFactory(ConstructorInfo ctor)
+            {
+                if (ctor == null)
+                {
+                    throw new ArgumentNullException("ctor");
+                }
+
+                return delegate(object[] args)
+                {
+                    return ctor.Invoke(args);
+                };
+            }
+
+            #endregion Type Factory Generators
         }
     }
 
