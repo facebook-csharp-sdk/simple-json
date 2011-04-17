@@ -15,6 +15,7 @@
 
 using System.Reflection.Emit;
 using System.Threading;
+using SimpleJson.Reflection;
 
 namespace SimpleJson
 {
@@ -1191,7 +1192,8 @@ namespace SimpleJson
 #endif
  class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
-        
+        internal Reflection.ResolverCache ResolverCache = new ResolverCache();
+
         public virtual bool SerializeNonPrimitiveObject(object input, out object output)
         {
             return TrySerializeKnownTypes(input, out output) || TrySerializeUnknownTypes(input, out output);
@@ -1214,7 +1216,7 @@ namespace SimpleJson
             {
                 var jsonObject = (IDictionary<string, object>)value;
 
-                obj = Activator.CreateInstance(type);
+                obj = ResolverCache.LoadFactory(type).Ctor();
 
                 FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
                 PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -1262,7 +1264,7 @@ namespace SimpleJson
                 }
                 else if (typeof(IList).IsAssignableFrom(type))
                 {
-                    list = (IList)Activator.CreateInstance(type);
+                    list = (IList)ResolverCache.LoadFactory(type).Ctor();
                     foreach (var o in jsonObject)
                     {
                         list.Add(DeserializeObject(o, type));
@@ -1272,7 +1274,7 @@ namespace SimpleJson
                 {
                     Type innerType = type.GetGenericArguments()[0];
                     Type genericType = typeof(List<>).MakeGenericType(innerType);
-                    list = (IList)Activator.CreateInstance(genericType);
+                    list = (IList)ResolverCache.LoadFactory(genericType).Ctor();
                     foreach (var o in jsonObject)
                     {
                         list.Add(DeserializeObject(o, type));
@@ -1449,7 +1451,7 @@ namespace SimpleJson
             {
                 var jsonObject = (IDictionary<string, object>)value;
 
-                obj = Activator.CreateInstance(type);
+                obj = ResolverCache.LoadFactory(type).Ctor();
 
                 FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -1497,7 +1499,7 @@ namespace SimpleJson
                 }
                 else if (typeof(IList).IsAssignableFrom(type))
                 {
-                    list = (IList)Activator.CreateInstance(type);
+                    list = (IList)ResolverCache.LoadFactory(type).Ctor();
                     foreach (var o in jsonObject)
                     {
                         list.Add(DeserializeObject(o, type));
