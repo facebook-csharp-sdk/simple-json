@@ -48,8 +48,6 @@ namespace SimpleJson
     {
         public JsonArray() { }
 
-        public JsonArray(IEnumerable<object> collection) : base(collection) { }
-
         public JsonArray(int capacity) : base(capacity) { }
 
         public override string ToString()
