@@ -1574,9 +1574,8 @@ namespace SimpleJson
 #if !SIMPLE_JSON_CONCURRENTDICTIONARY
                 maps = new Dictionary<string, MemberMap>();
 #else
-                maps = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, MemberMap>>();
+                maps = new System.Collections.Concurrent.ConcurrentDictionary<string, MemberMap>();
 #endif
-
                 _memberMapsCreator(type, maps);
 
 #if !SIMPLE_JSON_CONCURRENTDICTIONARY
