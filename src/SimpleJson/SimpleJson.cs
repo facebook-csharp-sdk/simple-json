@@ -2,8 +2,11 @@
 // http://bit.ly/simplejson
 // License: Apache License 2.0 (Apache)
 
-// NOTE: uncomment the following line to make simple json classes internal.
+// NOTE: uncomment the following line to make SimpleJson class internal.
 //#define SIMPLE_JSON_INTERNAL
+
+// NOTE: uncomment the following line to make JsonArray and JsonObject class internal.
+//#define SIMPLE_JSON_OBJARRAYINTERNAL
 
 // NOTE: uncomment the following line to enable dynamic support.
 //#define SIMPLE_JSON_DYNAMIC
@@ -17,25 +20,25 @@
 // original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 // most of the reflection methods taken from https://github.com/jsonfx/jsonfx
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+#if SIMPLE_JSON_DYNAMIC
+using System.Dynamic;
+#endif
+using System.Globalization;
+using System.Reflection;
+#if SIMPLE_JSON_DATACONTRACT
+using System.Runtime.Serialization;
+#endif
+using System.Text;
+using SimpleJson.Reflection;
+
 namespace SimpleJson
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-#if SIMPLE_JSON_DYNAMIC
-    using System.Dynamic;
-#endif
-    using System.Globalization;
-    using System.Reflection;
-#if SIMPLE_JSON_DATACONTRACT
-    using System.Runtime.Serialization;
-#endif
-    using System.Text;
-    using Reflection;
-
     #region JsonArray
 
-#if SIMPLE_JSON_INTERNAL
+#if SIMPLE_JSON_OBJARRAYINTERNAL
     internal
 #else
     public
@@ -58,7 +61,7 @@ namespace SimpleJson
 
     #region JsonObject
 
-#if SIMPLE_JSON_INTERNAL
+#if SIMPLE_JSON_OBJARRAYINTERNAL
     internal
 #else
     public
@@ -407,7 +410,10 @@ namespace SimpleJson
     }
 
     #endregion
+}
 
+namespace SimpleJson
+{
     #region JsonParser
 
     /// <summary>
