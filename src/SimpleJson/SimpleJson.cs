@@ -1779,7 +1779,7 @@ namespace SimpleJson
             #endregion Type Factory Generators
         }
 
-        class FactoryMap
+        sealed class FactoryMap
         {
             public readonly FactoryDelegate Ctor;
 
@@ -1799,6 +1799,45 @@ namespace SimpleJson
             }
         }
 
+        sealed class MemberMap
+        {
+            /// <summary>
+            /// The original member info
+            /// </summary>
+            public readonly MemberInfo MemberInfo;
+
+            /// <summary>
+            /// The member type
+            /// </summary>
+            public readonly Type Type;
+
+            /// <summary>
+            /// The getter method
+            /// </summary>
+            public readonly GetterDelegate Getter;
+
+            /// <summary>
+            /// The setter method
+            /// </summary>
+            public readonly SetterDelegate Setter;
+
+            public MemberMap(PropertyInfo propertyInfo)
+            {
+                MemberInfo = propertyInfo;
+                Type = propertyInfo.PropertyType;
+                Getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+                Setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
+            }
+
+            public MemberMap(FieldInfo fieldInfo)
+            {
+                MemberInfo = fieldInfo;
+                Type = fieldInfo.FieldType;
+                Getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+                Setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+            }
+        }
+
         class ResolverCache
         {
 #if SIMPLE_JSON_CONCURRENTDICTIONARY
@@ -1806,7 +1845,6 @@ namespace SimpleJson
 #else
             private readonly IDictionary<Type, FactoryMap> _factories = new Dictionary<Type, FactoryMap>();
 #endif
-
             public FactoryMap LoadFactory(Type type)
             {
                 if (type == null || type == typeof(object))
