@@ -518,6 +518,23 @@ namespace SimpleJson
             return SerializeObject(json, CurrentJsonSerializerStrategy);
         }
 
+        public static string EscapeToJavascriptString(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+
+            return str
+                .Replace(@"\b", "\b")
+                .Replace(@"\t", "\t")
+                .Replace(@"\n", "\n")
+                .Replace(@"\f", "\f")
+                .Replace(@"\r", "\r")
+                .Replace(@"""", "\"")
+                .Replace(@"\""", "\"");
+        }
+
         protected static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
         {
             IDictionary<string, object> table = new JsonObject();
