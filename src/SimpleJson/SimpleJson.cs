@@ -1,7 +1,6 @@
 // SimpleJson http://simplejson.codeplex.com/
 // http://bit.ly/simplejson
 // License: Apache License 2.0 (Apache)
-// original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 
 // NOTE: uncomment the following line to make simple json classes internal.
 //#define SIMPLE_JSON_INTERNAL
@@ -9,11 +8,14 @@
 // NOTE: uncomment the following line to enable dynamic support.
 //#define SIMPLE_JSON_DYNAMIC
 
+// NOTE: uncomment the following line to enable DataContract support.
 //#define SIMPLE_JSON_DATACONTRACT
 
+// NOTE: uncomment the following line to enable ConcurrentDictionary instead of using locks.
 //#define SIMPLE_JSON_CONCURRENTDICTIONARY
 
-using SimpleJson.Reflection;
+// original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
+// most of the reflection methods taken from https://github.com/jsonfx/jsonfx
 
 namespace SimpleJson
 {
@@ -25,8 +27,11 @@ namespace SimpleJson
 #endif
     using System.Globalization;
     using System.Reflection;
+#if SIMPLE_JSON_DATACONTRACT
     using System.Runtime.Serialization;
+#endif
     using System.Text;
+    using Reflection;
 
     #region JsonArray
 
@@ -37,19 +42,11 @@ namespace SimpleJson
 #endif
  class JsonArray : List<object>
     {
-        public JsonArray()
-        {
-        }
+        public JsonArray() { }
 
-        public JsonArray(IEnumerable<object> collection)
-            : base(collection)
-        {
-        }
+        public JsonArray(IEnumerable<object> collection) : base(collection) { }
 
-        public JsonArray(int capacity)
-            : base(capacity)
-        {
-        }
+        public JsonArray(int capacity) : base(capacity) { }
 
         public override string ToString()
         {
@@ -75,7 +72,7 @@ namespace SimpleJson
         /// <summary>
         /// The internal member dictionary.
         /// </summary>
-        private Dictionary<string, object> members = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _members = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets the <see cref="System.Object"/> at the specified index.
@@ -83,32 +80,20 @@ namespace SimpleJson
         /// <value></value>
         public object this[int index]
         {
-            get
-            {
-                return GetAtIndex(this.members, index);
-            }
+            get { return GetAtIndex(_members, index); }
         }
 
         internal static object GetAtIndex(IDictionary<string, object> obj, int index)
         {
             if (obj == null)
-            {
                 throw new ArgumentNullException("obj");
-            }
 
             if (index >= obj.Count)
-            {
                 throw new ArgumentOutOfRangeException("index");
-            }
 
             int i = 0;
             foreach (KeyValuePair<string, object> o in obj)
-            {
-                if (i++ == index)
-                {
-                    return o.Value;
-                }
-            }
+                if (i++ == index) return o.Value;
 
             return null;
         }
@@ -120,7 +105,7 @@ namespace SimpleJson
         /// <param name="value">The value.</param>
         public void Add(string key, object value)
         {
-            this.members.Add(key, value);
+            _members.Add(key, value);
         }
 
         /// <summary>
@@ -132,7 +117,7 @@ namespace SimpleJson
         /// </returns>
         public bool ContainsKey(string key)
         {
-            return this.members.ContainsKey(key);
+            return _members.ContainsKey(key);
         }
 
         /// <summary>
@@ -141,7 +126,7 @@ namespace SimpleJson
         /// <value>The keys.</value>
         public ICollection<string> Keys
         {
-            get { return this.members.Keys; }
+            get { return _members.Keys; }
         }
 
         /// <summary>
@@ -151,7 +136,7 @@ namespace SimpleJson
         /// <returns></returns>
         public bool Remove(string key)
         {
-            return this.members.Remove(key);
+            return _members.Remove(key);
         }
 
         /// <summary>
@@ -162,7 +147,7 @@ namespace SimpleJson
         /// <returns></returns>
         public bool TryGetValue(string key, out object value)
         {
-            return this.members.TryGetValue(key, out value);
+            return _members.TryGetValue(key, out value);
         }
 
         /// <summary>
@@ -171,7 +156,7 @@ namespace SimpleJson
         /// <value>The values.</value>
         public ICollection<object> Values
         {
-            get { return this.members.Values; }
+            get { return _members.Values; }
         }
 
         /// <summary>
@@ -180,14 +165,8 @@ namespace SimpleJson
         /// <value></value>
         public object this[string key]
         {
-            get
-            {
-                return this.members[key];
-            }
-            set
-            {
-                this.members[key] = value;
-            }
+            get { return _members[key]; }
+            set { _members[key] = value; }
         }
 
         /// <summary>
@@ -196,7 +175,7 @@ namespace SimpleJson
         /// <param name="item">The item.</param>
         public void Add(KeyValuePair<string, object> item)
         {
-            this.members.Add(item.Key, item.Value);
+            _members.Add(item.Key, item.Value);
         }
 
         /// <summary>
@@ -204,7 +183,7 @@ namespace SimpleJson
         /// </summary>
         public void Clear()
         {
-            this.members.Clear();
+            _members.Clear();
         }
 
         /// <summary>
@@ -216,7 +195,7 @@ namespace SimpleJson
         /// </returns>
         public bool Contains(KeyValuePair<string, object> item)
         {
-            return this.members.ContainsKey(item.Key) && this.members[item.Key] == item.Value;
+            return _members.ContainsKey(item.Key) && _members[item.Key] == item.Value;
         }
 
         /// <summary>
@@ -235,7 +214,7 @@ namespace SimpleJson
         /// <value>The count.</value>
         public int Count
         {
-            get { return this.members.Count; }
+            get { return _members.Count; }
         }
 
         /// <summary>
@@ -256,7 +235,7 @@ namespace SimpleJson
         /// <returns></returns>
         public bool Remove(KeyValuePair<string, object> item)
         {
-            return this.members.Remove(item.Key);
+            return _members.Remove(item.Key);
         }
 
         /// <summary>
@@ -265,7 +244,7 @@ namespace SimpleJson
         /// <returns></returns>
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            return this.members.GetEnumerator();
+            return _members.GetEnumerator();
         }
 
         /// <summary>
@@ -276,7 +255,7 @@ namespace SimpleJson
         /// </returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.members.GetEnumerator();
+            return _members.GetEnumerator();
         }
 
         /// <summary>
@@ -332,7 +311,7 @@ namespace SimpleJson
             if (binder == (DeleteMemberBinder)null)
                 throw new ArgumentNullException("binder");
             // </pex>
-            return members.Remove(binder.Name);
+            return _members.Remove(binder.Name);
         }
 
         /// <summary>
@@ -351,11 +330,8 @@ namespace SimpleJson
                 result = ((IDictionary<string, object>)this)[(string)indexes[0]];
                 return true;
             }
-            else
-            {
-                result = (object)null;
-                return true;
-            }
+            result = (object)null;
+            return true;
         }
 
         /// <summary>
@@ -369,16 +345,13 @@ namespace SimpleJson
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             object value;
-            if (members.TryGetValue(binder.Name, out value))
+            if (_members.TryGetValue(binder.Name, out value))
             {
                 result = value;
                 return true;
             }
-            else
-            {
-                result = (object)null;
-                return true;
-            }
+            result = (object)null;
+            return true;
         }
 
         /// <summary>
@@ -415,7 +388,7 @@ namespace SimpleJson
             if (binder == (SetMemberBinder)null)
                 throw new ArgumentNullException("binder");
             // </pex>
-            members[binder.Name] = value;
+            _members[binder.Name] = value;
             return true;
         }
 
@@ -428,9 +401,7 @@ namespace SimpleJson
         public override IEnumerable<string> GetDynamicMemberNames()
         {
             foreach (var key in Keys)
-            {
                 yield return key;
-            }
         }
 #endif
     }
@@ -477,13 +448,8 @@ namespace SimpleJson
         {
             object @object;
             if (TryDeserializeObject(json, out @object))
-            {
                 return @object;
-            }
-            else
-            {
-                throw new System.Runtime.Serialization.SerializationException("Invalid JSON string");
-            }
+            throw new System.Runtime.Serialization.SerializationException("Invalid JSON string");
         }
 
         /// <summary>
@@ -508,9 +474,7 @@ namespace SimpleJson
                 @object = ParseValue(charArray, ref index, ref success);
             }
             else
-            {
                 @object = null;
-            }
 
             return success;
         }
@@ -519,14 +483,7 @@ namespace SimpleJson
         {
             var jsonObject = DeserializeObject(json);
 
-            if (type == null)
-            {
-                return jsonObject;
-            }
-            else
-            {
-                return (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(jsonObject, type);
-            }
+            return type == null ? jsonObject : (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(jsonObject, type);
         }
 
         public static object DeserializeObject(string json, Type type)
@@ -558,7 +515,7 @@ namespace SimpleJson
 
         public static string SerializeObject(object json)
         {
-            return SerializeObject(json, SimpleJson.CurrentJsonSerializerStrategy);
+            return SerializeObject(json, CurrentJsonSerializerStrategy);
         }
 
         protected static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
@@ -579,9 +536,7 @@ namespace SimpleJson
                     return null;
                 }
                 else if (token == TOKEN_COMMA)
-                {
                     NextToken(json, ref index);
-                }
                 else if (token == TOKEN_CURLY_CLOSE)
                 {
                     NextToken(json, ref index);
@@ -589,7 +544,6 @@ namespace SimpleJson
                 }
                 else
                 {
-
                     // name
                     string name = ParseString(json, ref index, ref success);
                     if (!success)
@@ -638,9 +592,7 @@ namespace SimpleJson
                     return null;
                 }
                 else if (token == TOKEN_COMMA)
-                {
                     NextToken(json, ref index);
-                }
                 else if (token == TOKEN_SQUARED_CLOSE)
                 {
                     NextToken(json, ref index);
@@ -650,10 +602,7 @@ namespace SimpleJson
                 {
                     object value = ParseValue(json, ref index, ref success);
                     if (!success)
-                    {
                         return null;
-                    }
-
                     array.Add(value);
                 }
             }
@@ -716,44 +665,25 @@ namespace SimpleJson
                 }
                 else if (c == '\\')
                 {
-
                     if (index == json.Length)
-                    {
                         break;
-                    }
                     c = json[index++];
                     if (c == '"')
-                    {
                         s.Append('"');
-                    }
                     else if (c == '\\')
-                    {
                         s.Append('\\');
-                    }
                     else if (c == '/')
-                    {
                         s.Append('/');
-                    }
                     else if (c == 'b')
-                    {
                         s.Append('\b');
-                    }
                     else if (c == 'f')
-                    {
                         s.Append('\f');
-                    }
                     else if (c == 'n')
-                    {
                         s.Append('\n');
-                    }
                     else if (c == 'r')
-                    {
                         s.Append('\r');
-                    }
                     else if (c == 't')
-                    {
                         s.Append('\t');
-                    }
                     else if (c == 'u')
                     {
                         int remainingLength = json.Length - index;
@@ -761,10 +691,11 @@ namespace SimpleJson
                         {
                             // parse the 32 bit hex into an integer codepoint
                             uint codePoint;
-                            if (!(success = UInt32.TryParse(new string(json, index, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out codePoint)))
-                            {
+                            if (
+                                !(success =
+                                  UInt32.TryParse(new string(json, index, 4), NumberStyles.HexNumber,
+                                                  CultureInfo.InvariantCulture, out codePoint)))
                                 return "";
-                            }
 
                             // convert the integer codepoint to a unicode char and add to string
 #if SILVERLIGHT
@@ -776,15 +707,11 @@ namespace SimpleJson
                             index += 4;
                         }
                         else
-                        {
                             break;
-                        }
                     }
                 }
                 else
-                {
                     s.Append(c);
-                }
             }
 
             if (!complete)
@@ -807,9 +734,7 @@ namespace SimpleJson
             if (utf32 < 0x10000)
                 return new string((char)utf32, 1);
             utf32 -= 0x10000;
-            return new string(
-                new char[] {(char) ((utf32 >> 10) + 0xD800),
-                (char) (utf32 % 0x0400 + 0xDC00)});
+            return new string(new char[] {(char) ((utf32 >> 10) + 0xD800),(char) (utf32 % 0x0400 + 0xDC00)});
         }
 #endif
 
@@ -832,24 +757,14 @@ namespace SimpleJson
             int lastIndex;
 
             for (lastIndex = index; lastIndex < json.Length; lastIndex++)
-            {
-                if ("0123456789+-.eE".IndexOf(json[lastIndex]) == -1)
-                {
-                    break;
-                }
-            }
+                if ("0123456789+-.eE".IndexOf(json[lastIndex]) == -1) break;
             return lastIndex - 1;
         }
 
         protected static void EatWhitespace(char[] json, ref int index)
         {
             for (; index < json.Length; index++)
-            {
-                if (" \t\n\r\b\f".IndexOf(json[index]) == -1)
-                {
-                    break;
-                }
-            }
+                if (" \t\n\r\b\f".IndexOf(json[index]) == -1) break;
         }
 
         protected static int LookAhead(char[] json, int index)
@@ -863,9 +778,7 @@ namespace SimpleJson
             EatWhitespace(json, ref index);
 
             if (index == json.Length)
-            {
                 return TOKEN_NONE;
-            }
 
             char c = json[index];
             index++;
@@ -950,41 +863,25 @@ namespace SimpleJson
             bool success = true;
 
             if (value is string)
-            {
                 success = SerializeString((string)value, builder);
-            }
             else if (value is IDictionary<string, object>)
-            {
                 success = SerializeObject(jsonSerializerStrategy, (IDictionary<string, object>)value, builder);
-            }
             else if (value is IEnumerable)
-            {
                 success = SerializeArray(jsonSerializerStrategy, (IEnumerable)value, builder);
-            }
             else if (IsNumeric(value))
-            {
                 success = SerializeNumber(Convert.ToDouble(value), builder);
-            }
-            else if ((value is Boolean) && ((Boolean)value == true))
-            {
+            else if ((value is Boolean) && (((Boolean)value) == true))
                 builder.Append("true");
-            }
             else if ((value is Boolean) && ((Boolean)value == false))
-            {
                 builder.Append("false");
-            }
             else if (value == null)
-            {
                 builder.Append("null");
-            }
             else
             {
                 object serializedObject;
                 success = jsonSerializerStrategy.SerializeNonPrimitiveObject(value, out serializedObject);
                 if (success)
-                {
                     SerializeValue(jsonSerializerStrategy, serializedObject, builder);
-                }
             }
 
             return success;
@@ -1002,16 +899,12 @@ namespace SimpleJson
                 object value = e.Current.Value;
 
                 if (!first)
-                {
                     builder.Append(",");
-                }
 
                 SerializeString(key, builder);
                 builder.Append(":");
                 if (!SerializeValue(jsonSerializerStrategy, value, builder))
-                {
                     return false;
-                }
 
                 first = false;
             }
@@ -1029,14 +922,10 @@ namespace SimpleJson
             foreach (var value in anArray)
             {
                 if (!first)
-                {
                     builder.Append(",");
-                }
 
                 if (!SerializeValue(jsonSerializerStrategy, value, builder))
-                {
                     return false;
-                }
 
                 first = false;
             }
@@ -1054,44 +943,26 @@ namespace SimpleJson
             {
                 char c = charArray[i];
                 if (c == '"')
-                {
                     builder.Append("\\\"");
-                }
                 else if (c == '\\')
-                {
                     builder.Append("\\\\");
-                }
                 else if (c == '\b')
-                {
                     builder.Append("\\b");
-                }
                 else if (c == '\f')
-                {
                     builder.Append("\\f");
-                }
                 else if (c == '\n')
-                {
                     builder.Append("\\n");
-                }
                 else if (c == '\r')
-                {
                     builder.Append("\\r");
-                }
                 else if (c == '\t')
-                {
                     builder.Append("\\t");
-                }
                 else
                 {
                     int codepoint = Convert.ToInt32(c);
                     if ((codepoint >= 32) && (codepoint <= 126))
-                    {
                         builder.Append(c);
-                    }
                     else
-                    {
                         builder.Append("\\u" + Convert.ToString(codepoint, 16).PadLeft(4, '0'));
-                    }
                 }
             }
 
@@ -1190,7 +1061,7 @@ namespace SimpleJson
 #endif
  class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
-        internal Reflection.ResolverCache ResolverCache;
+        internal ResolverCache ResolverCache;
 
         public PocoJsonSerializerStrategy()
         {
@@ -1200,14 +1071,9 @@ namespace SimpleJson
         protected virtual void BuildMap(Type type, IDictionary<string, MemberMap> map)
         {
             foreach (PropertyInfo info in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-            {
                 map.Add(info.Name, new MemberMap(info));
-            }
-
             foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
-            {
                 map.Add(info.Name, new MemberMap(info));
-            }
         }
 
         public virtual bool SerializeNonPrimitiveObject(object input, out object output)
@@ -1218,13 +1084,9 @@ namespace SimpleJson
         public virtual object DeserializeObject(object value, Type type)
         {
             if (value is string || value is bool || value is double)
-            {
                 return value;
-            }
             else if (value == null)
-            {
                 return null;
-            }
 
             object obj = null;
 
@@ -1239,9 +1101,7 @@ namespace SimpleJson
                 {
                     var v = keyValuePair.Value;
                     if (!v.CanWrite)
-                    {
                         continue;
-                    }
 
                     var jsonKey = keyValuePair.Key;
                     if (jsonObject.ContainsKey(jsonKey))
@@ -1261,17 +1121,13 @@ namespace SimpleJson
                     list = (IList)Activator.CreateInstance(type, jsonObject.Count);
                     int i = 0;
                     foreach (var o in jsonObject)
-                    {
                         list[i++] = DeserializeObject(o, type);
-                    }
                 }
                 else if (typeof(IList).IsAssignableFrom(type))
                 {
                     list = (IList)ResolverCache.LoadFactory(type).Ctor();
                     foreach (var o in jsonObject)
-                    {
                         list.Add(DeserializeObject(o, type));
-                    }
                 }
                 else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type))
                 {
@@ -1279,9 +1135,7 @@ namespace SimpleJson
                     Type genericType = typeof(List<>).MakeGenericType(innerType);
                     list = (IList)ResolverCache.LoadFactory(genericType).Ctor();
                     foreach (var o in jsonObject)
-                    {
                         list.Add(DeserializeObject(o, type));
-                    }
                 }
 
                 obj = list;
@@ -1299,25 +1153,13 @@ namespace SimpleJson
         {
             bool returnValue = true;
             if (input is DateTime)
-            {
                 output = ((DateTime)input).ToString("o");
-            }
             else if (input is Guid)
-            {
                 output = ((Guid)input).ToString("D");
-            }
             else if (input is Uri)
-            {
                 output = input.ToString();
-            }
             else if (input is Enum)
-            {
                 output = SerializeEnum((Enum)input);
-            }
-            //else if(Convert.IsDBNull(input))
-            //{
-            //    output = null;
-            //}
             else
             {
                 returnValue = false;
@@ -1335,9 +1177,7 @@ namespace SimpleJson
             var type = input.GetType();
 
             if (type.FullName == null)
-            {
                 return false;
-            }
 
             IDictionary<string, object> obj = new JsonObject();
 
@@ -1346,9 +1186,7 @@ namespace SimpleJson
             foreach (KeyValuePair<string, MemberMap> keyValuePair in maps)
             {
                 if (keyValuePair.Value.CanRead)
-                {
                     obj.Add(keyValuePair.Key, keyValuePair.Value.Getter(input));
-                }
             }
 
             output = obj;
@@ -1383,17 +1221,13 @@ namespace SimpleJson
             foreach (PropertyInfo info in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 if (CanAdd(info, out jsonKey))
-                {
                     map.Add(jsonKey, new MemberMap(info));
-                }
             }
 
             foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 if (CanAdd(info, out jsonKey))
-                {
                     map.Add(jsonKey, new MemberMap(info));
-                }
             }
 
             // todo implement sorting for DATACONTRACT.
@@ -1404,16 +1238,12 @@ namespace SimpleJson
             jsonKey = null;
 
             if (ReflectionUtils.GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
-            {
                 return false;
-            }
 
             DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)ReflectionUtils.GetAttribute(info, typeof(DataMemberAttribute));
 
             if (dataMemberAttribute == null)
-            {
                 return false;
-            }
 
             jsonKey = string.IsNullOrEmpty(dataMemberAttribute.Name) ? info.Name : dataMemberAttribute.Name;
             return true;
@@ -1432,9 +1262,7 @@ namespace SimpleJson
             public static Attribute GetAttribute(MemberInfo info, Type type)
             {
                 if (info == null || type == null || !Attribute.IsDefined(info, type))
-                {
                     return null;
-                }
 
                 return Attribute.GetCustomAttribute(info, type);
             }
@@ -1442,9 +1270,7 @@ namespace SimpleJson
             public static Attribute GetAttribute(Type objectType, Type attributeType)
             {
                 if (objectType == null || attributeType == null || !Attribute.IsDefined(objectType, attributeType))
-                {
                     return null;
-                }
 
                 return Attribute.GetCustomAttribute(objectType, attributeType);
             }
@@ -1456,9 +1282,7 @@ namespace SimpleJson
 
                 Type genericDefinition = type.GetGenericTypeDefinition();
 
-                return (genericDefinition == typeof(IList<>)
-                        || genericDefinition == typeof(ICollection<>)
-                        || genericDefinition == typeof(IEnumerable<>));
+                return (genericDefinition == typeof(IList<>) || genericDefinition == typeof(ICollection<>) || genericDefinition == typeof(IEnumerable<>));
             }
         }
 
@@ -1519,20 +1343,13 @@ namespace SimpleJson
             public static GetterDelegate GetPropertyGetter(PropertyInfo propertyInfo)
             {
                 if (!propertyInfo.CanRead)
-                {
                     return null;
-                }
 
                 MethodInfo methodInfo = propertyInfo.GetGetMethod(true);
                 if (methodInfo == null)
-                {
                     return null;
-                }
 
-                return delegate(object instance)
-                {
-                    return methodInfo.Invoke(instance, Type.EmptyTypes);
-                };
+                return delegate(object instance) { return methodInfo.Invoke(instance, Type.EmptyTypes); };
             }
 
             /// <summary>
@@ -1546,20 +1363,13 @@ namespace SimpleJson
             public static SetterDelegate GetPropertySetter(PropertyInfo propertyInfo)
             {
                 if (!propertyInfo.CanWrite)
-                {
                     return null;
-                }
 
                 MethodInfo methodInfo = propertyInfo.GetSetMethod(true);
                 if (methodInfo == null)
-                {
                     return null;
-                }
 
-                return delegate(object instance, object value)
-                {
-                    methodInfo.Invoke(instance, new object[] { value });
-                };
+                return delegate(object instance, object value) { methodInfo.Invoke(instance, new[] { value }); };
             }
 
             /// <summary>
@@ -1572,10 +1382,7 @@ namespace SimpleJson
             /// </remarks>
             public static GetterDelegate GetFieldGetter(FieldInfo fieldInfo)
             {
-                return delegate(object instance)
-                {
-                    return fieldInfo.GetValue(instance);
-                };
+                return delegate(object instance) { return fieldInfo.GetValue(instance); };
             }
 
             /// <summary>
@@ -1588,16 +1395,10 @@ namespace SimpleJson
             /// </remarks>
             public static SetterDelegate GetFieldSetter(FieldInfo fieldInfo)
             {
-                if (fieldInfo.IsInitOnly ||
-                    fieldInfo.IsLiteral)
-                {
+                if (fieldInfo.IsInitOnly || fieldInfo.IsLiteral)
                     return null;
-                }
 
-                return delegate(object instance, object value)
-                {
-                    fieldInfo.SetValue(instance, value);
-                };
+                return delegate(object instance, object value) { fieldInfo.SetValue(instance, value); };
             }
 
             #endregion Getter / Setter Generators
@@ -1615,24 +1416,19 @@ namespace SimpleJson
             public static FactoryDelegate GetTypeFactory(Type type)
             {
                 if (type == null)
-                {
                     throw new ArgumentNullException("type");
-                }
 
                 ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null);
                 if (ctor == null)
-                {
                     return null;
-                }
 
-                return DynamicMethodGenerator.GetTypeFactory(ctor);
+                return GetTypeFactory(ctor);
             }
 
             /// <summary>
             /// Creates a constructor delegate accepting specified arguments
             /// </summary>
-            /// <param name="type">type to be created</param>
-            /// <param name="args">constructor arguments type list</param>
+            /// <param name="ctor">The constructor</param>
             /// <returns>FactoryDelegate or null if constructor not found</returns>
             /// <remarks>
             /// Note: use with caution this method will expose private and protected constructors without safety checks.
@@ -1640,14 +1436,9 @@ namespace SimpleJson
             public static FactoryDelegate GetTypeFactory(ConstructorInfo ctor)
             {
                 if (ctor == null)
-                {
                     throw new ArgumentNullException("ctor");
-                }
 
-                return delegate(object[] args)
-                {
-                    return ctor.Invoke(args);
-                };
+                return delegate(object[] args) { return ctor.Invoke(args); };
             }
 
             #endregion Type Factory Generators
@@ -1660,14 +1451,10 @@ namespace SimpleJson
             public FactoryMap(Type type)
             {
                 if (type == null)
-                {
                     throw new ArgumentNullException("type");
-                }
 
                 if (type.IsInterface || type.IsAbstract || type.IsValueType)
-                {
                     throw new ArgumentException(string.Format("Invalid type. Cannot create an instance of {0}", type.FullName));
-                }
 
                 Ctor = DynamicMethodGenerator.GetTypeFactory(type);
             }
@@ -1740,9 +1527,7 @@ namespace SimpleJson
             public FactoryMap LoadFactory(Type type)
             {
                 if (type == null || type == typeof(object))
-                {
                     return null;
-                }
 
                 FactoryMap map;
 
@@ -1752,9 +1537,7 @@ namespace SimpleJson
                 {
                     // try getting from cache
                     if (_factories.TryGetValue(type, out map))
-                    {
                         return map;
-                    }
                 }
 
                 map = new FactoryMap(type);
@@ -1771,9 +1554,7 @@ namespace SimpleJson
             public IDictionary<string, MemberMap> LoadMaps(Type type)
             {
                 if (type == null || type == typeof(object))
-                {
                     return null;
-                }
 
                 IDictionary<string, MemberMap> maps;
 
@@ -1782,9 +1563,7 @@ namespace SimpleJson
 #endif
                 {
                     if (_memberMaps.TryGetValue(type, out maps))
-                    {
                         return maps;
-                    }
                 }
 
 #if !SIMPLE_JSON_CONCURRENTDICTIONARY
@@ -1807,5 +1586,4 @@ namespace SimpleJson
     }
 
     #endregion
-
 }
