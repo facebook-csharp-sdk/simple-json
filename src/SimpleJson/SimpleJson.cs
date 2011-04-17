@@ -207,7 +207,14 @@ namespace SimpleJson
         /// <param name="arrayIndex">Index of the array.</param>
         public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            int num = Count;
+            foreach (var kvp in this)
+            {
+                array[arrayIndex++] = kvp;
+
+                if (--num <= 0)
+                    return;
+            }
         }
 
         /// <summary>
