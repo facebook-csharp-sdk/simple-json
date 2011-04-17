@@ -1128,7 +1128,7 @@ namespace SimpleJson
 #if SIMPLE_JSON_DATACONTRACT
  DataContractJsonSerializerStrategy
 #else
-                        PocoJsonSerializerStrategy
+ PocoJsonSerializerStrategy
 #endif
 );
             }
@@ -1620,8 +1620,8 @@ namespace SimpleJson
         /// Generates delegates for getting/setting properties and field and invoking constructors
         /// </summary>
 #if NET20
-	[System.Security.SecurityTreatAsSafe]
-	[System.Security.SecurityCritical]
+        [System.Security.SecurityTreatAsSafe]
+        [System.Security.SecurityCritical]
 #else
         [System.Security.SecuritySafeCritical]
 #endif
@@ -1772,6 +1772,26 @@ namespace SimpleJson
             }
 
             #endregion Type Factory Generators
+        }
+
+        class FactoryMap
+        {
+            public readonly FactoryDelegate Ctor;
+
+            public FactoryMap(Type type)
+            {
+                if (type == null)
+                {
+                    throw new ArgumentNullException("type");
+                }
+
+                if (type.IsInterface || type.IsAbstract || type.IsValueType)
+                {
+                    throw new ArgumentException(string.Format("Invalid type. Cannot create an instance of {0}", type.FullName));
+                }
+
+                Ctor = DynamicMethodGenerator.GetTypeFactory(type);
+            }
         }
     }
 
