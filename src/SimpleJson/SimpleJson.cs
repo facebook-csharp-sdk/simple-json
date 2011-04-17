@@ -11,6 +11,7 @@
 
 //#define SIMPLE_JSON_DATACONTRACT
 
+using System.Reflection.Emit;
 using System.Threading;
 
 namespace SimpleJson
@@ -1388,7 +1389,7 @@ namespace SimpleJson
                 return false;
             }
 
-            bool hasDataContract = GetAttribute(type, typeof(DataContractAttribute)) != null;
+            bool hasDataContract = Reflection.ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
             if (hasDataContract)
             {
                 var anonymous = type.FullName.Contains("__AnonymousType");
@@ -1424,7 +1425,7 @@ namespace SimpleJson
 
         public override object DeserializeObject(object value, Type type)
         {
-            bool hasDataContract = GetAttribute(type, typeof(DataContractAttribute)) != null;
+            bool hasDataContract = Reflection.ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
             if (!hasDataContract)
             {
                 return base.DeserializeObject(value, type);
@@ -1518,12 +1519,12 @@ namespace SimpleJson
 
         private string GetKey(MemberInfo info)
         {
-            if (GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
+            if (Reflection.ReflectionUtils.GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
             {
                 return info.Name;
             }
 
-            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)GetAttribute(info, typeof(DataMemberAttribute));
+            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)Reflection.ReflectionUtils.GetAttribute(info, typeof(DataMemberAttribute));
 
             if (dataMemberAttribute == null)
             {
@@ -1535,64 +1536,14 @@ namespace SimpleJson
             return jsonKey;
         }
 
-        protected static Attribute GetAttribute(Type objectType, Type attributeType)
-        {
-            foreach (var attr in objectType.GetCustomAttributes(attributeType, true))
-            {
-                if (AreSame(attr.GetType(), attributeType))
-                {
-                    return (Attribute)attr;
-                }
-            }
-
-            return null;
-        }
-
-        protected static Attribute GetAttribute(MemberInfo memberInfo, Type attributeType)
-        {
-            foreach (var attr in memberInfo.GetCustomAttributes(attributeType, true))
-            {
-                if (AreSame(attr.GetType(), attributeType))
-                {
-                    return (Attribute)attr;
-                }
-            }
-
-            return null;
-        }
-
-        protected static bool AreSame(Type a, Type b)
-        {
-            // http://stackoverflow.com/questions/708205/c-object-type-comparison
-            if (a == b)
-            {
-                // either both are null or they are the same type
-                return true;
-            }
-
-            if (a == null || b == null)
-            {
-                return false;
-            }
-
-            if (a.IsSubclassOf(b) || b.IsSubclassOf(a))
-            {
-                // one inherits from the other
-                return true;
-            }
-
-            // they have same immediate parent
-            return a.BaseType == b.BaseType;
-        }
-
         protected static void Add(MemberInfo info, object value, IDictionary<string, object> jsonObject)
         {
-            if (GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
+            if (Reflection.ReflectionUtils.GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
             {
                 return;
             }
 
-            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)GetAttribute(info, typeof(DataMemberAttribute));
+            DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)Reflection.ReflectionUtils.GetAttribute(info, typeof(DataMemberAttribute));
 
             if (dataMemberAttribute == null)
             {
@@ -1609,149 +1560,36 @@ namespace SimpleJson
 
     #endregion
 
-    sealed class Cache<TKey, TValue>
+
+    #region Reflection helpers
+
+    namespace Reflection
     {
-        private readonly Dictionary<TKey, object> entries;
-        private int owner;
-
-        #region Constructors
-        public Cache()
+        class ReflectionUtils
         {
-            entries = new Dictionary<TKey, object>();
-        }
-        public Cache(IEqualityComparer<TKey> equalityComparer)
-        {
-            entries = new Dictionary<TKey, object>(equalityComparer);
-        }
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// Returns the number of entries currently stored in the cache. Accessing this property
-        /// causes a check of all entries in the cache to ensure collected entries are not counted.
-        /// </summary>
-        public int Count
-        {
-            get { return ClearCollected(); }
-        }
-        #endregion
-
-        #region Indexers
-        /// <summary>
-        /// Indexer for accessing or adding cache entries.
-        /// </summary>
-        public TValue this[TKey key]
-        {
-            get { return Get(key); }
-            set { Insert(key, value); }
-        }
-
-        #endregion
-
-        #region Insert Methods
-
-        /// <summary>
-        /// Insert an object into the cache using the specified cache strategy (lifetime management).
-        /// </summary>
-        /// <param name="key">The cache key used to reference the item.</param>
-        /// <param name="value">The object to be inserted into the cache.</param>
-        public void Insert(TKey key, TValue value)
-        {
-            object entry = new WeakReference(value);
-            int current = Thread.CurrentThread.ManagedThreadId;
-            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
-            entries[key] = entry;
-            if (current != Interlocked.Exchange(ref owner, 0))
-                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
-        }
-        #endregion
-
-        #region GetValue Methods
-        /// <summary>
-        /// Retrieves an entry from the cache using the given key.
-        /// </summary>
-        /// <param name="key">The cache key of the item to retrieve.</param>
-        /// <returns>The retrieved cache item or null if not found.</returns>
-        public TValue Get(TKey key)
-        {
-            int current = Thread.CurrentThread.ManagedThreadId;
-            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
-            object entry;
-            entries.TryGetValue(key, out entry);
-            if (current != Interlocked.Exchange(ref owner, 0))
-                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
-            var wr = entry as WeakReference;
-            return (TValue)(wr != null ? wr.Target : entry);
-        }
-        #endregion
-
-        #region Remove Methods
-        /// <summary>
-        /// Removes the object associated with the given key from the cache.
-        /// </summary>
-        /// <param name="key">The cache key of the item to remove.</param>
-        /// <returns>True if an item removed from the cache and false otherwise.</returns>
-        public bool Remove(TKey key)
-        {
-            int current = Thread.CurrentThread.ManagedThreadId;
-            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
-            bool found = entries.Remove(key);
-            if (current != Interlocked.Exchange(ref owner, 0))
-                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
-            return found;
-        }
-        #endregion
-
-        #region Clear Methods
-        /// <summary>
-        /// Removes all entries from the cache.
-        /// </summary>
-        public void Clear()
-        {
-            int current = Thread.CurrentThread.ManagedThreadId;
-            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
-            entries.Clear();
-            if (current != Interlocked.Exchange(ref owner, 0))
-                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
-        }
-
-        /// <summary>
-        /// Process all entries in the cache and remove entries that refer to collected entries.
-        /// </summary>
-        /// <returns>The number of live cache entries still in the cache.</returns>
-        private int ClearCollected()
-        {
-            int current = Thread.CurrentThread.ManagedThreadId;
-            while (Interlocked.CompareExchange(ref owner, current, 0) != current) { }
-            //IList<TKey> keys = entries.Where(kvp => kvp.Value is WeakReference && !(kvp.Value as WeakReference).IsAlive).Select(kvp => kvp.Key).ToList();
-            IList<TKey> keys = new List<TKey>();
-            foreach (var entry in entries)
+            public static Attribute GetAttribute(MemberInfo info, Type type)
             {
-                if (entry.Value is WeakReference && !(entry.Value as WeakReference).IsAlive)
+                if (info == null || type == null || !Attribute.IsDefined(info, type))
                 {
-                    keys.Add(entry.Key);
+                    return null;
                 }
-            }
-            foreach (var k in keys)
-            {
-                entries.Remove(k);
-            }
-            int count = entries.Count;
-            if (current != Interlocked.Exchange(ref owner, 0))
-                throw new UnauthorizedAccessException("Thread had access to cache even though it shouldn't have.");
-            return count;
-        }
-        #endregion
 
-        #region ToString
-        /// <summary>
-        /// This method returns a string with information on the cache contents (number of contained objects).
-        /// </summary>
-        public override string ToString()
-        {
-            int count = ClearCollected();
-            return count > 0 ? String.Format("Cache contains {0} live objects.", count) : "Cache is empty.";
+                return Attribute.GetCustomAttribute(info, type);
+            }
+
+            protected static Attribute GetAttribute(Type objectType, Type attributeType)
+            {
+                if (objectType == null || attributeType == null || !Attribute.IsDefined(objectType, attributeType))
+                {
+                    return null;
+                }
+
+                return Attribute.GetCustomAttribute(objectType, attributeType);
+            }
         }
-        #endregion
     }
+
+
+    #endregion
+
 }
