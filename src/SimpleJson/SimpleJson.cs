@@ -520,19 +520,7 @@ namespace SimpleJson
 
         public static string EscapeToJavascriptString(string str)
         {
-            if (string.IsNullOrEmpty(str))
-            {
-                return str;
-            }
-
-            return str
-                .Replace(@"\b", "\b")
-                .Replace(@"\t", "\t")
-                .Replace(@"\n", "\n")
-                .Replace(@"\f", "\f")
-                .Replace(@"\r", "\r")
-                .Replace(@"""", "\"")
-                .Replace(@"\""", "\"");
+            return string.IsNullOrEmpty(str) ? str : str.Replace(@"\b", "\b").Replace(@"\t", "\t").Replace(@"\n", "\n").Replace(@"\f", "\f").Replace(@"\r", "\r").Replace(@"""", "\"").Replace(@"\""", "\"");
         }
 
         protected static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
