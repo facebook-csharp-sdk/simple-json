@@ -11,6 +11,8 @@
 
 //#define SIMPLE_JSON_DATACONTRACT
 
+//#define SIMPLE_JSON_CONCURRENTDICTIONARY
+
 using System.Reflection.Emit;
 using System.Threading;
 
@@ -1189,6 +1191,7 @@ namespace SimpleJson
 #endif
  class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
+        
         public virtual bool SerializeNonPrimitiveObject(object input, out object output)
         {
             return TrySerializeKnownTypes(input, out output) || TrySerializeUnknownTypes(input, out output);
@@ -1791,6 +1794,46 @@ namespace SimpleJson
                 }
 
                 Ctor = DynamicMethodGenerator.GetTypeFactory(type);
+            }
+        }
+
+        class ResolverCache
+        {
+#if SIMPLE_JSON_CONCURRENTDICTIONARY
+        private readonly IDictionary<Type, FactoryMap> _factories = new System.Collections.Concurrent.ConcurrentDictionary<Type, FactoryMap>();
+#else
+            private readonly IDictionary<Type, FactoryMap> _factories = new Dictionary<Type, FactoryMap>();
+#endif
+
+            public FactoryMap LoadFactory(Type type)
+            {
+                if (type == null || type == typeof(object))
+                {
+                    return null;
+                }
+
+                FactoryMap map;
+
+#if !SIMPLE_JSON_CONCURRENTDICTIONARY
+                lock (_factories)
+#endif
+                {
+                    // try getting from cache
+                    if (_factories.TryGetValue(type, out map))
+                    {
+                        return map;
+                    }
+                }
+
+                map = new FactoryMap(type);
+
+#if !SIMPLE_JSON_CONCURRENTDICTIONARY
+                lock (_factories)
+#endif
+                {
+                    // store in cache for future requests.
+                    return (_factories[type] = map);
+                }
             }
         }
     }
