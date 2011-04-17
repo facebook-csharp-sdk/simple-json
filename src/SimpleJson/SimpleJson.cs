@@ -34,6 +34,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using SimpleJson.Reflection;
 
+
 namespace SimpleJson
 {
     #region JsonArray
@@ -53,7 +54,7 @@ namespace SimpleJson
 
         public override string ToString()
         {
-            return SimpleJson.SerializeObject(this) ?? string.Empty;
+            return global::SimpleJson.SimpleJson.SerializeObject(this) ?? string.Empty;
         }
     }
 
@@ -269,7 +270,7 @@ namespace SimpleJson
         /// </returns>
         public override string ToString()
         {
-            return SimpleJson.SerializeObject(this);
+            return global::SimpleJson.SimpleJson.SerializeObject(this);
         }
 
 #if SIMPLE_JSON_DYNAMIC
