@@ -887,10 +887,8 @@ namespace SimpleJson
                 success = SerializeArray(jsonSerializerStrategy, (IEnumerable)value, builder);
             else if (IsNumeric(value))
                 success = SerializeNumber(Convert.ToDouble(value), builder);
-            else if ((value is Boolean) && (((Boolean)value) == true))
-                builder.Append("true");
-            else if ((value is Boolean) && ((Boolean)value == false))
-                builder.Append("false");
+            else if (value is Boolean)
+                builder.Append((bool)value ? "true" : "false");
             else if (value == null)
                 builder.Append("null");
             else
@@ -1104,7 +1102,7 @@ namespace SimpleJson
                 return value;
             else if (value == null)
                 return null;
-            else if (value is double && type != typeof (double))
+            else if (value is double && type != typeof(double))
                 return typeof(IConvertible).IsAssignableFrom(type) ? Convert.ChangeType(value, type, CultureInfo.InvariantCulture) : value;
 
             object obj = null;
