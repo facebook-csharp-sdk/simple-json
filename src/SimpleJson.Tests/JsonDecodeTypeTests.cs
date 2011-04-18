@@ -133,5 +133,45 @@ namespace SimpleJsonTests
 
             Assert.IsNull(result.Nothing);
         }
+
+        [TestMethod]
+        public void ClassArrayTests()
+        {
+            var json = "{\"Name\":\"person1\",\"HobbyArray\":[{\"name\":\"basketball\",\"value\":10},{\"name\":\"football\",\"value\":9}]}";
+
+            var result = SimpleJson.DeserializeObject<HobbyPersonArray>(json);
+
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void ClassListTests()
+        {
+            var json = "{\"Name\":\"person1\",\"HobbyArray\":[{\"name\":\"basketball\",\"value\":10},{\"name\":\"football\",\"value\":9}]}";
+
+            var result = SimpleJson.DeserializeObject<HobbyPersonList>(json);
+
+            Assert.IsNotNull(result);
+        }
+
+        public class HobbyPersonArray
+        {
+            public string Name { get; set; }
+            public Hobbies[] Hobbies { get; set; }
+        }
+
+        public class HobbyPersonList
+        {
+            public string Name { get; set; }
+            public IList<Hobbies> Hobbies { get; set; }
+        }
+
+        public class Hobbies
+        {
+            public string Name;
+            public int Value;
+        }
     }
+
+    
 }
