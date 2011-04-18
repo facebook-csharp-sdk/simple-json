@@ -94,6 +94,15 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
+        public void DecimalToIntTest()
+        {
+            var json = "10.2";
+            var result = SimpleJson.DeserializeObject<int>(json);
+
+            Assert.AreEqual(10, result);
+        }
+
+        [TestMethod]
         public void ArrayAndListDeserializationTests()
         {
             var obj = new

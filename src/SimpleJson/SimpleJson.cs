@@ -1100,10 +1100,12 @@ namespace SimpleJson
 
         public virtual object DeserializeObject(object value, Type type)
         {
-            if (value is string || value is bool || value is double)
+            if (value is string || value is bool)
                 return value;
             else if (value == null)
                 return null;
+            else if (value is double && type != typeof (double))
+                return typeof (IConvertible).IsAssignableFrom(type) ? Convert.ChangeType(value, type) : value;
 
             object obj = null;
 
