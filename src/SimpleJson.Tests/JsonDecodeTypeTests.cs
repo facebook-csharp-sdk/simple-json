@@ -103,6 +103,24 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
+        public void GivenNumberWithoutDecimalTypeIsLong()
+        {
+            var json = "10";
+            var result = SimpleJson.DeserializeObject(json);
+
+            Assert.IsInstanceOf<long>(result);
+        }
+
+        [TestMethod]
+        public void GivenNumberWithDecimalTypeIsDouble()
+        {
+            var json = "10.2";
+            var result = SimpleJson.DeserializeObject(json);
+
+            Assert.IsInstanceOf<double>(result);
+        }
+
+        [TestMethod]
         public void ArrayAndListDeserializationTests()
         {
             var obj = new

@@ -755,18 +755,31 @@ namespace SimpleJson
         }
 #endif
 
-        protected static double ParseNumber(char[] json, ref int index, ref bool success)
+        protected static object ParseNumber(char[] json, ref int index, ref bool success)
         {
             EatWhitespace(json, ref index);
 
             int lastIndex = GetLastIndexOfNumber(json, index);
             int charLength = (lastIndex - index) + 1;
 
-            double number;
-            success = Double.TryParse(new string(json, index, charLength), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+            object returnNumber;
+            var str = new string(json, index, charLength);
+            if (str.IndexOf(".", StringComparison.OrdinalIgnoreCase) != -1 || str.IndexOf("e", StringComparison.OrdinalIgnoreCase) != -1)
+            {
+                double number;
+                success = double.TryParse(new string(json, index, charLength), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+                returnNumber = number;
+
+            }
+            else
+            {
+                long number;
+                success = long.TryParse(new string(json, index, charLength), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+                returnNumber = number;
+            }
 
             index = lastIndex + 1;
-            return number;
+            return returnNumber;
         }
 
         protected static int GetLastIndexOfNumber(char[] json, int index)
@@ -1000,7 +1013,6 @@ namespace SimpleJson
         protected static bool IsNumeric(object o)
         {
             double result;
-
             return (o == null) ? false : Double.TryParse(o.ToString(), out result);
         }
 
