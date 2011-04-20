@@ -28,6 +28,9 @@ using System.Dynamic;
 #endif
 using System.Globalization;
 using System.Reflection;
+#if SIMPLE_JSON_REFLECTIONEMIT
+using System.Reflection.Emit;
+#endif
 #if SIMPLE_JSON_DATACONTRACT
 using System.Runtime.Serialization;
 #endif
@@ -1393,11 +1396,24 @@ namespace SimpleJson
                 if (!propertyInfo.CanRead)
                     return null;
 
+#if SIMPLE_JSON_REFLECTIONEMIT
+                MethodInfo getMethodInfo = propertyInfo.GetGetMethod(true);
+                DynamicMethod dynamicGet = CreateGetDynamicMethod(propertyInfo.DeclaringType);
+                ILGenerator getGenerator = dynamicGet.GetILGenerator();
+
+                getGenerator.Emit(OpCodes.Ldarg_0);
+                getGenerator.Emit(OpCodes.Call, getMethodInfo);
+                BoxIfNeeded(getMethodInfo.ReturnType, getGenerator);
+                getGenerator.Emit(OpCodes.Ret);
+
+                return (GetterDelegate)dynamicGet.CreateDelegate(typeof(GetterDelegate));
+#else
                 MethodInfo methodInfo = propertyInfo.GetGetMethod(true);
                 if (methodInfo == null)
                     return null;
 
                 return delegate(object instance) { return methodInfo.Invoke(instance, Type.EmptyTypes); };
+#endif
             }
 
             /// <summary>
@@ -1412,6 +1428,7 @@ namespace SimpleJson
             {
                 if (!propertyInfo.CanWrite)
                     return null;
+
 
                 MethodInfo methodInfo = propertyInfo.GetSetMethod(true);
                 if (methodInfo == null)
@@ -1490,6 +1507,31 @@ namespace SimpleJson
             }
 
             #endregion Type Factory Generators
+
+#if SIMPLE_JSON_REFLECTIONEMIT
+            // CreateGetDynamicMethod
+            private static DynamicMethod CreateGetDynamicMethod(Type type)
+            {
+                return new DynamicMethod("DynamicGet", typeof(object), new Type[] { typeof(object) }, type, true);
+            }
+
+            private static void BoxIfNeeded(Type type, ILGenerator generator)
+            {
+                if (type.IsValueType)
+                {
+                    generator.Emit(OpCodes.Box, type);
+                }
+            }
+
+            // UnboxIfNeeded
+            private static void UnboxIfNeeded(Type type, ILGenerator generator)
+            {
+                if (type.IsValueType)
+                {
+                    generator.Emit(OpCodes.Unbox_Any, type);
+                }
+            }
+#endif
         }
 
 #if SIMPLE_JSON_INTERNAL
