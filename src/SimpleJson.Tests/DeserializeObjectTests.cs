@@ -1,4 +1,4 @@
-namespace SimpleJsonTests
+﻿namespace SimpleJsonTests
 {
     using System;
     using System.Collections.Generic;
@@ -191,7 +191,7 @@ bye", pair.Key);
         public void ReadOcatalNumber()
         {
             var json = @"[0372, 0xFA, 0XFA]";
-            
+
             var o = SimpleJson.DeserializeObject(json);
         }
 
@@ -208,6 +208,18 @@ bye", pair.Key);
             var dict = (IDictionary<string, object>)o;
 
             Assert.AreEqual(@"Hi,I" + '\u0092' + "ve send you smth", dict["Message"]);
+        }
+
+        [TestMethod]
+        public void DeserializeUnicodeChar()
+        {
+            string json = "\"न\"";
+
+            var o = SimpleJson.DeserializeObject(json);
+
+            Assert.IsInstanceOf<string>(o);
+
+            Assert.AreEqual("न", o);
         }
 
         [TestMethod]

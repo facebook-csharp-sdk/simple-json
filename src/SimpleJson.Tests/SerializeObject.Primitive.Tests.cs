@@ -289,5 +289,13 @@ namespace SimpleJsonTests
 
             Assert.AreEqual(expected, actual["Value"]);
         }
+
+        [TestMethod]
+        public void SerializeUnicodeTests()
+        {
+            var o = SimpleJson.SerializeObject("न");
+
+            Assert.AreEqual("\"न\"", o);
+        }
     }
 }

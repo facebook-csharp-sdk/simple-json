@@ -985,13 +985,7 @@ namespace SimpleJson
                 else if (c == '\t')
                     builder.Append("\\t");
                 else
-                {
-                    int codepoint = Convert.ToInt32(c);
-                    if ((codepoint >= 32) && (codepoint <= 126))
-                        builder.Append(c);
-                    else
-                        builder.Append("\\u" + Convert.ToString(codepoint, 16).PadLeft(4, '0'));
-                }
+                    builder.Append(c);
             }
 
             builder.Append("\"");
