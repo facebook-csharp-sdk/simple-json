@@ -17,6 +17,9 @@
 // NOTE: uncomment the following line to enable ConcurrentDictionary instead of using locks.
 //#define SIMPLE_JSON_CONCURRENTDICTIONARY
 
+// NOTE: uncomment the following line to use Reflection.Emit (better performance) instead for method.invoke().
+//#define SIMPLE_JSON_REFLECTIONEMIT
+
 // original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 // most of the reflection methods taken from https://github.com/jsonfx/jsonfx
 
@@ -1111,7 +1114,9 @@ namespace SimpleJson
                 return value;
             else if (value == null)
                 return null;
-            else if (value is double && type != typeof(double))
+            else if ((value is long && type == typeof(long)) || (value is double && type == typeof(double)))
+                return value;
+            else if ((value is double && type != typeof(double)) || (value is long && type != typeof(long)))
                 return typeof(IConvertible).IsAssignableFrom(type) ? Convert.ChangeType(value, type, CultureInfo.InvariantCulture) : value;
 
             object obj = null;
@@ -1403,7 +1408,8 @@ namespace SimpleJson
 
                 getGenerator.Emit(OpCodes.Ldarg_0);
                 getGenerator.Emit(OpCodes.Call, getMethodInfo);
-                BoxIfNeeded(getMethodInfo.ReturnType, getGenerator);
+                if (!propertyInfo.PropertyType.IsClass) // box if needed
+                    getGenerator.Emit(OpCodes.Box, propertyInfo.PropertyType);
                 getGenerator.Emit(OpCodes.Ret);
 
                 return (GetterDelegate)dynamicGet.CreateDelegate(typeof(GetterDelegate));
@@ -1429,12 +1435,29 @@ namespace SimpleJson
                 if (!propertyInfo.CanWrite)
                     return null;
 
-
-                MethodInfo methodInfo = propertyInfo.GetSetMethod(true);
-                if (methodInfo == null)
+                MethodInfo setMethodInfo = propertyInfo.GetSetMethod(true);
+                if (setMethodInfo == null)
                     return null;
 
-                return delegate(object instance, object value) { methodInfo.Invoke(instance, new[] { value }); };
+#if SIMPLE_JSON_REFLECTIONEMIT
+                DynamicMethod dynamicSet = CreateSetDynamicMethod(propertyInfo.DeclaringType);
+                ILGenerator setGenerator = dynamicSet.GetILGenerator();
+
+                setGenerator.Emit(OpCodes.Ldarg_0);
+                setGenerator.Emit(OpCodes.Ldarg_1);
+                if (propertyInfo.PropertyType.IsClass)
+                    setGenerator.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
+                else
+                    setGenerator.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
+                setGenerator.Emit(OpCodes.Call, setMethodInfo);
+                setGenerator.Emit(OpCodes.Ret);
+
+                return (SetterDelegate)dynamicSet.CreateDelegate(typeof(SetterDelegate));
+#else
+                
+
+                return delegate(object instance, object value) { setMethodInfo.Invoke(instance, new[] { value }); };
+#endif
             }
 
             /// <summary>
@@ -1515,12 +1538,10 @@ namespace SimpleJson
                 return new DynamicMethod("DynamicGet", typeof(object), new Type[] { typeof(object) }, type, true);
             }
 
-            private static void BoxIfNeeded(Type type, ILGenerator generator)
+            // CreateSetDynamicMethod
+            private static DynamicMethod CreateSetDynamicMethod(Type type)
             {
-                if (type.IsValueType)
-                {
-                    generator.Emit(OpCodes.Box, type);
-                }
+                return new DynamicMethod("DynamicSet", typeof(void), new Type[] { typeof(object), typeof(object) }, type, true);
             }
 
             // UnboxIfNeeded
