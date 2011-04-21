@@ -1704,6 +1704,11 @@ namespace SimpleJson
 #endif
  delegate void SetHandler(object source, object value);
 
+#if SIMPLE_JSON_REFLECTIONEMIT
+        delegate object CtorDelegate();
+#endif
+
+
 #if SIMPLE_JSON_INTERNAL
     internal
 #else
@@ -1711,6 +1716,9 @@ namespace SimpleJson
 #endif
  class CacheResolver
         {
+#if SIMPLE_JSON_REFLECTIONEMIT
+            readonly static SafeDictionary<Type, CtorDelegate> _constructorCache = new SafeDictionary<Type, CtorDelegate>();
+#endif
         }
 
 #if SIMPLE_JSON_INTERNAL
