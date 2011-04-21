@@ -1322,11 +1322,6 @@ namespace SimpleJson
             }
         }
 
-        /// <summary>
-        /// Generalized delegate for invoking a constructor
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
 #if SIMPLE_JSON_INTERNAL
     internal
 #else
@@ -1346,11 +1341,6 @@ namespace SimpleJson
 #endif
  delegate object GetterDelegate(object target);
 
-        /// <summary>
-        /// Generalized delegate for setting a field or property value
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="value"></param>
 #if SIMPLE_JSON_INTERNAL
     internal
 #else
@@ -1358,16 +1348,6 @@ namespace SimpleJson
 #endif
  delegate void SetterDelegate(object target, object value);
 
-        /// <summary>
-        /// Delegate represnting Action&lt;T1,T2>
-        /// </summary>
-        /// <typeparam name="TArg1"></typeparam>
-        /// <typeparam name="TArg2"></typeparam>
-        /// <param name="arg1"></param>
-        /// <param name="arg2"></param>
-        /// <remarks>
-        /// Since .net 2.0 doesn't support Action taking 2 parameters we need this delegate.
-        /// </remarks>
 #if SIMPLE_JSON_INTERNAL
     internal
 #else
@@ -1708,6 +1688,21 @@ namespace SimpleJson
                 }
             }
         }
+
+        /*********************/
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+        public
+#endif
+ delegate object GetHandler(object source);
+
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+        public
+#endif
+ delegate void SetHandler(object source, object value);
 
 #if SIMPLE_JSON_INTERNAL
     internal
