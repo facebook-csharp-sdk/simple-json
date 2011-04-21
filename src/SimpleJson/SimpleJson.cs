@@ -1125,7 +1125,7 @@ namespace SimpleJson
             {
                 var jsonObject = (IDictionary<string, object>)value;
 
-                obj = ResolverCache.LoadFactory(type).Ctor();
+                obj = CacheResolver.GetNewInstance(type);
                 var maps = ResolverCache.LoadMaps(type);
 
                 foreach (KeyValuePair<string, MemberMap> keyValuePair in maps)
@@ -1164,7 +1164,7 @@ namespace SimpleJson
                 {
                     Type innerType = type.GetGenericArguments()[0];
                     Type genericType = typeof(List<>).MakeGenericType(innerType);
-                    list = (IList)ResolverCache.LoadFactory(genericType).Ctor();
+                    list = (IList)CacheResolver.GetNewInstance(genericType);
                     foreach (var o in jsonObject)
                         list.Add(DeserializeObject(o, innerType));
                 }
@@ -1322,13 +1322,6 @@ namespace SimpleJson
             }
         }
 
-#if SIMPLE_JSON_INTERNAL
-    internal
-#else
-        public
-#endif
- delegate object FactoryDelegate(params object[] args);
-
         /// <summary>
         /// Generalized delegate for getting a field or property value
         /// </summary>
@@ -1471,46 +1464,6 @@ namespace SimpleJson
 
             #endregion Getter / Setter Generators
 
-            #region Type Factory Generators
-
-            /// <summary>
-            /// Creates a default constructor delegate
-            /// </summary>
-            /// <param name="type">type to be created</param>
-            /// <returns>FactoryDelegate or null if default constructor not found</returns>
-            /// <remarks>
-            /// Note: use with caution this method will expose private and protected constructors without safety checks.
-            /// </remarks>
-            public static FactoryDelegate GetTypeFactory(Type type)
-            {
-                if (type == null)
-                    throw new ArgumentNullException("type");
-
-                ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null);
-                if (ctor == null)
-                    return null;
-
-                return GetTypeFactory(ctor);
-            }
-
-            /// <summary>
-            /// Creates a constructor delegate accepting specified arguments
-            /// </summary>
-            /// <param name="ctor">The constructor</param>
-            /// <returns>FactoryDelegate or null if constructor not found</returns>
-            /// <remarks>
-            /// Note: use with caution this method will expose private and protected constructors without safety checks.
-            /// </remarks>
-            public static FactoryDelegate GetTypeFactory(ConstructorInfo ctor)
-            {
-                if (ctor == null)
-                    throw new ArgumentNullException("ctor");
-
-                return delegate(object[] args) { return ctor.Invoke(args); };
-            }
-
-            #endregion Type Factory Generators
-
 #if SIMPLE_JSON_REFLECTIONEMIT
             // CreateGetDynamicMethod
             private static DynamicMethod CreateGetDynamicMethod(Type type)
@@ -1533,27 +1486,6 @@ namespace SimpleJson
                 }
             }
 #endif
-        }
-
-#if SIMPLE_JSON_INTERNAL
-    internal
-#else
-        public
-#endif
- sealed class FactoryMap
-        {
-            public readonly FactoryDelegate Ctor;
-
-            public FactoryMap(Type type)
-            {
-                if (type == null)
-                    throw new ArgumentNullException("type");
-
-                if (type.IsInterface || type.IsAbstract || type.IsValueType)
-                    throw new ArgumentException(string.Format("Invalid type. Cannot create an instance of {0}", type.FullName));
-
-                Ctor = DynamicMethodGenerator.GetTypeFactory(type);
-            }
         }
 
 #if SIMPLE_JSON_INTERNAL
@@ -1618,43 +1550,14 @@ namespace SimpleJson
             private readonly Action<Type, IDictionary<string, MemberMap>> _memberMapsCreator;
 
 #if SIMPLE_JSON_CONCURRENTDICTIONARY
-        private readonly IDictionary<Type, FactoryMap> _factories = new System.Collections.Concurrent.ConcurrentDictionary<Type, FactoryMap>();
         private readonly IDictionary<Type, IDictionary<string, MemberMap>> _memberMaps = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, MemberMap>>();
 #else
-            private readonly IDictionary<Type, FactoryMap> _factories = new Dictionary<Type, FactoryMap>();
             private readonly IDictionary<Type, IDictionary<string, MemberMap>> _memberMaps = new Dictionary<Type, IDictionary<string, MemberMap>>();
 #endif
 
             public ResolverCache(Action<Type, IDictionary<string, MemberMap>> memberMapsCreator)
             {
                 _memberMapsCreator = memberMapsCreator;
-            }
-
-            public FactoryMap LoadFactory(Type type)
-            {
-                if (type == null || type == typeof(object))
-                    return null;
-
-                FactoryMap map;
-
-#if !SIMPLE_JSON_CONCURRENTDICTIONARY
-                lock (_factories)
-#endif
-                {
-                    // try getting from cache
-                    if (_factories.TryGetValue(type, out map))
-                        return map;
-                }
-
-                map = new FactoryMap(type);
-
-#if !SIMPLE_JSON_CONCURRENTDICTIONARY
-                lock (_factories)
-#endif
-                {
-                    // store in cache for future requests.
-                    return (_factories[type] = map);
-                }
             }
 
             public IDictionary<string, MemberMap> LoadMaps(Type type)
@@ -1704,9 +1607,12 @@ namespace SimpleJson
 #endif
  delegate void SetHandler(object source, object value);
 
-#if SIMPLE_JSON_REFLECTIONEMIT
-        delegate object CtorDelegate();
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+        public
 #endif
+ delegate object CtorDelegate();
 
 
 #if SIMPLE_JSON_INTERNAL
@@ -1716,9 +1622,41 @@ namespace SimpleJson
 #endif
  class CacheResolver
         {
-#if SIMPLE_JSON_REFLECTIONEMIT
             readonly static SafeDictionary<Type, CtorDelegate> _constructorCache = new SafeDictionary<Type, CtorDelegate>();
+
+            public static object GetNewInstance(Type type)
+            {
+                CtorDelegate c;
+                if (_constructorCache.TryGetValue(type, out c))
+                    return c();
+#if SIMPLE_JSON_REFLECTIONEMIT
+                DynamicMethod dynamicMethod = new DynamicMethod("Create" + type.FullName, typeof(object), Type.EmptyTypes, type, true);
+                dynamicMethod.InitLocals = true;
+                ILGenerator generator = dynamicMethod.GetILGenerator();
+                if (type.IsValueType)
+                {
+                    generator.DeclareLocal(type);
+                    generator.Emit(OpCodes.Ldloc_0);
+                    generator.Emit(OpCodes.Box, type);
+                }
+                else
+                {
+                    ConstructorInfo constructorInfo = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+                    if (constructorInfo == null)
+                        throw new Exception(string.Format("Could not get constructor for {0}.", type));
+                    generator.Emit(OpCodes.Newobj, constructorInfo);
+                }
+                generator.Emit(OpCodes.Ret);
+                c = (CtorDelegate)dynamicMethod.CreateDelegate(typeof(CtorDelegate));
+                _constructorCache.Add(type, c);
+                return c();
+#else
+                ConstructorInfo constructorInfo = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+                c = delegate { return constructorInfo.Invoke(null); };
+                _constructorCache.Add(type, c);
+                return c();
 #endif
+            }
         }
 
 #if SIMPLE_JSON_INTERNAL
