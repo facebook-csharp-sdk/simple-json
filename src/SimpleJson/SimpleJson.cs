@@ -1709,6 +1709,15 @@ namespace SimpleJson
 #else
         public
 #endif
+ class CacheResolver
+        {
+        }
+
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+        public
+#endif
  class SafeDictionary<TKey, TValue>
         {
             private readonly object _padlock = new object();
