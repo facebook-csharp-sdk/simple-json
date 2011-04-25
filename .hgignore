@@ -7,3 +7,4 @@ glob:_ReSharper.*/
 glob:*.resharper.user
 glob:*.TeamCity.user
 glob:.git/*
+glob:.working/*

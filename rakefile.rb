@@ -6,6 +6,7 @@ LOG               = false                # TODO: enable albacore logging from EN
 ENV['NIGHTLY']    = 'false'
 
 build_config = nil
+nuspec_config = nil
 
 task :configure do
    # do configuration stuffs here
@@ -57,15 +58,20 @@ task :configure do
             :authors                 => "Jim Zimmerman, Nathan Totten, Prabir Shrestha"
        }
    }
+
+   nuspec_config = {
+        "SimpleJson" => {
+            :description => "Super lightweight Json library for .NET"
+        }
+	}
    
    build_config[:paths][:packages]  = "#{build_config[:paths][:src]}packages/"
    build_config[:paths][:nunit][:x86_console_path]  = "#{build_config[:paths][:packages]}NUnit.2.5.9.10348/Tools/nunit-console-x86.exe"
-   
-   #build_config[:paths][:nuget]  = "#{build_config[:paths][:packages]}NuGet.CommandLine.1.2.20311.3/Tools/NuGet.exe"
+   build_config[:paths][:nuget]  = "#{build_config[:paths][:packages]}NuGet.CommandLine.1.2.20417.31/Tools/NuGet.exe"
    
    build_config[:sln]        = "#{build_config[:paths][:src]}SimpleJson.sln"
    
-    begin
+   begin
         build_config[:vcs][:rev_id] = `hg id -i`.chomp.chop # remove the +
         build_config[:vcs][:name] = 'hg'
         build_config[:vcs][:short_rev_id] = build_config[:vcs][:rev_id]
@@ -139,4 +145,57 @@ nunit :tests => [:build] do |nunit|
     nunit.command    = build_config[:paths][:nunit][:x86_console_path]
     nunit.assemblies = ["#{build_config[:paths][:src]}SimpleJson.Tests/bin/Release/SimpleJson.Tests.dll"]
     nunit.options = ["/xml=#{build_config[:paths][:output]}/Tests.nunit.xml"]
+end
+
+directory "#{build_config[:paths][:working]}"
+directory "#{build_config[:paths][:working]}NuGet/"
+directory "#{build_config[:paths][:dist]}"
+directory "#{build_config[:paths][:dist]}NuGet"
+
+task :nuspec => ["#{build_config[:paths][:working]}"] do
+    rm_rf "#{build_config[:paths][:working]}NuGet/"
+    mkdir "#{build_config[:paths][:working]}NuGet/"
+    
+	 Dir.entries(base_dir = "#{build_config[:paths][:build]}NuGet/").each do |name|
+        path = "#{base_dir}#{name}/"
+        dest_path = "#{build_config[:paths][:working]}NuGet/#{name}/"
+        if name == '.' or name == '..' then
+            next
+        end
+        FileUtils.cp_r path, dest_path
+        
+        nuspec do |nuspec|
+            config = nuspec_config[name]
+            nuspec.id = name
+            nuspec.version = "#{build_config[:version][:full]}"
+            nuspec.authors = "#{build_config[:nuspec][:authors]}"
+            nuspec.description = config[:description]
+            nuspec.language = "en-US"
+            nuspec.licenseUrl = "http://simplejson.codeplex.com/license"
+            nuspec.requireLicenseAcceptance = "false"
+            nuspec.projectUrl = "http://simplejson.codeplex.com"
+            nuspec.tags = "json"
+            nuspec.output_file = "#{dest_path}/#{name}.nuspec"
+        
+            if !config[:dependencies].nil? then
+                config[:dependencies].each do |d|
+                    nuspec.dependency d[:id], d[:version]
+                end
+            end
+        end
+    end
+
+	mkdir "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/"
+	cp "#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs", "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/"
+
+end
+
+task :nuget => [:nuspec] do
+	Dir["#{build_config[:paths][:working]}*/*/*.nuspec"].each do |name|
+        nugetpack :nuget do |nuget|
+            nuget.command = "#{build_config[:paths][:nuget]}"
+            nuget.nuspec  = name            
+            nuget.output = "#{build_config[:paths][:working]}Nuget/"
+        end
+    end
 end
