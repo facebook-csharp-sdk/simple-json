@@ -21,7 +21,6 @@
 //#define SIMPLE_JSON_REFLECTIONEMIT
 
 // original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
-// most of the reflection methods taken from https://github.com/jsonfx/jsonfx
 
 using System;
 using System.Collections;
