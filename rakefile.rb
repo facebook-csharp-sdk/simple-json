@@ -119,7 +119,7 @@ end
 
 Rake::Task["configure"].invoke
 
-task :default => [:build,:tests]
+task :default => [:build,:tests,:nuget]
 
 desc "Build"
 msbuild :build => [:clean] do |msb|
