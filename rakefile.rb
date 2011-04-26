@@ -66,7 +66,7 @@ task :configure do
 	}
    
    build_config[:paths][:packages]  = "#{build_config[:paths][:src]}packages/"
-   build_config[:paths][:nunit][:x86_console_path]  = "#{build_config[:paths][:packages]}NUnit.2.5.9.10348/Tools/nunit-console-x86.exe"
+   build_config[:paths][:nunit][:x86_console_path]  = "#{build_config[:paths][:packages]}NUnit.2.5.10.11092/Tools/nunit-console-x86.exe"
    build_config[:paths][:nuget]  = "#{build_config[:paths][:packages]}NuGet.CommandLine.1.2.20417.31/Tools/NuGet.exe"
    
    build_config[:sln]        = "#{build_config[:paths][:src]}SimpleJson.sln"
