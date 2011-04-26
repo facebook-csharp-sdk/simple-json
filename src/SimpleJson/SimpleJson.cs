@@ -14,13 +14,10 @@
 // NOTE: uncomment the following line to enable DataContract support.
 //#define SIMPLE_JSON_DATACONTRACT
 
-// NOTE: uncomment the following line to enable ConcurrentDictionary instead of using locks.
-//#define SIMPLE_JSON_CONCURRENTDICTIONARY
-
-// NOTE: uncomment the following line to use Reflection.Emit (better performance) instead for method.invoke().
+// NOTE: uncomment the following line to use Reflection.Emit (better performance) instead of method.invoke().
 //#define SIMPLE_JSON_REFLECTIONEMIT
 
-// original code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
+// original json parsing code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 
 using System;
 using System.Collections;
