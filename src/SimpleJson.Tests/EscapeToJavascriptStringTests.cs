@@ -1,8 +1,5 @@
 ﻿namespace SimpleJsonTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
 
 #if NUNIT
     using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -28,6 +25,15 @@
             var result = SimpleJson.EscapeToJavascriptString(serialized);
 
             Assert.AreEqual("\"c:\\haha.pl\"", result);
+        }
+
+        [TestMethod]
+        public void BackSlashWithT()
+        {
+            var serialized = SimpleJson.SerializeObject("c:\\taha.pl");
+            var result = SimpleJson.EscapeToJavascriptString(serialized);
+
+            Assert.AreEqual("\"c:\\taha.pl\"", result);
         }
     }
 }
