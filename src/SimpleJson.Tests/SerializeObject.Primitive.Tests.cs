@@ -297,5 +297,31 @@ namespace SimpleJsonTests
 
             Assert.AreEqual("\"न\"", o);
         }
+
+        [TestMethod]
+        public void SerializeDictionaryStringObjectTests()
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters["caption"] = string.Empty;
+            parameters["description"] = "hello world";
+            parameters["link"] = "http://google.com";
+
+            var result = SimpleJson.SerializeObject(parameters);
+
+            Assert.AreEqual("{\"caption\":\"\",\"description\":\"hello world\",\"link\":\"http://google.com\"}", result);
+        }
+
+        [TestMethod]
+        public void SerializeDictionaryStringStringTests()
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters["caption"] = string.Empty;
+            parameters["description"] = "hello world";
+            parameters["link"] = "http://google.com";
+
+            var result = SimpleJson.SerializeObject(parameters);
+
+            Assert.AreEqual("{\"caption\":\"\",\"description\":\"hello world\",\"link\":\"http://google.com\"}", result);
+        }
     }
 }
