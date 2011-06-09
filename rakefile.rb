@@ -119,7 +119,7 @@ end
 
 Rake::Task["configure"].invoke
 
-task :default => [:build,:tests,:nuget]
+task :default => [:build,:tests,:powershell,:nuget]
 
 desc "Build"
 msbuild :build => [:clean] do |msb|
@@ -198,4 +198,22 @@ task :nuget => [:nuspec] do
             nuget.output = "#{build_config[:paths][:working]}Nuget/"
         end
     end
+end
+
+task :powershell => ["#{build_config[:paths][:working]}"] do
+	cp "#{build_config[:paths][:src]}simplejson.script.ps1", "#{build_config[:paths][:working]}simplejson.ps1"
+
+	File.open("#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs", 'r') do |cs|
+		File.open("#{build_config[:paths][:working]}simplejson.ps1", 'a') do |ps|
+			ps.puts
+			ps.puts "Add-Type @\""
+			ps.puts "#define SIMPLE_JSON_DATACONTRACT"
+			ps.puts "#define SIMPLE_JSON_REFLECTIONEMIT"
+			ps.puts
+			while line = cs.gets
+				ps.puts line
+			end
+			ps.puts "\"@"
+		end
+	end
 end
