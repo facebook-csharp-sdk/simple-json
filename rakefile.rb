@@ -206,14 +206,16 @@ task :powershell => ["#{build_config[:paths][:working]}"] do
 	File.open("#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs", 'r') do |cs|
 		File.open("#{build_config[:paths][:working]}simplejson.ps1", 'a') do |ps|
 			ps.puts
-			ps.puts "Add-Type @\""
+			ps.puts "$source = @\""
+			ps.puts
 			ps.puts "#define SIMPLE_JSON_DATACONTRACT"
-			ps.puts "#define SIMPLE_JSON_REFLECTIONEMIT"
+			ps.puts "#define SIMPLE_JSON_REFLECTIONEMIT"			
 			ps.puts
 			while line = cs.gets
 				ps.puts line
 			end
 			ps.puts "\"@"
+			ps.puts "Add-Type -ReferencedAssemblies System.Runtime.Serialization -TypeDefinition $source -Language CSharp"
 		end
 	end
 end
