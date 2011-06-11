@@ -5,6 +5,13 @@
 
 function ConvertFrom-Json
 {
+    param(
+        [string][Parameter(Mandatory=$true,ValueFromPipeline=$true)] $json
+    )
+    
+    $obj = [SimpleJson.SimpleJson]::DeserializeObject($json)
+    
+    return $obj
 }
 
 function ConvertTo-Json
