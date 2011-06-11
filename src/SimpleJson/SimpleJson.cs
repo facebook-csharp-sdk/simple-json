@@ -1065,14 +1065,22 @@ namespace SimpleJson
 
         /// <summary>
         /// Determines if a given object is numeric in any way
-        /// (can be integer, double, null, etc). 
-        /// 
-        /// Thanks to mtighe for pointing out Double.TryParse to me.
+        /// (can be integer, double, null, etc).
         /// </summary>
-        protected static bool IsNumeric(object o)
+        protected static bool IsNumeric(object value)
         {
-            double result;
-            return (o == null) ? false : Double.TryParse(o.ToString(), out result);
+            if (value is sbyte) return true;
+            if (value is byte) return true;
+            if (value is short) return true;
+            if (value is ushort) return true;
+            if (value is int) return true;
+            if (value is uint) return true;
+            if (value is long) return true;
+            if (value is ulong) return true;
+            if (value is float) return true;
+            if (value is double) return true;
+            if (value is decimal) return true;
+            return false;
         }
 
         private static IJsonSerializerStrategy currentJsonSerializerStrategy;
