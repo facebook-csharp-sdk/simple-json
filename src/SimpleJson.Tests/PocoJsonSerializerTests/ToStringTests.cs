@@ -22,15 +22,15 @@
 
             Assert.AreEqual("{\"Y\":\"z\"}", json);
         }
-    }
 
-    class X
-    {
-        public string Y { get; set; }
-
-        public override string ToString()
+        class X
         {
-            return SimpleJson.SimpleJson.SerializeObject(this, SimpleJson.SimpleJson.PocoJsonSerializerStrategy);
+            public string Y { get; set; }
+
+            public override string ToString()
+            {
+                return SimpleJson.SimpleJson.SerializeObject(this, SimpleJson.SimpleJson.PocoJsonSerializerStrategy);
+            }
         }
     }
 }
