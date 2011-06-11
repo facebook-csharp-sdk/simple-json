@@ -37,7 +37,7 @@ function ConvertJsonObjectToPsObject
     
     if($obj -eq $null)
     {
-        return
+        return $null
     }
     if($obj -is [System.Collections.Generic.IDictionary[string,object]])
     {
