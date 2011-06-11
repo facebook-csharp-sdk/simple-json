@@ -6,10 +6,16 @@
 function ConvertFrom-Json
 {
     param(
-        [string][Parameter(Mandatory=$true,ValueFromPipeline=$true)] $json
+        [Switch] $AsPSObject,
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)][String]$json
     )
     
-    $obj = [SimpleJson.SimpleJson]::DeserializeObject($json)
+    $obj= [SimpleJson.SimpleJson]::DeserializeObject($json)
+    
+    if($AsPSObject)
+    {
+        $obj = ConvertJsonObjectToPsObject($obj)
+    }
     
     return $obj
 }
@@ -21,4 +27,39 @@ function ConvertTo-Json
     )
     
     return [SimpleJson.SimpleJson]::SerializeObject($obj)
+}
+
+function ConvertJsonObjectToPsObject
+{
+    param(
+        [Object] $obj
+    )
+    
+    if($obj -eq $null)
+    {
+        return
+    }
+    if($obj -is [System.Collections.Generic.IDictionary[string,object]])
+    {
+        $hash = @{}
+        foreach($kvp in $obj)
+        {
+            $hash[$kvp.Key] = ConvertJsonObjectToPsObject($kvp.Value)
+        }
+        
+        return $hash
+    }
+    if($obj -is [system.collections.generic.list[object]])
+    {
+        $arr = New-Object object[] $obj.Count
+        
+        for ( $i = 0; $i -lt $obj.count; $i++ )
+        { 
+            $arr[$i] = ConvertJsonObjectToPsObject($obj[$i])
+        }
+        
+        return $arr
+    }
+    
+    return  $obj
 }
