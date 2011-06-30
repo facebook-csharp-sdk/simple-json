@@ -237,5 +237,32 @@ bye", pair.Key);
         {
             var o = SimpleJson.DeserializeObject("[1");
         }
+
+        [TestMethod]
+        public void DeauthorizeSurrogatePair()
+        {
+            string json = "\"𩸽 is Arabesque greenling(fish) in japanese\"";
+            var o = SimpleJson.DeserializeObject(json);
+            Assert.IsInstanceOf<string>(o);
+            Assert.AreEqual("𩸽 is Arabesque greenling(fish) in japanese", o);
+        }
+
+        [TestMethod]
+        public void DeauthorizeEscapedSurrogatePair()
+        {
+            string json = "\"\\uD867\\uDE3D is Arabesque greenling(fish)\"";  // 𩸽
+            var o = SimpleJson.DeserializeObject(json);
+            Assert.IsInstanceOf<string>(o);
+            Assert.AreEqual("\uD867\uDE3D is Arabesque greenling(fish)", o);
+            Assert.AreEqual("𩸽 is Arabesque greenling(fish)", o);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SerializationException), ExpectedMessage = "Invalid JSON string")]
+        public void DeauthorizeInvaildEscapedSurrogatePair()
+        {
+            string json = "\"\\uD867\\u0000 is Arabesque greenling(fish)\"";
+            var o = SimpleJson.DeserializeObject(json);
+        }
     }
 }
