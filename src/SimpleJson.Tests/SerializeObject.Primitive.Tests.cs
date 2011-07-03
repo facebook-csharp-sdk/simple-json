@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Runtime.Serialization;
 
 namespace SimpleJsonTests
@@ -329,19 +330,10 @@ namespace SimpleJsonTests
         [TestMethod]
         public void SerializeSurrogatePair()
         {
-            string json = "𩸽 is Arabesque greenling(fish) in japanese";
-            var o = SimpleJson.SerializeObject(json);
-            
-            Assert.AreEqual("\"𩸽 is Arabesque greenling(fish) in japanese\"", o);
-        }
+            string str = "𩸽 is Arabesque greenling(fish) in japanese";
+            string json = SimpleJson.SerializeObject(str);
 
-        [TestMethod]
-        public void SerializeEscapedSurrogatePair()
-        {
-            string json = "\uD867\uDE3D is Arabesque greenling(fish)";  // 𩸽
-            var o = SimpleJson.SerializeObject(json);
-            Assert.AreEqual("\"\uD867\uDE3D is Arabesque greenling(fish)\"", o);
-            Assert.AreEqual("\"𩸽 is Arabesque greenling(fish)\"", o);
+            Assert.AreEqual("\"𩸽 is Arabesque greenling(fish) in japanese\"", json);
         }
     }
 }
