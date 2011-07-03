@@ -201,10 +201,10 @@ task :nuget => [:nuspec] do
 end
 
 task :powershell => ["#{build_config[:paths][:working]}"] do
-	cp "#{build_config[:paths][:src]}simplejson.script.ps1", "#{build_config[:paths][:working]}simplejson.ps1"
+	cp "#{build_config[:paths][:src]}simplejson.script.ps1", "#{build_config[:paths][:working]}simplejson.psm1"
 
 	File.open("#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs", 'r') do |cs|
-		File.open("#{build_config[:paths][:working]}simplejson.ps1", 'a') do |ps|
+		File.open("#{build_config[:paths][:working]}simplejson.psm1", 'a') do |ps|
 			ps.puts
 			ps.puts "$source = @\""
 			ps.puts
@@ -215,6 +215,8 @@ task :powershell => ["#{build_config[:paths][:working]}"] do
 				ps.puts line
 			end
 			ps.puts "\"@"
+            ps.puts "Export-ModuleMember ConvertFrom-Json"
+            ps.puts "Export-ModuleMember ConvertTo-Json"
 			ps.puts "Add-Type -ReferencedAssemblies System.Runtime.Serialization -TypeDefinition $source -Language CSharp"
 		end
 	end
