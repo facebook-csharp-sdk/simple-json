@@ -264,5 +264,33 @@ bye", pair.Key);
             string json = "\"\\uD867\\u0000 is Arabesque greenling(fish)\"";
             var o = SimpleJson.DeserializeObject(json);
         }
+
+        [TestMethod]
+        public void DeserializeKnownJsonObjectType()
+        {
+            var json = "{\"FirstName\":\"Bruno\",\"LastName\":\"Baïa\",\"Address\":{\"Country\":\"France\",\"City\":\"Toulouse\"}}";
+            var result = SimpleJson.DeserializeObject<JsonObject>(json);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Bruno", result["FirstName"]);
+            Assert.AreEqual("Baïa", result["LastName"]);
+            var address = result["Address"] as JsonObject;
+            Assert.AreEqual("France", address["Country"]);
+            Assert.AreEqual("Toulouse", address["City"]);
+        }
+
+        [TestMethod]
+        public void DeserializeKnownJsonArrayType()
+        {
+            var json = "[{\"name\":\"road cycling\",\"value\":11},{\"name\":\"football\",\"value\":9}]";
+            var result = SimpleJson.DeserializeObject<JsonArray>(json);
+
+            Assert.IsNotNull(result);
+            foreach (JsonObject hobby in result)
+            {
+                Assert.NotNull(hobby["name"]);
+                Assert.NotNull(hobby["value"]);
+            }
+        }
     }
 }

@@ -497,7 +497,15 @@ namespace SimpleJson
         {
             object jsonObject = DeserializeObject(json);
 
-            return type == null ? jsonObject : (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(jsonObject, type);
+            if (type == null ||
+                jsonObject != null && jsonObject.GetType().IsAssignableFrom(type))
+            {
+                return jsonObject;
+            }
+            else
+            {
+                return (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(jsonObject, type);
+            }
         }
 
         public static object DeserializeObject(string json, Type type)
