@@ -155,7 +155,10 @@ directory "#{build_config[:paths][:dist]}NuGet"
 task :nuspec => ["#{build_config[:paths][:working]}"] do
     rm_rf "#{build_config[:paths][:working]}NuGet/"
     mkdir "#{build_config[:paths][:working]}NuGet/"
-    
+
+    mkdir "#{build_config[:paths][:build]}NuGet/" if !Dir.exist? "#{build_config[:paths][:build]}NuGet/"
+    mkdir "#{build_config[:paths][:build]}NuGet/SimpleJson" if !Dir.exist? "#{build_config[:paths][:build]}NuGet/SimpleJson"
+
 	 Dir.entries(base_dir = "#{build_config[:paths][:build]}NuGet/").each do |name|
         path = "#{base_dir}#{name}/"
         dest_path = "#{build_config[:paths][:working]}NuGet/#{name}/"
