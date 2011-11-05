@@ -13,7 +13,8 @@ namespace SimpleJsonTests.DataContractTests
 #endif
 
     using SimpleJson;
-
+    
+    [TestClass]
     public class PrivateReadonlySerializeTests
     {
         private DataContractPrivateReadOnlyFields _dataContractPrivateReadOnlyFields;
@@ -23,7 +24,7 @@ namespace SimpleJsonTests.DataContractTests
             _dataContractPrivateReadOnlyFields = new DataContractPrivateReadOnlyFields();
         }
 
-        [Test]
+        [TestMethod]
         public void SerializesCorrectly()
         {
             var result = SimpleJson.SerializeObject(_dataContractPrivateReadOnlyFields,

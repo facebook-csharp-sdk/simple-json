@@ -15,6 +15,7 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
     using SimpleJson;
     using SimpleJsonTests.DataContractTests;
 
+    [TestClass]
     public class PrivateReadonlySerializeTests
     {
         private DataContractPrivateReadOnlyFields _dataContractPrivateReadOnlyFields;
@@ -24,7 +25,7 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
             _dataContractPrivateReadOnlyFields = new DataContractPrivateReadOnlyFields();
         }
 
-        [Test]
+        [TestMethod]
         public void SerializesCorrectly()
         {
             var result = SimpleJson.SerializeObject(_dataContractPrivateReadOnlyFields,

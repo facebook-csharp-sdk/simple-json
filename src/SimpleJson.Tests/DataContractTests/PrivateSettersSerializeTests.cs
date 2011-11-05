@@ -14,6 +14,7 @@ namespace SimpleJsonTests.DataContractTests
 
     using SimpleJson;
 
+    [TestClass]
     public class PrivateSettersSerializeTests
     {
         private DataContractPrivateSetters _dataContractPrivateSetters;
@@ -23,7 +24,7 @@ namespace SimpleJsonTests.DataContractTests
             _dataContractPrivateSetters = new DataContractPrivateSetters();
         }
 
-        [Test]
+        [TestMethod]
         public void SerializesCorrectly()
         {
             var result = SimpleJson.SerializeObject(_dataContractPrivateSetters,

@@ -16,6 +16,7 @@ namespace SimpleJsonTests
 
     using SimpleJson;
 
+    [TestClass]
     public class SerializeObject_KnownNonPrimitive_Tests
     {
         [TestMethod]

@@ -17,6 +17,7 @@ namespace SimpleJsonTests.DataContractTests
 
     using SimpleJson;
 
+    [TestClass]
     public class PublicGetterSetterDeserializeTests
     {
         [TestMethod]

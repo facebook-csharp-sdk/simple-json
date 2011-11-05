@@ -17,6 +17,7 @@ namespace SimpleJsonTests
 
     using SimpleJson;
 
+    [TestClass]
     public class DeserializeObjectTypeTests
     {
         private class Person
@@ -107,8 +108,11 @@ namespace SimpleJsonTests
         {
             var json = "10";
             var result = SimpleJson.DeserializeObject(json);
-
+#if SIMPLE_JSON_WINRT
+            Assert.IsInstanceOfType(result, typeof(long));
+#else
             Assert.IsInstanceOf<long>(result);
+#endif
         }
 
         [TestMethod]
@@ -117,7 +121,11 @@ namespace SimpleJsonTests
             var json = "10.2";
             var result = SimpleJson.DeserializeObject(json);
 
-            Assert.IsInstanceOf<double>(result);
+#if SIMPLE_JSON_WINRT
+            Assert.IsInstanceOfType(result, typeof(double));
+#else
+          Assert.IsInstanceOf<double>(result);  
+#endif
         }
 
         [TestMethod]
@@ -191,5 +199,5 @@ namespace SimpleJsonTests
         }
     }
 
-    
+
 }

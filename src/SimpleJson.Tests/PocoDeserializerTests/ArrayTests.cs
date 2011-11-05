@@ -13,6 +13,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
 
+    [TestClass]
     public class ArrayTests
     {
         [TestMethod]
@@ -22,8 +23,14 @@
 
             var result = SimpleJson.SimpleJson.DeserializeObject<X>(json);
 
+#if SIMPLE_JSON_WINRT
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Y);
+#else
             Assert.NotNull(result);
             Assert.NotNull(result.Y);
+#endif
+
             Assert.AreEqual(2, result.Y.Length);
             Assert.AreEqual("a", result.Y[0]);
             Assert.AreEqual("b", result.Y[1]);

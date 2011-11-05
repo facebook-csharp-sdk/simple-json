@@ -15,6 +15,7 @@ namespace SimpleJsonTests
 
     using SimpleJson;
 
+    [TestClass]
     public class SerializeObject_UnknownNonPrimitive_Tests
     {
         private class Dog

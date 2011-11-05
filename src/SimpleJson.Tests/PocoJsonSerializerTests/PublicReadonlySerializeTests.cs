@@ -9,11 +9,13 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
     using ClassInitialize = NUnit.Framework.TestFixtureSetUpAttribute;
     using NUnit.Framework;
 #else
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
 
     using SimpleJson;
     using SimpleJsonTests.DataContractTests;
 
+    [TestClass]
     public class PublicReadonlySerializeTests
     {
         private DataContractPublicReadOnlyFields _dataContractPublicReadOnlyFields;
@@ -23,7 +25,7 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
             _dataContractPublicReadOnlyFields = new DataContractPublicReadOnlyFields();
         }
 
-        [Test]
+        [TestMethod]
         public void SerializesCorrectly()
         {
             var result = SimpleJson.SerializeObject(_dataContractPublicReadOnlyFields,

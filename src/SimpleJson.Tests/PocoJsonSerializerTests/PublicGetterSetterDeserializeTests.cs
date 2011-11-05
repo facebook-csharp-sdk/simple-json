@@ -14,7 +14,8 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
 
     using SimpleJson;
     using SimpleJsonTests.DataContractTests;
-
+    
+    [TestClass]
     public class PublicGetterSetterDeserializeTests
     {
         [TestMethod]

@@ -17,6 +17,7 @@ namespace SimpleJsonTests
 
     using SimpleJson;
 
+    [TestClass]
     public class JsonDataContractSerializeObjectTests
     {
         [DataContract]

@@ -9,11 +9,13 @@
     using ClassInitialize = NUnit.Framework.TestFixtureSetUpAttribute;
     using NUnit.Framework;
 #else
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
 
+    [TestClass]
     public class ToStringTests
     {
-        [Test]
+        [TestMethod]
         public void ToStringCallingSerializeObjectOnItself()
         {
             var x = new X { Y = "z" };

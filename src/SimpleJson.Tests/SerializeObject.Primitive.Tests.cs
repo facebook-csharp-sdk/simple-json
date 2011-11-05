@@ -20,6 +20,7 @@ namespace SimpleJsonTests
 
     using SimpleJson;
 
+    [TestClass]
     public class SerializeObject_Primitive_Tests
     {
         [TestMethod]
@@ -97,7 +98,11 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
-        [Ignore("not part of json standards")]
+#if SIMPLE_JSON_WINRT
+        [Ignore]
+#else
+        [Ignore("not part of the json standard.")]    
+#endif
         public void CharSerialization()
         {
             Assert.AreEqual(@"""c""", SimpleJson.SerializeObject('c'));
@@ -121,12 +126,14 @@ namespace SimpleJsonTests
             Assert.AreEqual("null", SimpleJson.SerializeObject(null));
         }
 
+#if !SIMPLE_JSON_WINRT
         [TestMethod]
         [Ignore("uncomment if(Convert.IsDBNull(input)) in PocoJsonSerializerStrategy.TrySerializeKnownTypes. disabled to improve performance.")]
         public void DbNullSerialization()
         {
             Assert.AreEqual("null", SimpleJson.SerializeObject(System.DBNull.Value));
         }
+#endif
 
         [TestMethod]
         public void Int16Serialization()

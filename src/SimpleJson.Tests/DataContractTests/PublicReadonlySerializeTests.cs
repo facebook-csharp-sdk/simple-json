@@ -14,6 +14,7 @@ namespace SimpleJsonTests.DataContractTests
 
     using SimpleJson;
 
+    [TestClass]
     public class PublicReadonlySerializeTests
     {
         private DataContractPublicReadOnlyFields _dataContractPublicReadOnlyFields;
@@ -23,7 +24,7 @@ namespace SimpleJsonTests.DataContractTests
             _dataContractPublicReadOnlyFields = new DataContractPublicReadOnlyFields();
         }
 
-        [Test]
+        [TestMethod]
         public void SerializesCorrectly()
         {
             var result = SimpleJson.SerializeObject(_dataContractPublicReadOnlyFields,

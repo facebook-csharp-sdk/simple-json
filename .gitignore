@@ -1,13 +1,23 @@
 # Visual Studio Ignores
 [Bb]in/
 obj/
+App_Data/
 
 *.sln.cache
-*.docstates
 *.suo
 *.user
-
+*.build.csdef
 *.ncb
+*.docstates
+
+# Visual Studio 11+ Unit Test ignores
+*.UTests.ldf
+*.UTests.mdf
+
+*.xap
+!*StatLight.Client.For.*.xap
+
+*.userprefs # Mono develop
 
 # Visual Studio Extensions Ignores
 .vs10x

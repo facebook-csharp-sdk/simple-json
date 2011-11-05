@@ -15,6 +15,7 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
     using SimpleJson;
     using SimpleJsonTests.DataContractTests;
 
+    [TestClass]
     public class PrivateGettersSerializeTests
     {
         private DataContractPrivateGetters _dataContractPrivateGetters;
@@ -24,7 +25,7 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
             _dataContractPrivateGetters = new DataContractPrivateGetters();
         }
 
-        [Test]
+        [TestMethod]
         public void SerializesCorrectly()
         {
             var result = SimpleJson.SerializeObject(_dataContractPrivateGetters,
