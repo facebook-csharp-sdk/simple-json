@@ -344,8 +344,6 @@ bye", pair.Key);
             var o = SimpleJson.DeserializeObject("[1");
         }
 
-
-
         [TestMethod]
         public void DeserializeSurrogatePair()
         {

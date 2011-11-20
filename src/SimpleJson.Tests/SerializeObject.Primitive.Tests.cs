@@ -101,7 +101,7 @@ namespace SimpleJsonTests
 #if SIMPLE_JSON_WINRT
         [Ignore]
 #else
-        [Ignore("not part of the json standard.")]    
+        [Ignore("not part of the json standard.")]
 #endif
         public void CharSerialization()
         {
@@ -341,6 +341,15 @@ namespace SimpleJsonTests
             string json = SimpleJson.SerializeObject(str);
 
             Assert.AreEqual("\"𩸽 is Arabesque greenling(fish) in japanese\"", json);
+        }
+
+        [TestMethod]
+        public void SerializeDoubleQuotesCorrectly()
+        {
+            var obj = new { message = "Hi \"Prabir\"" };
+            string json = SimpleJson.SerializeObject(obj);
+
+            Assert.AreEqual("{\"message\":\"Hi \\\"Prabir\\\"\"}", json);
         }
     }
 }
