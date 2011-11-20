@@ -83,7 +83,7 @@
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !SIMPLE_JSON_WINRT
-       ExpectedMessage = 
+ ExpectedMessage =
 #endif
  "Invalid JSON string")]
         public void UnexpectedEndOfString()
@@ -103,7 +103,7 @@
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !SIMPLE_JSON_WINRT
-       ExpectedMessage = 
+ ExpectedMessage =
 #endif
  "Invalid JSON string")]
         public void UnexpectedEndOfHex()
@@ -115,7 +115,7 @@
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !SIMPLE_JSON_WINRT
-       ExpectedMessage = 
+ ExpectedMessage =
 #endif
  "Invalid JSON string")]
         public void UnexpectedEndOfControlCharacter()
@@ -126,7 +126,7 @@
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !SIMPLE_JSON_WINRT
-       ExpectedMessage = 
+ ExpectedMessage =
 #endif
  "Invalid JSON string")]
         public void UnexpectedEndWhenParsingUnquotedProperty()
@@ -145,7 +145,7 @@
             Assert.IsInstanceOfType(result, typeof(JsonObject));
 #else
             Assert.IsInstanceOf<IDictionary<string, object>>(result);
-            Assert.IsInstanceOf<JsonObject>(result); 
+            Assert.IsInstanceOf<JsonObject>(result);
 #endif
 
 
@@ -192,7 +192,7 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
         [Ignore]
 #else
-        [Ignore("not part of the json standard.")]    
+        [Ignore("not part of the json standard.")]
 #endif
         public void FloatingPointNonFiniteNumber()
         {
@@ -217,7 +217,7 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
             Assert.IsInstanceOfType(a[0], typeof(string));
 #else
-          Assert.IsInstanceOf<string>(a[0]);  
+            Assert.IsInstanceOf<string>(a[0]);
 #endif
 
 
@@ -234,7 +234,7 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
             Assert.IsInstanceOfType(o, typeof(List<object>));
 #else
-          Assert.IsInstanceOf<List<object>>(o);  
+            Assert.IsInstanceOf<List<object>>(o);
 #endif
 
             var l = (List<object>)o;
@@ -249,7 +249,7 @@ bye", pair.Key);
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !SIMPLE_JSON_WINRT
-       ExpectedMessage = 
+ ExpectedMessage =
 #endif
  "Invalid JSON string")]
         public void MissingColon()
@@ -269,7 +269,7 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
         [Ignore]
 #else
-        [Ignore("not part of the json standard.")]    
+        [Ignore("not part of the json standard.")]
 #endif
         public void ReadOcatalNumber()
         {
@@ -291,7 +291,7 @@ bye", pair.Key);
             Assert.IsInstanceOfType(o, typeof(JsonObject));
 #else
             Assert.IsInstanceOf<IDictionary<string, object>>(o);
-            Assert.IsInstanceOf<JsonObject>(o);  
+            Assert.IsInstanceOf<JsonObject>(o);
 #endif
 
 
@@ -312,7 +312,7 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
             Assert.IsInstanceOfType(o, typeof(string));
 #else
-         Assert.IsInstanceOf<string>(o);   
+            Assert.IsInstanceOf<string>(o);
 #endif
 
 
@@ -324,7 +324,7 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
         [Ignore]
 #else
-        [Ignore("not part of the json standard.")]    
+        [Ignore("not part of the json standard.")]
 #endif
         public void ReadHexidecimalWithAllLetters()
         {
@@ -336,7 +336,7 @@ bye", pair.Key);
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !SIMPLE_JSON_WINRT
-       ExpectedMessage = 
+ ExpectedMessage =
 #endif
  "Invalid JSON string")]
         public void ParseIncompleteArray()
@@ -352,12 +352,12 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
             Assert.IsInstanceOfType(o, typeof(string));
 #else
-           Assert.IsInstanceOf<string>(o); 
+            Assert.IsInstanceOf<string>(o);
 #endif
 
             Assert.AreEqual("𩸽 is Arabesque greenling(fish) in japanese", o);
         }
-        
+
         [TestMethod]
         public void DeserializeEscapedSurrogatePair()
         {
@@ -366,7 +366,7 @@ bye", pair.Key);
 #if SIMPLE_JSON_WINRT
             Assert.IsInstanceOfType(o, typeof(string));
 #else
-           Assert.IsInstanceOf<string>(o); 
+            Assert.IsInstanceOf<string>(o);
 #endif
             Assert.AreEqual("\uD867\uDE3D is Arabesque greenling(fish)", o);
             Assert.AreEqual("𩸽 is Arabesque greenling(fish)", o);
@@ -375,7 +375,7 @@ bye", pair.Key);
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !SIMPLE_JSON_WINRT
-       ExpectedMessage = 
+ ExpectedMessage =
 #endif
  "Invalid JSON string")]
         public void DeserializeInvaildEscapedSurrogatePair()
@@ -416,6 +416,15 @@ bye", pair.Key);
 #endif
 
             }
+        }
+
+        [TestMethod]
+        public void DeserializeDoubleQuotesCorrectly()
+        {
+            var json = "{\"message\":\"Hi \\\"Prabir\\\"\"}";
+            var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
+
+            Assert.AreEqual("Hi \"Prabir\"", result["message"]);
         }
     }
 }
