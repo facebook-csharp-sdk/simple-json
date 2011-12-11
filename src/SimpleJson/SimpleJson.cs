@@ -15,6 +15,7 @@
 //#define SIMPLE_JSON_DATACONTRACT
 
 // NOTE: uncomment the following line to use Reflection.Emit (better performance) instead of method.invoke().
+// don't enable ReflectionEmit for WinRT, Silverlight and WP7.
 //#define SIMPLE_JSON_REFLECTIONEMIT
 
 // NOTE: uncomment the following line if you are compiling under Window Metro style application/library.
@@ -587,6 +588,11 @@ namespace SimpleJson
                         if (lookahead == '\\')
                         {
                             sb.Append('\\');
+                            ++i;
+                        }
+                        else if (lookahead == '"')
+                        {
+                            sb.Append("\"");
                             ++i;
                         }
                         else if (lookahead == 't')
