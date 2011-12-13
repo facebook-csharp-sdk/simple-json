@@ -438,7 +438,7 @@ bye", pair.Key);
             var json = "{\"PropTypeKnown\":\"str\",\"PropTypeUnknown\":{\"unknown\":\"property\"}}";
             var result = SimpleJson.DeserializeObject<ObjProp>(json);
 
-            Assert.NotNull(result);
+            Assert.IsNotNull(result);
             Assert.AreEqual("str", result.PropTypeKnown);
 
 #if SIMPLE_JSON_WINRT
@@ -449,7 +449,7 @@ bye", pair.Key);
             Assert.IsInstanceOf<JsonObject>(result.PropTypeUnknown);
 #endif
             var dict = (IDictionary<string, object>)result.PropTypeUnknown;
-            Assert.NotNull(dict);
+            Assert.IsNotNull(dict);
             Assert.AreEqual(1, dict.Count);
             Assert.AreEqual("property", dict["unknown"]);
         }
