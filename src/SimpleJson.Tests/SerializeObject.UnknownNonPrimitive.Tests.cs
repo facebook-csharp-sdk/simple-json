@@ -23,6 +23,12 @@ namespace SimpleJsonTests
             public string Name { get; set; }
         }
 
+        public class ObjProp
+        {
+            public string PropTypeKnown { get; set; }
+            public object PropTypeUnknown { get; set; }
+        }
+
         [TestMethod]
         public void CanSerializeClassInstanceExample()
         {
@@ -84,6 +90,15 @@ namespace SimpleJsonTests
 
             var json = SimpleJson.SerializeObject(instance);
             Assert.IsNotNull(json);
+        }
+
+        [TestMethod]
+        public void CanSerializeUnknownProperty()
+        {
+            var instance = new ObjProp { PropTypeKnown = "str", PropTypeUnknown = new { unknown = "property" } };
+
+            var json = SimpleJson.SerializeObject(instance);
+            Assert.AreEqual("{\"PropTypeKnown\":\"str\",\"PropTypeUnknown\":{\"unknown\":\"property\"}}", json);
         }
     }
 }

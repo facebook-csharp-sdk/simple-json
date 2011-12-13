@@ -21,6 +21,11 @@
     [TestClass]
     public class DeserializeObjectTests
     {
+        public class ObjProp
+        {
+            public string PropTypeKnown { get; set; }
+            public object PropTypeUnknown { get; set; }
+        }
 
         [TestMethod]
         public void ReadIndented()
@@ -425,6 +430,28 @@ bye", pair.Key);
             var result = (IDictionary<string, object>)SimpleJson.DeserializeObject(json);
 
             Assert.AreEqual("Hi \"Prabir\"", result["message"]);
+        }
+
+        [TestMethod]
+        public void DeserializeUnknownProperty()
+        {
+            var json = "{\"PropTypeKnown\":\"str\",\"PropTypeUnknown\":{\"unknown\":\"property\"}}";
+            var result = SimpleJson.DeserializeObject<ObjProp>(json);
+
+            Assert.NotNull(result);
+            Assert.AreEqual("str", result.PropTypeKnown);
+
+#if SIMPLE_JSON_WINRT
+            Assert.IsInstanceOfType(result.PropTypeUnknown, typeof(IDictionary<string, object>));
+            Assert.IsInstanceOfType(result.PropTypeUnknown, typeof(JsonObject));
+#else
+            Assert.IsInstanceOf<IDictionary<string, object>>(result.PropTypeUnknown);
+            Assert.IsInstanceOf<JsonObject>(result.PropTypeUnknown);
+#endif
+            var dict = (IDictionary<string, object>)result.PropTypeUnknown;
+            Assert.NotNull(dict);
+            Assert.AreEqual(1, dict.Count);
+            Assert.AreEqual("property", dict["unknown"]);
         }
     }
 }
