@@ -61,7 +61,7 @@ task :configure do
 
    nuspec_config = {
         "SimpleJson" => {
-            :description => "Super lightweight Json library for .NET"
+            :description => "Super lightweight Json library for .NET 2.0+/SL4+/WP7/WinRT along with dynamic and DataContract support"
         }
 	}
    
