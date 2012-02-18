@@ -58,7 +58,6 @@ using SimpleJson.Reflection;
 
 namespace SimpleJson
 {
-
     #region JsonArray
 
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -89,7 +88,7 @@ namespace SimpleJson
         /// <returns>The json representation of the array.</returns>
         public override string ToString()
         {
-            return global::SimpleJson.SimpleJson.SerializeObject(this) ?? string.Empty;
+            return SimpleJson.SerializeObject(this) ?? string.Empty;
         }
     }
 
@@ -316,7 +315,7 @@ namespace SimpleJson
         /// </returns>
         public override string ToString()
         {
-            return global::SimpleJson.SimpleJson.SerializeObject(this);
+            return SimpleJson.SerializeObject(this);
         }
 
 #if SIMPLE_JSON_DYNAMIC

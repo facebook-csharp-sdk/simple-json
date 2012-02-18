@@ -159,6 +159,12 @@ task :nuspec => ["#{build_config[:paths][:working]}"] do
     mkdir "#{build_config[:paths][:build]}NuGet/" if !Dir.exist? "#{build_config[:paths][:build]}NuGet/"
     mkdir "#{build_config[:paths][:build]}NuGet/SimpleJson" if !Dir.exist? "#{build_config[:paths][:build]}NuGet/SimpleJson"
 
+	simpleJson = File.read "#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs"
+	replace = simpleJson.gsub('namespace SimpleJson', 'namespace $rootnamespace$')
+	replace = replace.gsub('using SimpleJson.Reflection;', 'using $rootnamespace$.Reflection;')
+
+	File.open("#{build_config[:paths][:working]}SimpleJson.cs", "w") { |file| file.puts replace }
+
 	 Dir.entries(base_dir = "#{build_config[:paths][:build]}NuGet/").each do |name|
         path = "#{base_dir}#{name}/"
         dest_path = "#{build_config[:paths][:working]}NuGet/#{name}/"
@@ -189,7 +195,7 @@ task :nuspec => ["#{build_config[:paths][:working]}"] do
     end
 
 	mkdir "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/"
-	cp "#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs", "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/"
+	cp "#{build_config[:paths][:working]}SimpleJson.cs", "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/SimpleJson.cs.pp"
 
 end
 

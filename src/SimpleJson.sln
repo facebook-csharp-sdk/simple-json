@@ -5,6 +5,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AEDAD4B4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A6BE2C6-039D-408B-85D8-D130BD01D6A4}"
 	ProjectSection(SolutionItems) = preProject
+		..\rakefile.rb = ..\rakefile.rb
 		simplejson.script.ps1 = simplejson.script.ps1
 	EndProjectSection
 EndProject
