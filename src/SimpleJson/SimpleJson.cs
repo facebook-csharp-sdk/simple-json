@@ -41,6 +41,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 #if SIMPLE_JSON_DYNAMIC
 using System.Dynamic;
 #endif
@@ -55,11 +56,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using SimpleJson.Reflection;
 
-
 namespace SimpleJson
 {
+
     #region JsonArray
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     /// <summary>
     /// Represents the json array.
     /// </summary>
@@ -95,6 +97,7 @@ namespace SimpleJson
 
     #region JsonObject
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     /// <summary>
     /// Represents the json object.
     /// </summary>
