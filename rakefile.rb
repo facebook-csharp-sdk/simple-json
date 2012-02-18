@@ -174,9 +174,9 @@ task :nuspec => ["#{build_config[:paths][:working]}"] do
             nuspec.authors = "#{build_config[:nuspec][:authors]}"
             nuspec.description = config[:description]
             nuspec.language = "en-US"
-            nuspec.licenseUrl = "http://simplejson.codeplex.com/license"
+            nuspec.licenseUrl = "https://raw.github.com/facebook-csharp-sdk/simple-json/master/LICENSE.txt"
             nuspec.requireLicenseAcceptance = "false"
-            nuspec.projectUrl = "http://simplejson.codeplex.com"
+            nuspec.projectUrl = "https://raw.github.com/facebook-csharp-sdk/simple-json"
             nuspec.tags = "json"
             nuspec.output_file = "#{dest_path}/#{name}.nuspec"
         
