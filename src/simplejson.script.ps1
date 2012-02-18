@@ -1,5 +1,4 @@
-# SimpleJson http://simplejson.codeplex.com/
-# http://bit.ly/simplejson
+# SimpleJson https://github.com/facebook-csharp-sdk/simple-json
 # License: MIT License
 
 function ConvertFrom-Json
