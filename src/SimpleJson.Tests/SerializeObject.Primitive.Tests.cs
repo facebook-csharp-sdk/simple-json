@@ -351,5 +351,13 @@ namespace SimpleJsonTests
 
             Assert.AreEqual("{\"message\":\"Hi \\\"Prabir\\\"\"}", json);
         }
+
+        [TestMethod]
+        public void SerializerBigNumberCorrectly()
+        {
+            string json = SimpleJson.SerializeObject(new { object_id = 10150098461530576 });
+
+            Assert.AreEqual("{\"object_id\":10150098461530576}", json);
+        }
     }
 }
