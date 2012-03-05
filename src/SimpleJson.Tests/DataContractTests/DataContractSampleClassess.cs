@@ -34,6 +34,8 @@ namespace SimpleJsonTests.DataContractTests
         public string NoDataMember = "ndm";
     }
 
+    // Supress is assigned by its value is never used
+#pragma warning disable 0414
     [DataContract]
     public class DataContractPrivateReadOnlyFields
     {
@@ -64,6 +66,7 @@ namespace SimpleJsonTests.DataContractTests
         private string NoDataMember = "ndm";
     }
 
+#pragma warning restore 0414
     #endregion
 
     #region Getter

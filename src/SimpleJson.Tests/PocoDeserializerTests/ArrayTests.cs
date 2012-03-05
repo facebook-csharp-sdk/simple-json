@@ -23,7 +23,7 @@
 
             var result = SimpleJson.SimpleJson.DeserializeObject<X>(json);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Y);
 #else

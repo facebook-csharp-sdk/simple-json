@@ -39,10 +39,11 @@ namespace SimpleJsonTests
             [DataMember(Name = "field_name")]
             public readonly string ReadOnlyFieldDataMemberWithName = "public readonly data member with name";
 
+#pragma warning disable 0414
             [IgnoreDataMember]
             public readonly string ReadOnlyFieldIgnore = "public readonly ignore";
 
-            private readonly string PrivateReadOnlyFieldWihtoutDataMember = "private readonly without datamember";
+            private readonly string PrivateReadOnlyFieldWithoutDataMember = "private readonly without datamember";
 
             [DataMember]
             private readonly string PrivateReadOnlyFieldDataMemberWithoutName = "private readonly data member without name";
@@ -52,6 +53,7 @@ namespace SimpleJsonTests
 
             [IgnoreDataMember]
             private readonly string PrivateReadOnlyFieldIgnore = "private readonly ignore";
+#pragma warning restore 0414
 
             [DataMember]
             public string PropertyGetSetDataMemberWithoutName { get; set; }

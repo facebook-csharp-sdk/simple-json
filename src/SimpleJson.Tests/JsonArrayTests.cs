@@ -102,10 +102,10 @@ namespace SimpleJsonTests
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException),
-        #if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
          ExpectedMessage =
-        #endif
-          @"Index was out of range. Must be non-negative and less than the size of the collection.
+#endif
+ @"Index was out of range. Must be non-negative and less than the size of the collection.
 Parameter name: index")]
         public void RemoveAtOutOfRangeIndexShouldBeError()
         {
@@ -114,11 +114,11 @@ Parameter name: index")]
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException), 
-        #if !SIMPLE_JSON_WINRT
+        [ExpectedException(typeof(ArgumentOutOfRangeException),
+#if !NETFX_CORE
          ExpectedMessage =
-        #endif
-        @"Index was out of range. Must be non-negative and less than the size of the collection.
+#endif
+ @"Index was out of range. Must be non-negative and less than the size of the collection.
 Parameter name: index")]
         public void RemoveNegtiveIndexShouldBeError()
         {
@@ -173,11 +173,11 @@ Parameter name: index")]
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException), 
-        #if !SIMPLE_JSON_WINRT
+        [ExpectedException(typeof(ArgumentOutOfRangeException),
+#if !NETFX_CORE
          ExpectedMessage =
-        #endif
-         @"Index must be within the bounds of the List.
+#endif
+ @"Index must be within the bounds of the List.
 Parameter name: index")]
         public void InsertNegativeIndexShouldThrow()
         {
@@ -186,11 +186,11 @@ Parameter name: index")]
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException), 
-        #if !SIMPLE_JSON_WINRT
+        [ExpectedException(typeof(ArgumentOutOfRangeException),
+#if !NETFX_CORE
          ExpectedMessage =
-        #endif
-         @"Index must be within the bounds of the List.
+#endif
+ @"Index must be within the bounds of the List.
 Parameter name: index")]
         public void InsertOutOfRangeIndexShouldThrow()
         {
