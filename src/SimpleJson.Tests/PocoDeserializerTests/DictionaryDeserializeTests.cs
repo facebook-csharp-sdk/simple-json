@@ -49,8 +49,8 @@ namespace SimpleJsonTests.PocoDeserializerTests
 
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(1l, result["key1"]);
-            Assert.AreEqual(5l, result["key2"]);
+            Assert.AreEqual(1L, result["key1"]);
+            Assert.AreEqual(5L, result["key2"]);
         }
 
         [TestMethod]
@@ -62,8 +62,8 @@ namespace SimpleJsonTests.PocoDeserializerTests
 
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(1l, result["key1"]);
-            Assert.AreEqual(5l, result["key2"]);
+            Assert.AreEqual(1L, result["key1"]);
+            Assert.AreEqual(5L, result["key2"]);
         }
 
         [TestMethod]

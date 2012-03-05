@@ -61,7 +61,7 @@ task :configure do
 
    nuspec_config = {
         "SimpleJson" => {
-            :description => "Super lightweight Json library for .NET"
+            :description => "Super lightweight Json library for .NET 2.0+/SL4+/WP7/WinRT along with dynamic and DataContract support"
         }
 	}
    
@@ -159,6 +159,12 @@ task :nuspec => ["#{build_config[:paths][:working]}"] do
     mkdir "#{build_config[:paths][:build]}NuGet/" if !Dir.exist? "#{build_config[:paths][:build]}NuGet/"
     mkdir "#{build_config[:paths][:build]}NuGet/SimpleJson" if !Dir.exist? "#{build_config[:paths][:build]}NuGet/SimpleJson"
 
+	simpleJson = File.read "#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs"
+	replace = simpleJson.gsub('namespace SimpleJson', 'namespace $rootnamespace$')
+	replace = replace.gsub('using SimpleJson.Reflection;', 'using $rootnamespace$.Reflection;')
+
+	File.open("#{build_config[:paths][:working]}SimpleJson.cs", "w") { |file| file.puts replace }
+
 	 Dir.entries(base_dir = "#{build_config[:paths][:build]}NuGet/").each do |name|
         path = "#{base_dir}#{name}/"
         dest_path = "#{build_config[:paths][:working]}NuGet/#{name}/"
@@ -174,9 +180,9 @@ task :nuspec => ["#{build_config[:paths][:working]}"] do
             nuspec.authors = "#{build_config[:nuspec][:authors]}"
             nuspec.description = config[:description]
             nuspec.language = "en-US"
-            nuspec.licenseUrl = "http://simplejson.codeplex.com/license"
+            nuspec.licenseUrl = "https://raw.github.com/facebook-csharp-sdk/simple-json/master/LICENSE.txt"
             nuspec.requireLicenseAcceptance = "false"
-            nuspec.projectUrl = "http://simplejson.codeplex.com"
+            nuspec.projectUrl = "https://raw.github.com/facebook-csharp-sdk/simple-json"
             nuspec.tags = "json"
             nuspec.output_file = "#{dest_path}/#{name}.nuspec"
         
@@ -189,7 +195,7 @@ task :nuspec => ["#{build_config[:paths][:working]}"] do
     end
 
 	mkdir "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/"
-	cp "#{build_config[:paths][:src]}SimpleJson/SimpleJson.cs", "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/"
+	cp "#{build_config[:paths][:working]}SimpleJson.cs", "#{build_config[:paths][:working]}NuGet/SimpleJson/Content/SimpleJson.cs.pp"
 
 end
 

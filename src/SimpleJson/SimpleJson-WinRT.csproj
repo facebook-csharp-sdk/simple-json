@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_WINRT;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_DATACONTRACT;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_WINRT;</DefineConstants>
+    <DefineConstants>TRACE;NETFX_CORE;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_DATACONTRACT;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -38,7 +38,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleJson.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v1.0\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
