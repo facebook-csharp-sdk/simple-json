@@ -111,7 +111,7 @@ namespace SimpleJsonTests
         {
             var json = "10";
             var result = SimpleJson.DeserializeObject(json);
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(result, typeof(long));
 #else
             Assert.IsInstanceOf<long>(result);
@@ -124,7 +124,7 @@ namespace SimpleJsonTests
             var json = "10.2";
             var result = SimpleJson.DeserializeObject(json);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(result, typeof(double));
 #else
           Assert.IsInstanceOf<double>(result);  

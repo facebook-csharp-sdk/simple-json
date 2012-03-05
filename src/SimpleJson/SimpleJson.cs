@@ -34,7 +34,8 @@
 //#define SIMPLE_JSON_REFLECTIONEMIT
 
 // NOTE: uncomment the following line if you are compiling under Window Metro style application/library.
-//#define SIMPLE_JSON_WINRT;
+// usually already defined in properties
+//#define NETFX_CORE;
 
 // original json parsing code from http://techblog.procurios.nl/k/618/news/view/14605/14863/How-do-I-write-my-own-parser-for-JSON.html
 
@@ -338,7 +339,7 @@ namespace SimpleJson
             if ((targetType == typeof(IEnumerable)) ||
                 (targetType == typeof(IEnumerable<KeyValuePair<string, object>>)) ||
                 (targetType == typeof(IDictionary<string, object>)) ||
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
  (targetType == typeof(IDictionary<,>))
 #else
                 (targetType == typeof(IDictionary))
@@ -541,7 +542,7 @@ namespace SimpleJson
             object jsonObject = DeserializeObject(json);
 
             return type == null || jsonObject != null &&
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
  jsonObject.GetType().GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
 #else
             jsonObject.GetType().IsAssignableFrom(type)
@@ -1244,7 +1245,7 @@ namespace SimpleJson
 
         protected virtual void BuildMap(Type type, SafeDictionary<string, CacheResolver.MemberMap> memberMaps)
         {
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             foreach (PropertyInfo info in type.GetTypeInfo().DeclaredProperties) {
                 var getMethod = info.GetMethod;
                 if(getMethod==null || !getMethod.IsPublic || getMethod.IsStatic) continue;
@@ -1253,7 +1254,7 @@ namespace SimpleJson
 #endif                
                 memberMaps.Add(info.Name, new CacheResolver.MemberMap(info));
             }
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             foreach (FieldInfo info in type.GetTypeInfo().DeclaredFields) {
                 if(!info.IsPublic || info.IsStatic) continue;
 #else
@@ -1278,7 +1279,7 @@ namespace SimpleJson
                 return value;
             else if ((value is double && type != typeof(double)) || (value is long && type != typeof(long))) {
                 return 
-                #if SIMPLE_JSON_WINRT
+                #if NETFX_CORE
                     type == typeof(int) || type == typeof(long) || type == typeof(double) ||type == typeof(float) || type == typeof(bool) || type == typeof(decimal) ||type == typeof(byte) || type == typeof(short)
                 #else
                     typeof(IConvertible).IsAssignableFrom(type) 
@@ -1294,7 +1295,7 @@ namespace SimpleJson
                 if (ReflectionUtils.IsTypeDictionary(type))
                 {
                     // if dictionary then
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                     Type keyType = type.GetTypeInfo().GenericTypeArguments[0];
                     Type valueType = type.GetTypeInfo().GenericTypeArguments[1];
 #else
@@ -1304,7 +1305,7 @@ namespace SimpleJson
 
                     Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                     dynamic dict = CacheResolver.GetNewInstance(genericType);
 #else
                     IDictionary dict = (IDictionary)CacheResolver.GetNewInstance(genericType);
@@ -1356,14 +1357,14 @@ namespace SimpleJson
                         list[i++] = DeserializeObject(o, type.GetElementType());
                 }
                 else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) ||
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
  typeof(IList).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
 #else
                  typeof(IList).IsAssignableFrom(type)
 #endif
 )
                 {
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                     Type innerType = type.GetTypeInfo().GenericTypeArguments[0];
 #else
                     Type innerType = type.GetGenericArguments()[0];
@@ -1453,7 +1454,7 @@ namespace SimpleJson
             }
 
             string jsonKey;
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             foreach (PropertyInfo info in type.GetTypeInfo().DeclaredProperties)
 #else
             foreach (PropertyInfo info in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
@@ -1463,7 +1464,7 @@ namespace SimpleJson
                     map.Add(jsonKey, new CacheResolver.MemberMap(info));
             }
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             foreach (FieldInfo info in type.GetTypeInfo().DeclaredFields)
 #else
             foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
@@ -1509,7 +1510,7 @@ namespace SimpleJson
         {
             public static Attribute GetAttribute(MemberInfo info, Type type)
             {
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 if (info == null || type == null || !info.IsDefined(type))
                     return null;
                 return info.GetCustomAttribute(type);
@@ -1523,7 +1524,7 @@ namespace SimpleJson
             public static Attribute GetAttribute(Type objectType, Type attributeType)
             {
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 if (objectType == null || attributeType == null || !objectType.GetTypeInfo().IsDefined(attributeType))
                     return null;
                 return objectType.GetTypeInfo().GetCustomAttribute(attributeType);
@@ -1536,7 +1537,11 @@ namespace SimpleJson
 
             public static bool IsTypeGenericeCollectionInterface(Type type)
             {
+#if NETFX_CORE
+                if (!type.GetTypeInfo().IsGenericType)
+#else
                 if (!type.IsGenericType)
+#endif
                     return false;
 
                 Type genericDefinition = type.GetGenericTypeDefinition();
@@ -1546,17 +1551,19 @@ namespace SimpleJson
 
             public static bool IsTypeDictionary(Type type)
             {
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 if (typeof(IDictionary<,>).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
                     return true;
+
+                if (!type.GetTypeInfo().IsGenericType)
+                    return false;
 #else
                 if (typeof(IDictionary).IsAssignableFrom(type))
                     return true;
-#endif
 
                 if (!type.IsGenericType)
                     return false;
-
+#endif
                 Type genericDefinition = type.GetGenericTypeDefinition();
                 return genericDefinition == typeof(IDictionary<,>);
             }
@@ -1628,7 +1635,7 @@ namespace SimpleJson
                 ConstructorCache.Add(type, c);
                 return c();
 #else
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 IEnumerable<ConstructorInfo> constructorInfos = type.GetTypeInfo().DeclaredConstructors;
                 ConstructorInfo constructorInfo = null;
                 foreach (ConstructorInfo item in constructorInfos) // FirstOrDefault()
@@ -1715,7 +1722,7 @@ namespace SimpleJson
 
             static GetHandler CreateGetHandler(PropertyInfo propertyInfo)
             {
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 MethodInfo getMethodInfo = propertyInfo.GetMethod;
 #else
                 MethodInfo getMethodInfo = propertyInfo.GetGetMethod(true);
@@ -1735,7 +1742,7 @@ namespace SimpleJson
 
                 return (GetHandler)dynamicGet.CreateDelegate(typeof(GetHandler));
 #else
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 return delegate(object instance) { return getMethodInfo.Invoke(instance, new Type[] { }); };
 #else
                 return delegate(object instance) { return getMethodInfo.Invoke(instance, Type.EmptyTypes); };
@@ -1745,7 +1752,7 @@ namespace SimpleJson
 
             static SetHandler CreateSetHandler(PropertyInfo propertyInfo)
             {
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 MethodInfo setMethodInfo = propertyInfo.SetMethod;
 #else
                 MethodInfo setMethodInfo = propertyInfo.GetSetMethod(true);

@@ -98,7 +98,7 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
         [Ignore]
 #else
         [Ignore("not part of the json standard.")]
@@ -126,7 +126,7 @@ namespace SimpleJsonTests
             Assert.AreEqual("null", SimpleJson.SerializeObject(null));
         }
 
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
         [TestMethod]
         [Ignore("uncomment if(Convert.IsDBNull(input)) in PocoJsonSerializerStrategy.TrySerializeKnownTypes. disabled to improve performance.")]
         public void DbNullSerialization()

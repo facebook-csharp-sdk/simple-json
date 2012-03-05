@@ -39,7 +39,7 @@
 }";
             object obj = SimpleJson.DeserializeObject(input);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(obj, typeof(IDictionary<string, object>));
             Assert.IsInstanceOfType(obj, typeof(JsonObject));
 #else
@@ -56,7 +56,7 @@
 
             Assert.IsTrue(root.ContainsKey("Drives"));
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(root["Drives"], typeof(IList<object>));
             Assert.IsInstanceOfType(root["Drives"], typeof(JsonArray));
 #else
@@ -68,14 +68,14 @@
 
             Assert.AreEqual(2, drives.Count);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(drives[0], typeof(string));
 #else
             Assert.IsInstanceOf<string>(drives[0]);
 #endif
             Assert.AreEqual("DVD read/writer", drives[0]);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(drives[1], typeof(string));
 #else
             Assert.IsInstanceOf<string>(drives[1]);
@@ -87,7 +87,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
  ExpectedMessage =
 #endif
  "Invalid JSON string")]
@@ -107,7 +107,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
  ExpectedMessage =
 #endif
  "Invalid JSON string")]
@@ -119,7 +119,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
  ExpectedMessage =
 #endif
  "Invalid JSON string")]
@@ -130,7 +130,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
  ExpectedMessage =
 #endif
  "Invalid JSON string")]
@@ -145,7 +145,7 @@
         {
             var result = SimpleJson.DeserializeObject("{\"hi\r\nbye\":1}");
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(result, typeof(IDictionary<string, object>));
             Assert.IsInstanceOfType(result, typeof(JsonObject));
 #else
@@ -179,7 +179,7 @@ bye", pair.Key);
             object o = SimpleJson.DeserializeObject(input);
             Assert.IsNotNull(o);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(o, typeof(IDictionary<string, object>));
 #else
             Assert.IsInstanceOf<IDictionary<string, object>>(o);
@@ -194,7 +194,7 @@ bye", pair.Key);
 
 
         [TestMethod]
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
         [Ignore]
 #else
         [Ignore("not part of the json standard.")]
@@ -219,7 +219,7 @@ bye", pair.Key);
 
             var a = (IList<object>)o;
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(a[0], typeof(string));
 #else
             Assert.IsInstanceOf<string>(a[0]);
@@ -236,7 +236,7 @@ bye", pair.Key);
 
             var o = SimpleJson.DeserializeObject(json);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(o, typeof(List<object>));
 #else
             Assert.IsInstanceOf<List<object>>(o);
@@ -253,7 +253,7 @@ bye", pair.Key);
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
  ExpectedMessage =
 #endif
  "Invalid JSON string")]
@@ -271,7 +271,7 @@ bye", pair.Key);
 
 
         [TestMethod]
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
         [Ignore]
 #else
         [Ignore("not part of the json standard.")]
@@ -291,7 +291,7 @@ bye", pair.Key);
 
             var o = SimpleJson.DeserializeObject(json);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(o, typeof(IDictionary<string, object>));
             Assert.IsInstanceOfType(o, typeof(JsonObject));
 #else
@@ -314,7 +314,7 @@ bye", pair.Key);
 
             var o = SimpleJson.DeserializeObject(json);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(o, typeof(string));
 #else
             Assert.IsInstanceOf<string>(o);
@@ -326,7 +326,7 @@ bye", pair.Key);
         }
 
         [TestMethod]
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
         [Ignore]
 #else
         [Ignore("not part of the json standard.")]
@@ -340,7 +340,7 @@ bye", pair.Key);
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
  ExpectedMessage =
 #endif
  "Invalid JSON string")]
@@ -354,7 +354,7 @@ bye", pair.Key);
         {
             string json = "\"𩸽 is Arabesque greenling(fish) in japanese\"";
             var o = SimpleJson.DeserializeObject(json);
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(o, typeof(string));
 #else
             Assert.IsInstanceOf<string>(o);
@@ -368,7 +368,7 @@ bye", pair.Key);
         {
             string json = "\"\\uD867\\uDE3D is Arabesque greenling(fish)\"";  // 𩸽
             var o = SimpleJson.DeserializeObject(json);
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(o, typeof(string));
 #else
             Assert.IsInstanceOf<string>(o);
@@ -379,7 +379,7 @@ bye", pair.Key);
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
-#if !SIMPLE_JSON_WINRT
+#if !NETFX_CORE
  ExpectedMessage =
 #endif
  "Invalid JSON string")]
@@ -412,7 +412,7 @@ bye", pair.Key);
             Assert.IsNotNull(result);
             foreach (JsonObject hobby in result)
             {
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
                 Assert.IsNotNull(hobby["name"]);
                 Assert.IsNotNull(hobby["value"]);
 #else
@@ -441,7 +441,7 @@ bye", pair.Key);
             Assert.IsNotNull(result);
             Assert.AreEqual("str", result.PropTypeKnown);
 
-#if SIMPLE_JSON_WINRT
+#if NETFX_CORE
             Assert.IsInstanceOfType(result.PropTypeUnknown, typeof(IDictionary<string, object>));
             Assert.IsInstanceOfType(result.PropTypeUnknown, typeof(JsonObject));
 #else
