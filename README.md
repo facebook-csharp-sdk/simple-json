@@ -11,49 +11,6 @@ SimpleJson is not distributed as a compiled binary .dll file but rather as a sin
 Install-Package SimpleJson
 ```
 
-**Define appropriate conditional compilation symbol depending on your framework**
-
-_**.NET 2.0+ (including .NET 3.0/3.5/4.0/4.5)**_
-
-```csharp
-#define SIMPLE_JSON_REFLECTIONEMIT
-```
-
-_**Windows Runtime (Windows Metro Style Apps)**_
-
-```csharp
-#define NETFX_CORE
-```
-
-`NETFX_CORE` is automatically defined for new WinRT projects by Visual Studio.
-
-_**Silverlight 4+, .NET 4.0+ and WinRT (.net frameworks which supports dynamic)**_
-
-```csharp
-#define SIMPLE_JSON_DYNAMIC
-```
-
-_**DataContract/DataMember support**_
-
-```csharp
-#define SIMPLE_JSON_DATACONTRACT
-```
-
-You are also required to reference `System.Runtime.Serialization` library.
-
-_**Hiding SimpleJson class**_
-
-```csharp
-#define SIMPLE_JSON_INTERNAL
-```
-
-This will make the `SimpleJson` class to internal class instead of public.
-
-_**Hiding JsonArray and JsonObject class**_
-
-```csharp
-#define SIMPLE_JSON_OBJARRAYINTERNAL
-```
-
-This will make the `JsonArray` and `JsonObject` classes to internal class instead of public. You can cast `JsonObject`
-to `IDictionary<string,object>` or `IDictionary<string,dynamic>` and `JsonArray` to `IList<object>` or `IList<dynamic>`.
+## Preparing Simple Json for your .NET Framework/Platform
+Depending on the .net framework or platform you might want to enable/disable certain features of SimpleJson. You can read
+more about it at https://github.com/facebook-csharp-sdk/simple-json/wiki/Conditional-Compilation-Symbols
