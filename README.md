@@ -11,7 +11,7 @@ SimpleJson is not distributed as a compiled binary .dll file but rather as a sin
 Install-Package SimpleJson
 ```
 
-**Define appropriate conditional compilcation symbol depending on your framework**
+**Define appropriate conditional compilation symbol depending on your framework**
 
 _**.NET 2.0+ (including .NET 3.0/3.5/4.0/4.5)**_
 
