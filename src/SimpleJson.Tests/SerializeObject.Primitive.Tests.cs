@@ -371,11 +371,33 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
-        public void SerializerBigNumberCorrectly()
+        public void SerializeBigNumberCorrectly()
         {
             string json = SimpleJson.SerializeObject(new { object_id = 10150098461530576 });
 
             Assert.AreEqual("{\"object_id\":10150098461530576}", json);
+        }
+
+        [TestMethod]
+        public void SerializeNullableTypeThatIsNotNull()
+        {
+            var obj = new Dictionary<string, object>();
+            int? value = 3;
+            obj["value"] = value;
+            string json = SimpleJson.SerializeObject(obj);
+
+            Assert.AreEqual("{\"value\":3}", json);
+        }
+
+        [TestMethod]
+        public void SerializeNullableTypeThatIsNull()
+        {
+            var obj = new Dictionary<string, object>();
+            int? value = null;
+            obj["value"] = value;
+            string json = SimpleJson.SerializeObject(obj);
+
+            Assert.AreEqual("{\"value\":null}", json);
         }
     }
 }
