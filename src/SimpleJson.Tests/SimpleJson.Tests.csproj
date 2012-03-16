@@ -70,6 +70,7 @@
     <Compile Include="JsonDecodeTypeTests.cs" />
     <Compile Include="JsonDataContractSerializeObjectTests.cs" />
     <Compile Include="PocoDeserializerTests\ArrayTests.cs" />
+    <Compile Include="PocoDeserializerTests\NullableTypeDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\DateTimeDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\DictionaryDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\ListOfPocoDeserializeTests.cs" />

@@ -17,7 +17,7 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-namespace SimpleJsonTests.PocoJsonSerializerTests
+namespace SimpleJson.Tests.PocoDeserializerTests
 {
 #if NUNIT
     using System;
@@ -33,48 +33,73 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
 #endif
 
     [TestClass]
-    public class NullableSerializeTests
+    public class NullableTypeTests
     {
         [TestMethod]
-        public void Test()
+        public void WithValue()
         {
-            DateTime? obj = null;
+            var json = "4";
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+            var result = SimpleJson.DeserializeObject<int?>(json);
 
-            Assert.AreEqual("null", json);
+            Assert.AreEqual(4, result.Value);
         }
 
         [TestMethod]
-        public void TestWithValue()
+        public void TestNull()
         {
-            DateTime? obj = new DateTime(2004, 1, 20, 5, 3, 6, 12, DateTimeKind.Utc);
+            var json = "null";
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+            var result = SimpleJson.DeserializeObject<int?>(json);
 
-            Assert.AreEqual("\"2004-01-20T05:03:06.012Z\"", json);
+            Assert.IsFalse(result.HasValue);
         }
 
         [TestMethod]
-        public void SerializeNullableTypeThatIsNotNull()
+        public void DateTimeAsNull()
         {
-            var obj = new NullableTypeClass();
-            obj.Value = null;
+            var json = "null";
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+            var result = SimpleJson.DeserializeObject<DateTime?>(json);
 
-            Assert.AreEqual("{\"Value\":null}", json);
+            Assert.IsFalse(result.HasValue);
         }
 
         [TestMethod]
-        public void SerializeNullableTypeThatIsNull()
+        public void DateTimeWithValue()
         {
-            var obj = new NullableTypeClass();
-            obj.Value = 4;
+            var json = "\"2004-01-20T05:03:06Z\"";
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+            var result = SimpleJson.DeserializeObject<DateTime?>(json).Value;
 
-            Assert.AreEqual("{\"Value\":4}", json);
+            Assert.AreEqual(2004, result.Year);
+            Assert.AreEqual(1, result.Month);
+            Assert.AreEqual(20, result.Day);
+            Assert.AreEqual(5, result.Hour);
+            Assert.AreEqual(3, result.Minute);
+            Assert.AreEqual(6, result.Second);
+            Assert.AreEqual(0, result.Millisecond);
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
+        }
+
+        [TestMethod]
+        public void NullableTypeClassNullTest()
+        {
+            var json = "{\"Value\":null}";
+
+            var result = SimpleJson.DeserializeObject<NullableTypeClass>(json);
+
+            Assert.IsNull(result.Value);
+        }
+
+        [TestMethod]
+        public void NullableTypeClasssWithvalueTest()
+        {
+            var json = "{\"Value\":4}";
+
+            var result = SimpleJson.DeserializeObject<NullableTypeClass>(json);
+
+            Assert.AreEqual(4, result.Value);
         }
 
         public class NullableTypeClass
