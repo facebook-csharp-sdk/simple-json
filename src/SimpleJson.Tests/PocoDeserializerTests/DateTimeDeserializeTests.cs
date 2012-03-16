@@ -17,9 +17,10 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-namespace SimpleJsonTests.PocoJsonSerializerTests
+namespace SimpleJson.Tests.PocoDeserializerTests
 {
 #if NUNIT
+    using System;
     using TestClass = NUnit.Framework.TestFixtureAttribute;
     using TestMethod = NUnit.Framework.TestAttribute;
     using TestCleanup = NUnit.Framework.TearDownAttribute;
@@ -32,33 +33,43 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
 #endif
 
     [TestClass]
-    public class NullableSerializeTests
+    public class DateTimeDeserializeTests
     {
         [TestMethod]
-        public void SerializeNullableTypeThatIsNotNull()
+        public void Test()
         {
-            var obj = new NullableTypeClass();
-            obj.Value = null;
+            var json = "{\"Value\":\"2004-01-20T05:03:06Z\"}";
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
-
-            Assert.AreEqual("{\"Value\":null}", json);
+            var result = SimpleJson.DeserializeObject<SerializeDateTimeTypeClass>(json).Value;
+            Assert.AreEqual(2004, result.Year);
+            Assert.AreEqual(1, result.Month);
+            Assert.AreEqual(20, result.Day);
+            Assert.AreEqual(5, result.Hour);
+            Assert.AreEqual(3, result.Minute);
+            Assert.AreEqual(6, result.Second);
+            Assert.AreEqual(0, result.Millisecond);
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
         }
 
         [TestMethod]
-        public void SerializeNullableTypeThatIsNull()
+        public void TestWithMilliSecond()
         {
-            var obj = new NullableTypeClass();
-            obj.Value = 4;
+            var json = "{\"Value\":\"2004-01-20T05:03:06.012Z\"}";
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
-
-            Assert.AreEqual("{\"Value\":4}", json);
+            var result = SimpleJson.DeserializeObject<SerializeDateTimeTypeClass>(json).Value;
+            Assert.AreEqual(2004, result.Year);
+            Assert.AreEqual(1, result.Month);
+            Assert.AreEqual(20, result.Day);
+            Assert.AreEqual(5, result.Hour);
+            Assert.AreEqual(3, result.Minute);
+            Assert.AreEqual(6, result.Second);
+            Assert.AreEqual(12, result.Millisecond);
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
         }
 
-        public class NullableTypeClass
+        public class SerializeDateTimeTypeClass
         {
-            public int? Value { get; set; }
+            public DateTime Value { get; set; }
         }
     }
 }

@@ -1266,6 +1266,13 @@ namespace SimpleJson
     {
         internal CacheResolver CacheResolver;
 
+        private static readonly string[] Iso8601Format = new string[]
+                                                             {
+                                                                 @"yyyy-MM-dd\THH:mm:ss.FFFFFFF\Z",
+                                                                 @"yyyy-MM-dd\THH:mm:ss\Z",
+                                                                 @"yyyy-MM-dd\THH:mm:ssK"
+                                                             };
+
         public PocoJsonSerializerStrategy()
         {
             CacheResolver = new CacheResolver(BuildMap);
@@ -1369,7 +1376,16 @@ namespace SimpleJson
                             if (jsonObject.ContainsKey(jsonKey))
                             {
                                 object jsonValue = DeserializeObject(jsonObject[jsonKey], v.Type);
-                                v.Setter(obj, jsonValue);
+                                if (v.Type == typeof(DateTime))
+                                {
+                                    string jsonValueStr = jsonValue as string;
+                                    if (!string.IsNullOrEmpty(jsonValueStr))
+                                        v.Setter(obj, DateTime.ParseExact(jsonValueStr, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal));
+                                }
+                                else
+                                {
+                                    v.Setter(obj, jsonValue);
+                                }
                             }
                         }
                     }
@@ -1421,7 +1437,7 @@ namespace SimpleJson
         {
             bool returnValue = true;
             if (input is DateTime)
-                output = ((DateTime)input).ToString("o");
+                output = ((DateTime)input).ToUniversalTime().ToString(Iso8601Format[0], CultureInfo.InvariantCulture);
             else if (input is Guid)
                 output = ((Guid)input).ToString("D");
             else if (input is Uri)

@@ -17,7 +17,7 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-namespace SimpleJsonTests.PocoJsonSerializerTests
+namespace SimpleJson.Tests.PocoJsonSerializerTests
 {
 #if NUNIT
     using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -27,38 +27,43 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
     using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
     using ClassInitialize = NUnit.Framework.TestFixtureSetUpAttribute;
     using NUnit.Framework;
+    using System;
 #else
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
 
     [TestClass]
-    public class NullableSerializeTests
+    public class DateTimeSerializeTests
     {
         [TestMethod]
-        public void SerializeNullableTypeThatIsNotNull()
+        public void SerializeDateTimeThatHasMilliSecondAsNonZero()
         {
-            var obj = new NullableTypeClass();
-            obj.Value = null;
+            var obj = new SerializeDateTimeTypeClass
+                          {
+                              Value = new DateTime(2004, 1, 20, 5, 3, 6, 12, DateTimeKind.Utc)
+                          };
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+            var json = SimpleJson.SerializeObject(obj);
 
-            Assert.AreEqual("{\"Value\":null}", json);
+            Assert.AreEqual("{\"Value\":\"2004-01-20T05:03:06.012Z\"}", json);
         }
 
         [TestMethod]
-        public void SerializeNullableTypeThatIsNull()
+        public void SerializeDateTimeThatHasMilliSecondAsZero()
         {
-            var obj = new NullableTypeClass();
-            obj.Value = 4;
+            var obj = new SerializeDateTimeTypeClass
+            {
+                Value = new DateTime(2004, 1, 20, 5, 3, 6, 0, DateTimeKind.Utc)
+            };
 
-            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+            var json = SimpleJson.SerializeObject(obj);
 
-            Assert.AreEqual("{\"Value\":4}", json);
+            Assert.AreEqual("{\"Value\":\"2004-01-20T05:03:06Z\"}", json);
         }
 
-        public class NullableTypeClass
+        public class SerializeDateTimeTypeClass
         {
-            public int? Value { get; set; }
+            public DateTime Value { get; set; }
         }
     }
 }
