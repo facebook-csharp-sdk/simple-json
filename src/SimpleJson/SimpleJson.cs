@@ -1623,10 +1623,7 @@ namespace SimpleJson
 
             public static bool IsNullableType(Type type)
             {
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    return true;
-                else
-                    return false;
+                return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
             }
 
             public static object ToNullableType(object obj, Type nullableType)
