@@ -104,12 +104,12 @@ namespace SimpleJsonTests
         {
             var instance = new
             {
-                now = new DateTime(2004, 1, 20, 5, 3, 6, DateTimeKind.Utc)
+                now = new DateTime(2004, 1, 20, 5, 3, 6, 12, DateTimeKind.Utc)
             };
 
             var json = SimpleJson.SerializeObject(instance);
             Assert.IsNotNull(json);
-            Assert.AreEqual("{\"now\":\"2004-01-20T05:03:06.0000000Z\"}", json);
+            Assert.AreEqual("{\"now\":\"2004-01-20T05:03:06Z\"}", json);
         }
 
         [TestMethod]
