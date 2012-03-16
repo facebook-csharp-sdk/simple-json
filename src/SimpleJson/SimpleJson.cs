@@ -1308,7 +1308,15 @@ namespace SimpleJson
 
         public virtual object DeserializeObject(object value, Type type)
         {
-            if (value is string || value is bool)
+            if (value is string)
+            {
+                var str = value as string;
+                if(!string.IsNullOrEmpty(str) && type == typeof(DateTime))
+                     return DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+                else
+                    return str;
+            }
+            else if (value is bool)
                 return value;
             else if (value == null)
                 return null;
@@ -1376,16 +1384,7 @@ namespace SimpleJson
                             if (jsonObject.ContainsKey(jsonKey))
                             {
                                 object jsonValue = DeserializeObject(jsonObject[jsonKey], v.Type);
-                                if (v.Type == typeof(DateTime))
-                                {
-                                    string jsonValueStr = jsonValue as string;
-                                    if (!string.IsNullOrEmpty(jsonValueStr))
-                                        v.Setter(obj, DateTime.ParseExact(jsonValueStr, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal));
-                                }
-                                else
-                                {
-                                    v.Setter(obj, jsonValue);
-                                }
+                                v.Setter(obj, jsonValue);
                             }
                         }
                     }
