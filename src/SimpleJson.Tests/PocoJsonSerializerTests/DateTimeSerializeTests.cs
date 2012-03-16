@@ -36,12 +36,25 @@ namespace SimpleJson.Tests.PocoJsonSerializerTests
     public class DateTimeSerializeTests
     {
         [TestMethod]
-        public void SerializeDateTime()
+        public void SerializeDateTimeThatHasMilliSecondAsNonZero()
         {
             var obj = new SerializeDateTimeTypeClass
                           {
-                              Value = new DateTime(2004, 1, 20, 5, 3, 6, DateTimeKind.Utc)
+                              Value = new DateTime(2004, 1, 20, 5, 3, 6, 12, DateTimeKind.Utc)
                           };
+
+            var json = SimpleJson.SerializeObject(obj);
+
+            Assert.AreEqual("{\"Value\":\"2004-01-20T05:03:06.012Z\"}", json);
+        }
+
+        [TestMethod]
+        public void SerializeDateTimeThatHasMilliSecondAsZero()
+        {
+            var obj = new SerializeDateTimeTypeClass
+            {
+                Value = new DateTime(2004, 1, 20, 5, 3, 6, 0, DateTimeKind.Utc)
+            };
 
             var json = SimpleJson.SerializeObject(obj);
 
