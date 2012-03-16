@@ -1,7 +1,9 @@
 ﻿
-namespace SimpleJson.Tests.PocoJsonSerializerTests
+namespace SimpleJson.Tests.PocoDeserializerTests
 {
 #if NUNIT
+    using System;
+    using System.Globalization;
     using TestClass = NUnit.Framework.TestFixtureAttribute;
     using TestMethod = NUnit.Framework.TestAttribute;
     using TestCleanup = NUnit.Framework.TearDownAttribute;
@@ -9,25 +11,26 @@ namespace SimpleJson.Tests.PocoJsonSerializerTests
     using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
     using ClassInitialize = NUnit.Framework.TestFixtureSetUpAttribute;
     using NUnit.Framework;
-    using System;
 #else
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
 
     [TestClass]
-    public class DateTimeSerializeTests
+    public class DateTimeDeserializeTests
     {
         [TestMethod]
-        public void SerializeDateTime()
+        public void Test()
         {
-            var obj = new SerializeDateTimeTypeClass
-                          {
-                              Value = new DateTime(2004, 1, 20, 5, 3, 6, DateTimeKind.Utc)
-                          };
+            var json = "{\"Value\":\"2004-01-20T05:03:06Z\"}";
 
-            var json = SimpleJson.SerializeObject(obj);
-
-            Assert.AreEqual("{\"Value\":\"2004-01-20T05:03:06Z\"}", json);
+            var result = SimpleJson.DeserializeObject<SerializeDateTimeTypeClass>(json).Value;
+            Assert.AreEqual(2004, result.Year);
+            Assert.AreEqual(1, result.Month);
+            Assert.AreEqual(20, result.Day);
+            Assert.AreEqual(5, result.Hour);
+            Assert.AreEqual(3, result.Minute);
+            Assert.AreEqual(6, result.Second);
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
         }
 
         public class SerializeDateTimeTypeClass
