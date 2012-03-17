@@ -43,6 +43,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 #if SIMPLE_JSON_DYNAMIC
 using System.Dynamic;
 #endif
@@ -61,10 +62,11 @@ namespace SimpleJson
 {
     #region JsonArray
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
     /// <summary>
     /// Represents the json array.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
 #if SIMPLE_JSON_OBJARRAYINTERNAL
     internal
 #else
@@ -97,10 +99,11 @@ namespace SimpleJson
 
     #region JsonObject
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
     /// <summary>
     /// Represents the json object.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
 #if SIMPLE_JSON_OBJARRAYINTERNAL
     internal
 #else
@@ -936,6 +939,7 @@ namespace SimpleJson
             return NextToken(json, ref saveIndex);
         }
 
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         protected static int NextToken(char[] json, ref int index)
         {
             EatWhitespace(json, ref index);
@@ -1166,7 +1170,7 @@ namespace SimpleJson
             }
             else
             {
-                builder.Append(Convert.ToDouble(number).ToString("r", CultureInfo.InvariantCulture));
+                builder.Append(Convert.ToDouble(number, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture));
             }
 
             return true;
@@ -1306,6 +1310,7 @@ namespace SimpleJson
             return TrySerializeKnownTypes(input, out output) || TrySerializeUnknownTypes(input, out output);
         }
 
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         public virtual object DeserializeObject(object value, Type type)
         {
             object obj = null;
@@ -1436,7 +1441,7 @@ namespace SimpleJson
 
         protected virtual object SerializeEnum(Enum p)
         {
-            return Convert.ToDouble(p);
+            return Convert.ToDouble(p, CultureInfo.InvariantCulture);
         }
 
         protected virtual bool TrySerializeKnownTypes(object input, out object output)
@@ -1677,6 +1682,7 @@ namespace SimpleJson
                 _memberMapLoader = memberMapLoader;
             }
 
+            [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
             public static object GetNewInstance(Type type)
             {
                 CtorDelegate c;
@@ -1696,7 +1702,7 @@ namespace SimpleJson
                 {
                     ConstructorInfo constructorInfo = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
                     if (constructorInfo == null)
-                        throw new Exception(string.Format("Could not get constructor for {0}.", type));
+                        throw new Exception(string.Format(CultureInfo.InvariantCulture, "Could not get constructor for {0}.", type));
                     generator.Emit(OpCodes.Newobj, constructorInfo);
                 }
                 generator.Emit(OpCodes.Ret);
