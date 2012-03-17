@@ -19,6 +19,7 @@
 
 namespace SimpleJson.Tests.PocoJsonSerializerTests
 {
+    using System;
 #if NUNIT
     using TestClass = NUnit.Framework.TestFixtureAttribute;
     using TestMethod = NUnit.Framework.TestAttribute;
@@ -27,7 +28,6 @@ namespace SimpleJson.Tests.PocoJsonSerializerTests
     using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
     using ClassInitialize = NUnit.Framework.TestFixtureSetUpAttribute;
     using NUnit.Framework;
-    using System;
 #else
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif

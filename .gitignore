@@ -46,3 +46,4 @@ lint.db
 Thumbs.db
 !libs/*/[Bb]in/
 working/
+src/TestResults/
