@@ -1,6 +1,7 @@
 var fs = require('fs'),
 	njake = require('./src/njake'),
 	msbuild = njake.msbuild,
+	nunit = njake.nunit,
 	nuget = njake.nuget,
 	config = {
 		version: fs.readFileSync('VERSION', 'utf-8')
@@ -14,13 +15,17 @@ msbuild.setDefaults({
 	version: 'net4.0'
 })
 
+nunit.setDefaults({
+	_exe: 'src/packages/NUnit.2.5.10.11092/tools/nunit-console-x86.exe'
+})
+
 nuget.setDefaults({
 	_exe: 'src/packages/NuGet.CommandLine.1.7.0/tools/NuGet.exe',
 	verbose: true
 })
 
 desc('Build all')
-task('default', ['clean', 'build'])
+task('default', ['clean', 'build', 'test'])
 
 namespace('build', function () {
 
@@ -161,3 +166,32 @@ task('clean', ['clean:all'], function () {
 	jake.rmRf('working/')
 	jake.rmRf('bin/')
 })
+
+namespace('test-build', function () {
+		
+	task('net40', ['build:net40'], function () {
+		msbuild({
+			file: 'src/SimpleJson.Tests/SimpleJson.Tests.csproj',
+			targets: ['Build']
+		})
+	}, { async: true })
+
+	task('all', ['test-build:net40'])
+
+})
+
+namespace('test', function () {
+	
+	task('net40', ['test-build:net40'], function () {
+		nunit({
+			assemblies: ['bin/Tests/Net40/Release/SimpleJson.Tests.dll'],
+			xml: 'bin/Tests/Net40/Release/SimpleJson.Tests.nunit.xml'
+		})
+	}, { async: true })
+
+	task('all', ['test:net40'])
+
+})
+
+desc('test')
+task('test', ['test:all'])
