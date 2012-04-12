@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>SimpleJson</id>
+    <version>$version$</version>
+    <authors>Jim Zimmerman, Nathan Totten, Prabir Shrestha</authors>
+    <owners>Jim Zimmerman, Nathan Totten, Prabir Shrestha</owners>
+    <licenseUrl>https://raw.github.com/facebook-csharp-sdk/simple-json/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://raw.github.com/facebook-csharp-sdk/simple-json</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Super lightweight Json library for .NET 2.0+/SL4+/WP7/WinRT along with dynamic and DataContract support</description>
+    <language>en-US</language>
+    <tags>json</tags>
+  </metadata>
+  <files>
+        <file src="..\working\SimpleJson.cs.pp" target="content\SimpleJson.cs.pp" />
+        <file src="..\working\SimpleJson.psm1" target="SimpleJson.psm1" />
+  </files>
+</package>

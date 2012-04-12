@@ -47,3 +47,4 @@ Thumbs.db
 !libs/*/[Bb]in/
 working/
 src/TestResults/
+dist/

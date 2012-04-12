@@ -165,6 +165,7 @@ desc('Clean')
 task('clean', ['clean:all'], function () {
 	jake.rmRf('working/')
 	jake.rmRf('bin/')
+	jake.rmRf('dist/')
 })
 
 namespace('test-build', function () {
@@ -195,3 +196,50 @@ namespace('test', function () {
 
 desc('test')
 task('test', ['test:all'])
+
+directory('working/')
+
+namespace('generate', function () {
+	
+	desc('Generate SimpleJson.cs.pp at working/SimpleJson.cs.pp')
+	task('csharp', ['working/'], function () {
+		console.log('Generating working/SimpleJson.cs');
+
+		var csFile = fs
+			.readFileSync('src/SimpleJson/SimpleJson.cs', 'utf-8')
+			.replace('// VERSION:', '// VERSION: ' + config.version)
+			.replace('namespace SimpleJson', 'namespace $rootnamespace$')
+			.replace('using SimpleJson.Reflection;', 'using $rootnamespace$.Reflection;')
+
+		fs.writeFileSync('working/SimpleJson.cs.pp', csFile);
+	})
+
+	desc('Generate SimpleJson.psm1 at working/SimpleJson.psm1')
+	task('powershell', ['working/'], function () {
+		console.log('Generating working/SimpleJson.psm1');
+
+		var psFile = fs
+			.readFileSync('src/simplejson.script.ps1', 'utf-8')
+			.replace('# Version:', '# Version: ' + config.version);
+
+		fs.writeFileSync('working/SimpleJson.psm1', psFile);
+	})
+
+	task('all', ['generate:csharp', 'generate:powershell'])
+
+})
+
+directory('dist/')
+
+namespace('nuget', function () {
+
+	desc('Create nuget package')
+	task('pack', ['generate:all', 'dist/'], function () {
+		nuget.pack({
+			nuspec: 'src/SimpleJson.nuspec',
+			version: config.version,
+			outputDirectory: 'dist/'
+		})
+	}, { async: true })
+
+})
