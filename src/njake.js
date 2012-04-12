@@ -108,6 +108,15 @@
 
             opt.assemblies.forEach(function (assembly) { args.push(assembly); });
 
+            if(opt.nologo) args.push('/nologo');
+            if(opt.noshadow) args.push('/noshadow');
+            if(opt.nothread) args.push('/nothread');
+            if(opt.nodots) args.push('/nodots');
+
+            if(opt.timeout) args.push('/timeout=' + opt.timeout)
+
+            if(opt.xml) args.push('/xml=' + opt.xml);
+
             args.push.apply(args, opt._parameters || []);
 
             exports.exec(opt._exe, args, function (code) {
