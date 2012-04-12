@@ -25,7 +25,7 @@ nuget.setDefaults({
 })
 
 desc('Build all')
-task('default', ['clean', 'build', 'test'])
+task('default', ['clean', 'build', 'test', 'nuget:pack'])
 
 namespace('build', function () {
 
@@ -220,7 +220,15 @@ namespace('generate', function () {
 
 		var psFile = fs
 			.readFileSync('src/simplejson.script.ps1', 'utf-8')
-			.replace('# Version:', '# Version: ' + config.version);
+			.replace('# Version:', '# Version: ' + config.version) + 
+			'\r\n$source = @\"\r\n\r\n' + 
+			'#define SIMPLE_JSON_DATACONTRACT\r\n' +
+			'#define SIMPLE_JSON_REFLECTIONEMIT\r\n\r\n' +
+			fs.readFileSync('src/SimpleJson/SimpleJson.cs', 'utf-8').replace('// VERSION:', '// VERSION: ' + config.version) +
+			'\r\n\"@\r\n' + 
+			'Export-ModuleMember ConvertFrom-Json\r\n' +
+			'Export-ModuleMember ConvertTo-Json\r\n' + 
+			'Add-Type -ReferencedAssemblies System.Runtime.Serialization -TypeDefinition $source -Language CSharp';
 
 		fs.writeFileSync('working/SimpleJson.psm1', psFile);
 	})
