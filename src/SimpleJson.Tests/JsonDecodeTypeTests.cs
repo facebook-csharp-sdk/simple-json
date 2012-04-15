@@ -17,6 +17,8 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace SimpleJsonTests
 {
     using System.Collections.Generic;
@@ -39,7 +41,7 @@ namespace SimpleJsonTests
     [TestClass]
     public class DeserializeObjectTypeTests
     {
-// Disable never used warnings for fields - they are actually used in deserialization
+        // Disable never used warnings for fields - they are actually used in deserialization
 #pragma warning disable 0169, 0649
         private class Person
         {
@@ -146,8 +148,88 @@ namespace SimpleJsonTests
 #if NETFX_CORE
             Assert.IsInstanceOfType(result, typeof(double));
 #else
-          Assert.IsInstanceOf<double>(result);  
+            Assert.IsInstanceOf<double>(result);
 #endif
+        }
+
+        [TestMethod]
+        public void GivenGuidAsNull()
+        {
+            var json = "null";
+
+            var guid = SimpleJson.DeserializeObject<Guid>(json);
+
+            Assert.AreEqual(default(Guid), guid);
+        }
+
+        [TestMethod]
+        public void GivenNullableGuidAsNull()
+        {
+            var json = "null";
+
+            var guid = SimpleJson.DeserializeObject<Guid?>(json);
+
+            Assert.AreEqual(null, guid);
+        }
+
+        [TestMethod]
+        public void GivenGuidAsEmptyString()
+        {
+            var json = @"""""";
+
+            var guid = SimpleJson.DeserializeObject<Guid>(json);
+
+            Assert.AreEqual(default(Guid), guid);
+        }
+
+        [TestMethod]
+        public void GivenNullableGuidAsEmptyString()
+        {
+            var json = @"""""";
+
+            var guid = SimpleJson.DeserializeObject<Guid?>(json);
+
+            Assert.AreEqual(null, guid);
+        }
+
+        [TestMethod]
+        public void GiveGuidAsStringWithHashAndSmallLetters()
+        {
+            var json = @"""bed7f4ea-1a96-11d2-8f08-00a0c9a6186d""";
+
+            var guid = SimpleJson.DeserializeObject<Guid>(json);
+
+            Assert.AreEqual(new Guid("BED7F4EA-1A96-11d2-8F08-00A0C9A6186D"), guid);
+        }
+
+        [TestMethod]
+        public void GiveNullableGuidAsStringWithHashAndSmallLetters()
+        {
+            var json = @"""bed7f4ea-1a96-11d2-8f08-00a0c9a6186d""";
+
+            var guid = SimpleJson.DeserializeObject<Guid?>(json);
+
+            Assert.AreEqual(new Guid("BED7F4EA-1A96-11d2-8F08-00A0C9A6186D"), guid);
+        }
+
+        [TestMethod]
+        public void GiveGuidAsStringWithHashAndCapitalLetters()
+        {
+            var json = @"""BED7F4EA-1A96-11d2-8F08-00A0C9A6186D""";
+
+            var guid = SimpleJson.DeserializeObject<Guid>(json);
+
+            Assert.AreEqual(new Guid("BED7F4EA-1A96-11d2-8F08-00A0C9A6186D"), guid);
+        }
+
+        [TestMethod]
+        public void GivenNullableGuidAsStringWithHashAndCapitalLetters()
+        {
+            var json = @"""BED7F4EA-1A96-11d2-8F08-00A0C9A6186D""";
+
+            var guid = SimpleJson.DeserializeObject<Guid?>(json);
+
+            Assert.AreEqual(new Guid("BED7F4EA-1A96-11d2-8F08-00A0C9A6186D"), guid);
         }
 
         [TestMethod]

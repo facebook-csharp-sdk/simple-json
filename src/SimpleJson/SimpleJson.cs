@@ -1317,10 +1317,25 @@ namespace SimpleJson
             if (value is string)
             {
                 string str = value as string;
-                if(!string.IsNullOrEmpty(str) && (type == typeof(DateTime) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTime)) ))
-                     obj = DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+
+                if (!string.IsNullOrEmpty(str))
+                {
+                    if (type == typeof(DateTime) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTime)))
+                        obj = DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+                    else if (type == typeof(Guid) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid)))
+                        obj = new Guid(str);
+                    else
+                        obj = str;
+                }
                 else
-                    obj = str;
+                {
+                    if (type == typeof(Guid))
+                        obj= default(Guid);
+                    else if(ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid))
+                        obj = null;
+                    else
+                        obj = str;                    
+                }
             }
             else if (value is bool)
                 obj = value;
@@ -1342,7 +1357,7 @@ namespace SimpleJson
             {
                 if (value is IDictionary<string, object>)
                 {
-                    IDictionary<string, object> jsonObject = (IDictionary<string, object>) value;
+                    IDictionary<string, object> jsonObject = (IDictionary<string, object>)value;
 
                     if (ReflectionUtils.IsTypeDictionary(type))
                     {
@@ -1355,12 +1370,12 @@ namespace SimpleJson
                         Type valueType = type.GetGenericArguments()[1];
 #endif
 
-                        Type genericType = typeof (Dictionary<,>).MakeGenericType(keyType, valueType);
+                        Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
 
 #if NETFX_CORE
                     dynamic dict = CacheResolver.GetNewInstance(genericType);
 #else
-                        IDictionary dict = (IDictionary) CacheResolver.GetNewInstance(genericType);
+                        IDictionary dict = (IDictionary)CacheResolver.GetNewInstance(genericType);
 #endif
                         foreach (KeyValuePair<string, object> kvp in jsonObject)
                         {
@@ -1398,12 +1413,12 @@ namespace SimpleJson
                 }
                 else if (value is IList<object>)
                 {
-                    IList<object> jsonObject = (IList<object>) value;
+                    IList<object> jsonObject = (IList<object>)value;
                     IList list = null;
 
                     if (type.IsArray)
                     {
-                        list = (IList) Activator.CreateInstance(type, jsonObject.Count);
+                        list = (IList)Activator.CreateInstance(type, jsonObject.Count);
                         int i = 0;
                         foreach (object o in jsonObject)
                             list[i++] = DeserializeObject(o, type.GetElementType());
@@ -1412,17 +1427,17 @@ namespace SimpleJson
 #if NETFX_CORE
  typeof(IList).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
 #else
-                             typeof (IList).IsAssignableFrom(type)
+ typeof(IList).IsAssignableFrom(type)
 #endif
-                        )
+)
                     {
 #if NETFX_CORE
                     Type innerType = type.GetTypeInfo().GenericTypeArguments[0];
 #else
                         Type innerType = type.GetGenericArguments()[0];
 #endif
-                        Type genericType = typeof (List<>).MakeGenericType(innerType);
-                        list = (IList) CacheResolver.GetNewInstance(genericType);
+                        Type genericType = typeof(List<>).MakeGenericType(innerType);
+                        list = (IList)CacheResolver.GetNewInstance(genericType);
                         foreach (object o in jsonObject)
                             list.Add(DeserializeObject(o, innerType));
                     }
@@ -1435,6 +1450,12 @@ namespace SimpleJson
 
             if (ReflectionUtils.IsNullableType(type))
                 return ReflectionUtils.ToNullableType(obj, type);
+
+            if (obj == null)
+            {
+                if (type == typeof(Guid))
+                    return default(Guid);
+            }
 
             return obj;
         }
@@ -1632,9 +1653,9 @@ namespace SimpleJson
 #if NETFX_CORE
                     type.GetTypeInfo().IsGenericType
 #else
-                    type.IsGenericType
+ type.IsGenericType
 #endif
-                && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+ && type.GetGenericTypeDefinition() == typeof(Nullable<>);
             }
 
             public static object ToNullableType(object obj, Type nullableType)
