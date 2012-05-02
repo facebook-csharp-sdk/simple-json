@@ -209,6 +209,7 @@ namespace('generate', function () {
 			.readFileSync('src/SimpleJson/SimpleJson.cs', 'utf-8')
 			.replace('// VERSION:', '// VERSION: ' + config.version)
 			.replace('namespace SimpleJson', 'namespace $rootnamespace$')
+			.replace('namespace SimpleJson', 'namespace $rootnamespace$')
 			.replace('using SimpleJson.Reflection;', 'using $rootnamespace$.Reflection;')
 
 		fs.writeFileSync('working/SimpleJson.cs.pp', csFile);
