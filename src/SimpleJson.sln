@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonViewer", "JsonViewer\Js
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-SL5", "SimpleJson\SimpleJson-SL5.csproj", "{F918711A-6A76-488E-8990-0F0B73E1F532}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-Portable", "SimpleJson\SimpleJson-Portable.csproj", "{8264C25C-4195-4D37-B848-DE6A5C4F27CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +118,16 @@ Global
 		{F918711A-6A76-488E-8990-0F0B73E1F532}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F918711A-6A76-488E-8990-0F0B73E1F532}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F918711A-6A76-488E-8990-0F0B73E1F532}.Release|x86.ActiveCfg = Release|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
