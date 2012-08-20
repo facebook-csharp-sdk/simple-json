@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-SL5", "SimpleJso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-Portable", "SimpleJson\SimpleJson-Portable.csproj", "{8264C25C-4195-4D37-B848-DE6A5C4F27CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-Portable-NoLinqExpression", "SimpleJson\SimpleJson-Portable-NoLinqExpression.csproj", "{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,16 @@ Global
 		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8264C25C-4195-4D37-B848-DE6A5C4F27CC}.Release|x86.ActiveCfg = Release|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EC4EAFB1-A0A3-4C7B-8B38-CFEED0D6FC0A}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

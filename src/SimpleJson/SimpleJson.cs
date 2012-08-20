@@ -48,7 +48,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-#if !REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 using System.Linq.Expressions;
 #endif
 using System.ComponentModel;
@@ -1760,7 +1760,7 @@ namespace SimpleJson
 
             public static ConstructorDelegate GetContructor(ConstructorInfo constructorInfo)
             {
-#if REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
             return GetConstructorByReflection(constructorInfo);
 #else
                 return GetConstructorByExpression(constructorInfo);
@@ -1769,7 +1769,7 @@ namespace SimpleJson
 
             public static ConstructorDelegate GetContructor(Type type, params Type[] argsType)
             {
-#if REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
             return GetConstructorByReflection(type, argsType);
 #else
                 return GetConstructorByExpression(type, argsType);
@@ -1787,7 +1787,7 @@ namespace SimpleJson
                 return constructorInfo == null ? null : GetConstructorByReflection(constructorInfo);
             }
 
-#if !REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static ConstructorDelegate GetConstructorByExpression(ConstructorInfo constructorInfo)
             {
@@ -1818,7 +1818,7 @@ namespace SimpleJson
 
             public static GetDelegate GetGetMethod(PropertyInfo propertyInfo)
             {
-#if REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
             return GetGetMethodByReflection(propertyInfo);
 #else
                 return GetGetMethodByExpression(propertyInfo);
@@ -1827,7 +1827,7 @@ namespace SimpleJson
 
             public static GetDelegate GetGetMethod(FieldInfo fieldInfo)
             {
-#if REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
             return GetGetMethodByReflection(fieldInfo);
 #else
                 return GetGetMethodByExpression(fieldInfo);
@@ -1845,7 +1845,7 @@ namespace SimpleJson
                 return delegate(object source) { return fieldInfo.GetValue(source); };
             }
 
-#if !REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static GetDelegate GetGetMethodByExpression(PropertyInfo propertyInfo)
             {
@@ -1868,7 +1868,7 @@ namespace SimpleJson
 
             public static SetDelegate GetSetMethod(PropertyInfo propertyInfo)
             {
-#if REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
                 return GetSetMethodByReflection(propertyInfo);
 #else
                 return GetSetMethodByExpression(propertyInfo);
@@ -1877,7 +1877,7 @@ namespace SimpleJson
 
             public static SetDelegate GetSetMethod(FieldInfo fieldInfo)
             {
-#if REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
             return GetSetMethodByReflection(fieldInfo);
 #else
                 return GetSetMethodByExpression(fieldInfo);
@@ -1895,7 +1895,7 @@ namespace SimpleJson
                 return delegate(object source, object value) { fieldInfo.SetValue(source, value); };
             }
 
-#if !REFLECTION_UTILS_NO_LINQ_EXPRESSION
+#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static SetDelegate GetSetMethodByExpression(PropertyInfo propertyInfo)
             {
