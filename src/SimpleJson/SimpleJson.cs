@@ -1585,8 +1585,8 @@ namespace SimpleJson
 
     namespace Reflection
     {
-#if REFLECTION_UTILS_PUBLIC
-    public
+#if SIMPLE_JSON_REFLECTION_UTILS_PUBLIC
+        public
 #else
         internal
 #endif
@@ -1878,7 +1878,7 @@ namespace SimpleJson
             public static SetDelegate GetSetMethod(FieldInfo fieldInfo)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
-            return GetSetMethodByReflection(fieldInfo);
+                return GetSetMethodByReflection(fieldInfo);
 #else
                 return GetSetMethodByExpression(fieldInfo);
 #endif
