@@ -65,8 +65,8 @@
     <None Include="DataContractTests\PublicReadonlySerializeTests.cs" />
     <None Include="DataContractTests\PublicSettersSerializeTests.cs" />
     <Compile Include="EscapeToJavascriptStringTests.cs" />
-    <None Include="JsonArrayTests.cs" />
-    <None Include="DeserializeObjectTests.cs" />
+    <Compile Include="JsonArrayTests.cs" />
+    <Compile Include="DeserializeObjectTests.cs" />
     <Compile Include="JsonDecodeTypeTests.cs" />
     <None Include="JsonDataContractSerializeObjectTests.cs" />
     <None Include="PocoDeserializerTests\ArrayTests.cs" />

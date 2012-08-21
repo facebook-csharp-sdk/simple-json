@@ -1292,12 +1292,12 @@ namespace SimpleJson
             _setCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>>(SetterValueFactory);
         }
 
-        private ReflectionUtils.ConstructorDelegate ContructorDelegateFactory(Type key)
+        private static ReflectionUtils.ConstructorDelegate ContructorDelegateFactory(Type key)
         {
             return ReflectionUtils.GetContructor(key, key.IsArray ? ArrayConstructorParameterTypes : EmptyTypes);
         }
 
-        private IDictionary<string, ReflectionUtils.GetDelegate> GetterValueFactory(Type type)
+        private static IDictionary<string, ReflectionUtils.GetDelegate> GetterValueFactory(Type type)
         {
             IDictionary<string, ReflectionUtils.GetDelegate> result = new Dictionary<string, ReflectionUtils.GetDelegate>();
             foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
@@ -1321,7 +1321,7 @@ namespace SimpleJson
             return result;
         }
 
-        private IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> SetterValueFactory(Type type)
+        private static IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> SetterValueFactory(Type type)
         {
             IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> result = new Dictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>();
             foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
@@ -1345,30 +1345,6 @@ namespace SimpleJson
             return result;
         }
 
-        /*
-        protected virtual void BuildMap(Type type, SafeDictionary<string, CacheResolver.MemberMap> memberMaps)
-        {
-#if NETFX_CORE
-            foreach (PropertyInfo info in type.GetTypeInfo().DeclaredProperties) {
-                var getMethod = info.GetMethod;
-                if(getMethod==null || !getMethod.IsPublic || getMethod.IsStatic) continue;
-#else
-            foreach (PropertyInfo info in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-            {
-#endif
-                memberMaps.Add(info.Name, new CacheResolver.MemberMap(info));
-            }
-#if NETFX_CORE
-            foreach (FieldInfo info in type.GetTypeInfo().DeclaredFields) {
-                if(!info.IsPublic || info.IsStatic) continue;
-#else
-            foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
-            {
-#endif
-                memberMaps.Add(info.Name, new CacheResolver.MemberMap(info));
-            }
-        }
-        */
         public virtual bool SerializeNonPrimitiveObject(object input, out object output)
         {
             return TrySerializeKnownTypes(input, out output) || TrySerializeUnknownTypes(input, out output);
