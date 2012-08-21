@@ -1426,13 +1426,9 @@ namespace SimpleJson
                     if (ReflectionUtils.IsTypeDictionary(type))
                     {
                         // if dictionary then
-#if NETFX_CORE
-                        Type keyType = type.GetTypeInfo().GenericTypeArguments[0];
-                        Type valueType = type.GetTypeInfo().GenericTypeArguments[1];
-#else
-                        Type keyType = type.GetGenericArguments()[0];
-                        Type valueType = type.GetGenericArguments()[1];
-#endif
+                        Type[] types = ReflectionUtils.GetGenericTypeArguments(type);
+                        Type keyType = types[0];
+                        Type valueType = types[1];
 
                         Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
 
@@ -1469,7 +1465,6 @@ namespace SimpleJson
                     if (type.IsArray)
                     {
                         list = (IList)_constructorCache[type](jsonObject.Count);
-                        //list = (IList)Activator.CreateInstance(type, jsonObject.Count);
                         int i = 0;
                         foreach (object o in jsonObject)
                             list[i++] = DeserializeObject(o, type.GetElementType());
@@ -1482,11 +1477,7 @@ namespace SimpleJson
 #endif
 )
                     {
-#if NETFX_CORE
-                        Type innerType = type.GetTypeInfo().GenericTypeArguments[0];
-#else
-                        Type innerType = type.GetGenericArguments()[0];
-#endif
+                        Type innerType = ReflectionUtils.GetGenericTypeArguments(type)[0];
                         Type genericType = typeof(List<>).MakeGenericType(innerType);
                         list = (IList)_constructorCache[genericType](jsonObject.Count);
                         foreach (object o in jsonObject)
