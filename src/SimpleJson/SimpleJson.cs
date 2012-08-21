@@ -1872,7 +1872,7 @@ namespace SimpleJson
             public static GetDelegate GetGetMethod(PropertyInfo propertyInfo)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
-            return GetGetMethodByReflection(propertyInfo);
+                return GetGetMethodByReflection(propertyInfo);
 #else
                 return GetGetMethodByExpression(propertyInfo);
 #endif
@@ -1881,7 +1881,7 @@ namespace SimpleJson
             public static GetDelegate GetGetMethod(FieldInfo fieldInfo)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
-            return GetGetMethodByReflection(fieldInfo);
+                return GetGetMethodByReflection(fieldInfo);
 #else
                 return GetGetMethodByExpression(fieldInfo);
 #endif
@@ -1922,7 +1922,7 @@ namespace SimpleJson
             public static SetDelegate GetSetMethod(PropertyInfo propertyInfo)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
-            return GetSetMethodByReflection(propertyInfo);
+                return GetSetMethodByReflection(propertyInfo);
 #else
                 return GetSetMethodByExpression(propertyInfo);
 #endif
@@ -1931,7 +1931,7 @@ namespace SimpleJson
             public static SetDelegate GetSetMethod(FieldInfo fieldInfo)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
-            return GetSetMethodByReflection(fieldInfo);
+                return GetSetMethodByReflection(fieldInfo);
 #else
                 return GetSetMethodByExpression(fieldInfo);
 #endif

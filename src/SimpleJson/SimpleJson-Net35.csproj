@@ -8,7 +8,7 @@
     <ProjectGuid>{5033CD0A-483B-4E41-87A2-D0F65905B5D3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleJson_Net35</RootNamespace>
+    <RootNamespace>SimpleJson</RootNamespace>
     <AssemblyName>SimpleJson</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Net35\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_REFLECTIONEMIT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\Net35\Release\</OutputPath>
-    <DefineConstants>TRACE;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_REFLECTIONEMIT</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
