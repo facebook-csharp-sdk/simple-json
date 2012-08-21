@@ -1408,11 +1408,8 @@ namespace SimpleJson
 
                         Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
 
-#if NETFX_CORE
-                        dynamic dict = null; //CacheResolver.GetNewInstance(genericType);
-#else
-                        IDictionary dict = null;// (IDictionary)CacheResolver.GetNewInstance(genericType);
-#endif
+                        IDictionary dict = (IDictionary)_constructorCache[genericType]();
+
                         foreach (KeyValuePair<string, object> kvp in jsonObject)
                             dict.Add(kvp.Key, DeserializeObject(kvp.Value, valueType));
 

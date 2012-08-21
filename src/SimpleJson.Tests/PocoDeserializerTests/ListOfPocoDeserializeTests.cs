@@ -17,11 +17,12 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
+
 
 namespace SimpleJsonTests.PocoDeserializerTests
 {
-    using System;
+    using System.Collections.Generic;
+
 #if NUNIT
     using TestClass = NUnit.Framework.TestFixtureAttribute;
     using TestMethod = NUnit.Framework.TestAttribute;
