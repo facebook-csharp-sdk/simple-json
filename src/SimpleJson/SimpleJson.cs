@@ -1422,13 +1422,19 @@ namespace SimpleJson
                     }
                     else
                     {
-                        obj = _constructorCache[type]();
-                        foreach (KeyValuePair<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> setter in _setCache[type])
+                        if(type == typeof(object))
+                            obj = value;
+                        else
                         {
-                            if (jsonObject.ContainsKey(setter.Key))
+                            obj = _constructorCache[type]();
+                            foreach (KeyValuePair<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> setter in _setCache[type])
                             {
-                                object jsonValue = DeserializeObject(jsonObject[setter.Key], setter.Value.Key);
-                                setter.Value.Value(obj, jsonValue);
+                                object jsonValue;
+                                if (jsonObject.TryGetValue(setter.Key, out jsonValue))
+                                {
+                                    jsonValue = DeserializeObject(jsonValue, setter.Value.Key);
+                                    setter.Value.Value(obj, jsonValue);
+                                }
                             }
                         }
                     }
