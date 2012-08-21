@@ -17,9 +17,6 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Runtime.Serialization;
-
 namespace SimpleJsonTests
 {
     using System.Collections.Generic;

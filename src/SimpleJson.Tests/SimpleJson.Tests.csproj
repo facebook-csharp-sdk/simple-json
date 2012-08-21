@@ -52,59 +52,59 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataContractTests\DataContractSampleClassess.cs" />
-    <Compile Include="DataContractTests\PrivateFieldsSerializeTests.cs" />
-    <Compile Include="DataContractTests\PrivateGetterSettersSerializeTests.cs" />
-    <Compile Include="DataContractTests\PrivateGettersSerializeTests.cs" />
-    <Compile Include="DataContractTests\PrivateReadonlySerializeTests.cs" />
-    <Compile Include="DataContractTests\PrivateSettersSerializeTests.cs" />
-    <Compile Include="DataContractTests\PublicFieldsSerializeTests.cs" />
-    <Compile Include="DataContractTests\PublicGetterSetterDeserializeTests.cs" />
-    <Compile Include="DataContractTests\PublicGetterSettersSerializeTests.cs" />
-    <Compile Include="DataContractTests\PublicGettersSerializeTests.cs" />
-    <Compile Include="DataContractTests\PublicReadonlySerializeTests.cs" />
-    <Compile Include="DataContractTests\PublicSettersSerializeTests.cs" />
+    <None Include="DataContractTests\DataContractSampleClassess.cs" />
+    <None Include="DataContractTests\PrivateFieldsSerializeTests.cs" />
+    <None Include="DataContractTests\PrivateGetterSettersSerializeTests.cs" />
+    <None Include="DataContractTests\PrivateGettersSerializeTests.cs" />
+    <None Include="DataContractTests\PrivateReadonlySerializeTests.cs" />
+    <None Include="DataContractTests\PrivateSettersSerializeTests.cs" />
+    <None Include="DataContractTests\PublicFieldsSerializeTests.cs" />
+    <None Include="DataContractTests\PublicGetterSetterDeserializeTests.cs" />
+    <None Include="DataContractTests\PublicGetterSettersSerializeTests.cs" />
+    <None Include="DataContractTests\PublicGettersSerializeTests.cs" />
+    <None Include="DataContractTests\PublicReadonlySerializeTests.cs" />
+    <None Include="DataContractTests\PublicSettersSerializeTests.cs" />
     <Compile Include="EscapeToJavascriptStringTests.cs" />
-    <Compile Include="JsonArrayTests.cs" />
-    <Compile Include="DeserializeObjectTests.cs" />
+    <None Include="JsonArrayTests.cs" />
+    <None Include="DeserializeObjectTests.cs" />
     <Compile Include="JsonDecodeTypeTests.cs" />
-    <Compile Include="JsonDataContractSerializeObjectTests.cs" />
-    <Compile Include="PocoDeserializerTests\ArrayTests.cs" />
-    <Compile Include="PocoDeserializerTests\NullableTypeDeserializeTests.cs" />
-    <Compile Include="PocoDeserializerTests\DateTimeDeserializeTests.cs" />
-    <Compile Include="PocoDeserializerTests\DictionaryDeserializeTests.cs" />
-    <Compile Include="PocoDeserializerTests\ListOfPocoDeserializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\DateTimeSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\NullableSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PrivateFieldsDeserializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PrivateFieldsSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PrivateGetterSettersDeserializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PrivateGetterSettersSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PrivateGettersSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PrivateReadonlySerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PrivateSettersSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicFieldsDeserializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicFieldsSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicGetterDeserializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicGetterSetterDeserializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicGetterSettersSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicGettersSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicReadonlySerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\PublicSettersSerializeTests.cs" />
-    <Compile Include="PocoJsonSerializerTests\ToStringTests.cs" />
+    <None Include="JsonDataContractSerializeObjectTests.cs" />
+    <None Include="PocoDeserializerTests\ArrayTests.cs" />
+    <None Include="PocoDeserializerTests\NullableTypeDeserializeTests.cs" />
+    <None Include="PocoDeserializerTests\DateTimeDeserializeTests.cs" />
+    <None Include="PocoDeserializerTests\DictionaryDeserializeTests.cs" />
+    <None Include="PocoDeserializerTests\ListOfPocoDeserializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\DateTimeSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\NullableSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PrivateFieldsDeserializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PrivateFieldsSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PrivateGetterSettersDeserializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PrivateGetterSettersSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PrivateGettersSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PrivateReadonlySerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PrivateSettersSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicFieldsDeserializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicFieldsSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicGetterDeserializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicGetterSetterDeserializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicGetterSettersSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicGettersSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicReadonlySerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\PublicSettersSerializeTests.cs" />
+    <None Include="PocoJsonSerializerTests\ToStringTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializeObject.KnownNonPrimitive.Tests.cs" />
     <Compile Include="SerializeObject.Primitive.Tests.cs" />
     <Compile Include="SerializeObject.UnknownNonPrimitive.Tests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleJson\SimpleJson-Net40.csproj">
-      <Project>{4EE1BC6A-D96B-4BD6-A6F3-2E2135AA9B99}</Project>
-      <Name>SimpleJson-Net40</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\SimpleJson\SimpleJson-Portable.csproj">
+      <Project>{8264c25c-4195-4d37-b848-de6a5c4f27cc}</Project>
+      <Name>SimpleJson-Portable</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
