@@ -1313,7 +1313,7 @@ namespace SimpleJson
 
             foreach (FieldInfo fieldInfo in ReflectionUtils.GetFields(type))
             {
-                if (fieldInfo.IsInitOnly || fieldInfo.IsStatic || !fieldInfo.IsPublic)
+                if (fieldInfo.IsStatic || !fieldInfo.IsPublic)
                     continue;
                 result[fieldInfo.Name] = ReflectionUtils.GetGetMethod(fieldInfo);
             }
@@ -1414,9 +1414,7 @@ namespace SimpleJson
                         IDictionary dict = null;// (IDictionary)CacheResolver.GetNewInstance(genericType);
 #endif
                         foreach (KeyValuePair<string, object> kvp in jsonObject)
-                        {
                             dict.Add(kvp.Key, DeserializeObject(kvp.Value, valueType));
-                        }
 
                         obj = dict;
                     }
