@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_NO_LINQ_EXPRESSION;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_NO_LINQ_EXPRESSION;SIMPLE_JSON_DATACONTRACT;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>ISO-2</LangVersion>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SIMPLE_JSON_NO_LINQ_EXPRESSION;</DefineConstants>
+    <DefineConstants>TRACE;SIMPLE_JSON_NO_LINQ_EXPRESSION;SIMPLE_JSON_DATACONTRACT;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>ISO-2</LangVersion>

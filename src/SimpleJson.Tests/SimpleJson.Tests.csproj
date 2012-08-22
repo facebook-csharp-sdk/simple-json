@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Tests\Net40\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NUNIT;SIMPLE_JSON_DATACONTRACT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NUNIT;SIMPLE_JSON_DATACONTRACT;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -53,22 +53,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataContractTests\DataContractSampleClassess.cs" />
-    <None Include="DataContractTests\PrivateFieldsSerializeTests.cs" />
-    <None Include="DataContractTests\PrivateGetterSettersSerializeTests.cs" />
-    <None Include="DataContractTests\PrivateGettersSerializeTests.cs" />
-    <None Include="DataContractTests\PrivateReadonlySerializeTests.cs" />
-    <None Include="DataContractTests\PrivateSettersSerializeTests.cs" />
-    <None Include="DataContractTests\PublicFieldsSerializeTests.cs" />
-    <None Include="DataContractTests\PublicGetterSetterDeserializeTests.cs" />
-    <None Include="DataContractTests\PublicGetterSettersSerializeTests.cs" />
-    <None Include="DataContractTests\PublicGettersSerializeTests.cs" />
-    <None Include="DataContractTests\PublicReadonlySerializeTests.cs" />
-    <None Include="DataContractTests\PublicSettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateFieldsSerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateGetterSettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateGettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateReadonlySerializeTests.cs" />
+    <Compile Include="DataContractTests\PrivateSettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicFieldsSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicGetterSetterDeserializeTests.cs" />
+    <Compile Include="DataContractTests\PublicGetterSettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicGettersSerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicReadonlySerializeTests.cs" />
+    <Compile Include="DataContractTests\PublicSettersSerializeTests.cs" />
     <Compile Include="EscapeToJavascriptStringTests.cs" />
     <Compile Include="JsonArrayTests.cs" />
     <Compile Include="DeserializeObjectTests.cs" />
     <Compile Include="JsonDecodeTypeTests.cs" />
-    <None Include="JsonDataContractSerializeObjectTests.cs" />
+    <Compile Include="JsonDataContractSerializeObjectTests.cs" />
     <Compile Include="PocoDeserializerTests\ArrayTests.cs" />
     <Compile Include="PocoDeserializerTests\NullableTypeDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\DateTimeDeserializeTests.cs" />

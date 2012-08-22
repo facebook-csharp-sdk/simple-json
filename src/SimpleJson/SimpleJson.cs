@@ -31,9 +31,9 @@
 // NOTE: uncomment the following line to enable DataContract support.
 //#define SIMPLE_JSON_DATACONTRACT
 
-// NOTE: uncomment the following line to use Reflection.Emit (better performance) instead of method.invoke().
-// don't enable ReflectionEmit for WinRT, Silverlight and WP7.
-//#define SIMPLE_JSON_REFLECTIONEMIT
+// NOTE: uncomment the following line to disable linq expressions/compiled lambda (better performance) instead of method.invoke().
+// define if you are using .net framework <= 3.0 or < WP7.5
+//#define SIMPLE_JSON_NO_LINQ_EXPRESSION
 
 // NOTE: uncomment the following line if you are compiling under Window Metro style application/library.
 // usually already defined in properties
@@ -58,9 +58,6 @@ using System.Dynamic;
 #endif
 using System.Globalization;
 using System.Reflection;
-#if SIMPLE_JSON_REFLECTIONEMIT
-using System.Reflection.Emit;
-#endif
 #if SIMPLE_JSON_DATACONTRACT
 using System.Runtime.Serialization;
 #endif
@@ -1222,7 +1219,7 @@ namespace SimpleJson
         }
 
         private static PocoJsonSerializerStrategy pocoJsonSerializerStrategy;
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+        [System.ComponentModel.EditorBrowsable(EditorBrowsableState.Advanced)]
         public static PocoJsonSerializerStrategy PocoJsonSerializerStrategy
         {
             get
@@ -1235,7 +1232,7 @@ namespace SimpleJson
 #if SIMPLE_JSON_DATACONTRACT
 
         private static DataContractJsonSerializerStrategy dataContractJsonSerializerStrategy;
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+        [System.ComponentModel.EditorBrowsable(EditorBrowsableState.Advanced)]
         public static DataContractJsonSerializerStrategy DataContractJsonSerializerStrategy
         {
             get
@@ -1271,9 +1268,9 @@ namespace SimpleJson
 #endif
  class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
-        private readonly IDictionary<Type, ReflectionUtils.ConstructorDelegate> _constructorCache;
-        private readonly IDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>> _getCache;
-        private readonly IDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>> _setCache;
+        internal IDictionary<Type, ReflectionUtils.ConstructorDelegate> ConstructorCache;
+        internal IDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>> GetCache;
+        internal IDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>> SetCache;
 
         internal static readonly Type[] EmptyTypes = new Type[0];
         internal static readonly Type[] ArrayConstructorParameterTypes = new Type[] { typeof(int) };
@@ -1287,17 +1284,17 @@ namespace SimpleJson
 
         public PocoJsonSerializerStrategy()
         {
-            _constructorCache = new ReflectionUtils.ThreadSafeDictionary<Type, ReflectionUtils.ConstructorDelegate>(ContructorDelegateFactory);
-            _getCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>>(GetterValueFactory);
-            _setCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>>(SetterValueFactory);
+            ConstructorCache = new ReflectionUtils.ThreadSafeDictionary<Type, ReflectionUtils.ConstructorDelegate>(ContructorDelegateFactory);
+            GetCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>>(GetterValueFactory);
+            SetCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>>(SetterValueFactory);
         }
 
-        private static ReflectionUtils.ConstructorDelegate ContructorDelegateFactory(Type key)
+        internal virtual ReflectionUtils.ConstructorDelegate ContructorDelegateFactory(Type key)
         {
             return ReflectionUtils.GetContructor(key, key.IsArray ? ArrayConstructorParameterTypes : EmptyTypes);
         }
 
-        private static IDictionary<string, ReflectionUtils.GetDelegate> GetterValueFactory(Type type)
+        internal virtual IDictionary<string, ReflectionUtils.GetDelegate> GetterValueFactory(Type type)
         {
             IDictionary<string, ReflectionUtils.GetDelegate> result = new Dictionary<string, ReflectionUtils.GetDelegate>();
             foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
@@ -1321,7 +1318,7 @@ namespace SimpleJson
             return result;
         }
 
-        private static IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> SetterValueFactory(Type type)
+        internal virtual IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> SetterValueFactory(Type type)
         {
             IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> result = new Dictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>();
             foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
@@ -1408,7 +1405,7 @@ namespace SimpleJson
 
                         Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
 
-                        IDictionary dict = (IDictionary)_constructorCache[genericType]();
+                        IDictionary dict = (IDictionary)ConstructorCache[genericType]();
 
                         foreach (KeyValuePair<string, object> kvp in jsonObject)
                             dict.Add(kvp.Key, DeserializeObject(kvp.Value, valueType));
@@ -1417,12 +1414,12 @@ namespace SimpleJson
                     }
                     else
                     {
-                        if(type == typeof(object))
+                        if (type == typeof(object))
                             obj = value;
                         else
                         {
-                            obj = _constructorCache[type]();
-                            foreach (KeyValuePair<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> setter in _setCache[type])
+                            obj = ConstructorCache[type]();
+                            foreach (KeyValuePair<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> setter in SetCache[type])
                             {
                                 object jsonValue;
                                 if (jsonObject.TryGetValue(setter.Key, out jsonValue))
@@ -1441,7 +1438,7 @@ namespace SimpleJson
 
                     if (type.IsArray)
                     {
-                        list = (IList)_constructorCache[type](jsonObject.Count);
+                        list = (IList)ConstructorCache[type](jsonObject.Count);
                         int i = 0;
                         foreach (object o in jsonObject)
                             list[i++] = DeserializeObject(o, type.GetElementType());
@@ -1456,7 +1453,7 @@ namespace SimpleJson
                     {
                         Type innerType = ReflectionUtils.GetGenericTypeArguments(type)[0];
                         Type genericType = typeof(List<>).MakeGenericType(innerType);
-                        list = (IList)_constructorCache[genericType](jsonObject.Count);
+                        list = (IList)ConstructorCache[genericType](jsonObject.Count);
                         foreach (object o in jsonObject)
                             list.Add(DeserializeObject(o, innerType));
                     }
@@ -1516,7 +1513,7 @@ namespace SimpleJson
 
             IDictionary<string, object> obj = new JsonObject();
 
-            IDictionary<string, ReflectionUtils.GetDelegate> getters = _getCache[type];
+            IDictionary<string, ReflectionUtils.GetDelegate> getters = GetCache[type];
             foreach (KeyValuePair<string, ReflectionUtils.GetDelegate> getter in getters)
             {
                 if (getter.Value != null)
@@ -1538,54 +1535,75 @@ namespace SimpleJson
     {
         public DataContractJsonSerializerStrategy()
         {
-            CacheResolver = new CacheResolver(BuildMap);
+            GetCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>>(GetterValueFactory);
+            SetCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>>(SetterValueFactory);
         }
 
-        protected override void BuildMap(Type type, SafeDictionary<string, CacheResolver.MemberMap> map)
+        internal override IDictionary<string, ReflectionUtils.GetDelegate> GetterValueFactory(Type type)
         {
             bool hasDataContract = ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
             if (!hasDataContract)
-            {
-                base.BuildMap(type, map);
-                return;
-            }
+                return base.GetterValueFactory(type);
 
             string jsonKey;
-#if NETFX_CORE
-            foreach (PropertyInfo info in type.GetTypeInfo().DeclaredProperties)
-#else
-            foreach (PropertyInfo info in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-#endif
+
+            IDictionary<string, ReflectionUtils.GetDelegate> result = new Dictionary<string, ReflectionUtils.GetDelegate>();
+            foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
             {
-                if (CanAdd(info, out jsonKey))
-                    map.Add(jsonKey, new CacheResolver.MemberMap(info));
+                if (propertyInfo.CanRead)
+                {
+                    MethodInfo getMethod = ReflectionUtils.GetGetterMethodInfo(propertyInfo);
+                    if (!getMethod.IsStatic && CanAdd(propertyInfo, out jsonKey))
+                        result[jsonKey] = ReflectionUtils.GetGetMethod(propertyInfo);
+                }
             }
 
-#if NETFX_CORE
-            foreach (FieldInfo info in type.GetTypeInfo().DeclaredFields)
-#else
-            foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-#endif
+            foreach (FieldInfo fieldInfo in ReflectionUtils.GetFields(type))
             {
-                if (CanAdd(info, out jsonKey))
-                    map.Add(jsonKey, new CacheResolver.MemberMap(info));
+                if (!fieldInfo.IsStatic && CanAdd(fieldInfo, out jsonKey))
+                    result[jsonKey] = ReflectionUtils.GetGetMethod(fieldInfo);
+            }
+
+            return result;
+        }
+
+        internal override IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> SetterValueFactory(Type type)
+        {
+            bool hasDataContract = ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
+            if (!hasDataContract)
+                return base.SetterValueFactory(type);
+
+            string jsonKey;
+
+            IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> result = new Dictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>();
+            foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
+            {
+                if (propertyInfo.CanWrite)
+                {
+                    MethodInfo setMethod = ReflectionUtils.GetSetterMethodInfo(propertyInfo);
+                    if (!setMethod.IsStatic && CanAdd(propertyInfo, out jsonKey))
+                        result[jsonKey] = new KeyValuePair<Type, ReflectionUtils.SetDelegate>(propertyInfo.PropertyType, ReflectionUtils.GetSetMethod(propertyInfo));
+                }
+            }
+
+            foreach (FieldInfo fieldInfo in ReflectionUtils.GetFields(type))
+            {
+                if (!fieldInfo.IsInitOnly && !fieldInfo.IsStatic && CanAdd(fieldInfo, out jsonKey))
+                    result[jsonKey] = new KeyValuePair<Type, ReflectionUtils.SetDelegate>(fieldInfo.FieldType, ReflectionUtils.GetSetMethod(fieldInfo));
             }
 
             // todo implement sorting for DATACONTRACT.
+            return result;
         }
 
         private static bool CanAdd(MemberInfo info, out string jsonKey)
         {
             jsonKey = null;
-
             if (ReflectionUtils.GetAttribute(info, typeof(IgnoreDataMemberAttribute)) != null)
                 return false;
-
             DataMemberAttribute dataMemberAttribute = (DataMemberAttribute)ReflectionUtils.GetAttribute(info, typeof(DataMemberAttribute));
-
             if (dataMemberAttribute == null)
                 return false;
-
             jsonKey = string.IsNullOrEmpty(dataMemberAttribute.Name) ? info.Name : dataMemberAttribute.Name;
             return true;
         }
@@ -1596,8 +1614,8 @@ namespace SimpleJson
 
     namespace Reflection
     {
-#if SIMPLE_JSON_PUBLIC
-    public
+#if SIMPLE_JSON_REFLECTION_UTILS_PUBLIC
+        public
 #else
         internal
 #endif
