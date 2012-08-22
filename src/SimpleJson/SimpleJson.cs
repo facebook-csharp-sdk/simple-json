@@ -58,13 +58,13 @@ using System.Dynamic;
 #endif
 using System.Globalization;
 using System.Reflection;
-#if SIMPLE_JSON_DATACONTRACT
 using System.Runtime.Serialization;
-#endif
 using System.Text;
 using SimpleJson.Reflection;
 
 // ReSharper disable LoopCanBeConvertedToQuery
+// ReSharper disable RedundantExplicitArrayCreation
+// ReSharper disable SuggestUseVarKeywordEvident
 namespace SimpleJson
 {
     /// <summary>
@@ -338,7 +338,7 @@ namespace SimpleJson
 
             if ((targetType == typeof(IEnumerable)) ||
                 (targetType == typeof(IEnumerable<KeyValuePair<string, object>>)) ||
-                (targetType == typeof(IDictionary<string, object>)) || 
+                (targetType == typeof(IDictionary<string, object>)) ||
                 (targetType == typeof(IDictionary)))
             {
                 result = this;
@@ -484,7 +484,6 @@ namespace SimpleJson
         private const int TOKEN_TRUE = 9;
         private const int TOKEN_FALSE = 10;
         private const int TOKEN_NULL = 11;
-
         private const int BUILDER_CAPACITY = 2000;
 
         /// <summary>
@@ -494,10 +493,10 @@ namespace SimpleJson
         /// <returns>An IList&lt;object>, a IDictionary&lt;string,object>, a double, a string, null, true, or false</returns>
         public static object DeserializeObject(string json)
         {
-            object @object;
-            if (TryDeserializeObject(json, out @object))
-                return @object;
-            throw new System.Runtime.Serialization.SerializationException("Invalid JSON string");
+            object obj;
+            if (TryDeserializeObject(json, out obj))
+                return obj;
+            throw new SerializationException("Invalid JSON string");
         }
 
         /// <summary>
@@ -506,23 +505,23 @@ namespace SimpleJson
         /// <param name="json">
         /// A JSON string.
         /// </param>
-        /// <param name="object">
+        /// <param name="obj">
         /// The object.
         /// </param>
         /// <returns>
         /// Returns true if successfull otherwise false.
         /// </returns>
-        public static bool TryDeserializeObject(string json, out object @object)
+        public static bool TryDeserializeObject(string json, out object obj)
         {
             bool success = true;
             if (json != null)
             {
                 char[] charArray = json.ToCharArray();
                 int index = 0;
-                @object = ParseValue(charArray, ref index, ref success);
+                obj = ParseValue(charArray, ref index, ref success);
             }
             else
-                @object = null;
+                obj = null;
 
             return success;
         }
@@ -530,14 +529,8 @@ namespace SimpleJson
         public static object DeserializeObject(string json, Type type, IJsonSerializerStrategy jsonSerializerStrategy)
         {
             object jsonObject = DeserializeObject(json);
-
-            return type == null || jsonObject != null &&
-#if NETFX_CORE
- jsonObject.GetType().GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
-#else
- jsonObject.GetType().IsAssignableFrom(type)
-#endif
- ? jsonObject
+            return type == null || jsonObject != null && ReflectionUtils.IsAssignableFrom(jsonObject.GetType(), type)
+                       ? jsonObject
                        : (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(jsonObject, type);
         }
 
@@ -577,9 +570,7 @@ namespace SimpleJson
         public static string EscapeToJavascriptString(string jsonString)
         {
             if (string.IsNullOrEmpty(jsonString))
-            {
                 return jsonString;
-            }
 
             StringBuilder sb = new StringBuilder();
             char c;
@@ -631,7 +622,6 @@ namespace SimpleJson
                     sb.Append(c);
                 }
             }
-
             return sb.ToString();
         }
 
@@ -668,7 +658,6 @@ namespace SimpleJson
                         success = false;
                         return null;
                     }
-
                     // :
                     token = NextToken(json, ref index);
                     if (token != TOKEN_COLON)
@@ -676,7 +665,6 @@ namespace SimpleJson
                         success = false;
                         return null;
                     }
-
                     // value
                     object value = ParseValue(json, ref index, ref success);
                     if (!success)
@@ -684,11 +672,9 @@ namespace SimpleJson
                         success = false;
                         return null;
                     }
-
                     table[name] = value;
                 }
             }
-
             return table;
         }
 
@@ -723,7 +709,6 @@ namespace SimpleJson
                     array.Add(value);
                 }
             }
-
             return array;
         }
 
@@ -751,7 +736,6 @@ namespace SimpleJson
                 case TOKEN_NONE:
                     break;
             }
-
             success = false;
             return null;
         }
@@ -765,14 +749,11 @@ namespace SimpleJson
 
             // "
             c = json[index++];
-
             bool complete = false;
             while (!complete)
             {
                 if (index == json.Length)
-                {
                     break;
-                }
 
                 c = json[index++];
                 if (c == '"')
@@ -808,14 +789,10 @@ namespace SimpleJson
                         {
                             // parse the 32 bit hex into an integer codepoint
                             uint codePoint;
-                            if (
-                                !(success =
-                                  UInt32.TryParse(new string(json, index, 4), NumberStyles.HexNumber,
-                                                  CultureInfo.InvariantCulture, out codePoint)))
+                            if (!(success = UInt32.TryParse(new string(json, index, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out codePoint)))
                                 return "";
 
                             // convert the integer codepoint to a unicode char and add to string
-
                             if (0xD800 <= codePoint && codePoint <= 0xDBFF)  // if high surrogate
                             {
                                 index += 4; // skip 4 chars
@@ -823,9 +800,7 @@ namespace SimpleJson
                                 if (remainingLength >= 6)
                                 {
                                     uint lowCodePoint;
-                                    if (new string(json, index, 2) == "\\u" &&
-                                        UInt32.TryParse(new string(json, index + 2, 4), NumberStyles.HexNumber,
-                                                        CultureInfo.InvariantCulture, out lowCodePoint))
+                                    if (new string(json, index, 2) == "\\u" && UInt32.TryParse(new string(json, index + 2, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out lowCodePoint))
                                     {
                                         if (0xDC00 <= lowCodePoint && lowCodePoint <= 0xDFFF)    // if low surrogate
                                         {
@@ -850,13 +825,11 @@ namespace SimpleJson
                 else
                     s.Append(c);
             }
-
             if (!complete)
             {
                 success = false;
                 return null;
             }
-
             return s.ToString();
         }
 
@@ -876,10 +849,8 @@ namespace SimpleJson
         protected static object ParseNumber(char[] json, ref int index, ref bool success)
         {
             EatWhitespace(json, ref index);
-
             int lastIndex = GetLastIndexOfNumber(json, index);
             int charLength = (lastIndex - index) + 1;
-
             object returnNumber;
             string str = new string(json, index, charLength);
             if (str.IndexOf(".", StringComparison.OrdinalIgnoreCase) != -1 || str.IndexOf("e", StringComparison.OrdinalIgnoreCase) != -1)
@@ -894,7 +865,6 @@ namespace SimpleJson
                 success = long.TryParse(new string(json, index, charLength), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
                 returnNumber = number;
             }
-
             index = lastIndex + 1;
             return returnNumber;
         }
@@ -902,7 +872,6 @@ namespace SimpleJson
         protected static int GetLastIndexOfNumber(char[] json, int index)
         {
             int lastIndex;
-
             for (lastIndex = index; lastIndex < json.Length; lastIndex++)
                 if ("0123456789+-.eE".IndexOf(json[lastIndex]) == -1) break;
             return lastIndex - 1;
@@ -924,10 +893,8 @@ namespace SimpleJson
         protected static int NextToken(char[] json, ref int index)
         {
             EatWhitespace(json, ref index);
-
             if (index == json.Length)
                 return TOKEN_NONE;
-
             char c = json[index];
             index++;
             switch (c)
@@ -960,56 +927,40 @@ namespace SimpleJson
                     return TOKEN_COLON;
             }
             index--;
-
             int remainingLength = json.Length - index;
-
             // false
             if (remainingLength >= 5)
             {
-                if (json[index] == 'f' &&
-                    json[index + 1] == 'a' &&
-                    json[index + 2] == 'l' &&
-                    json[index + 3] == 's' &&
-                    json[index + 4] == 'e')
+                if (json[index] == 'f' && json[index + 1] == 'a' && json[index + 2] == 'l' && json[index + 3] == 's' && json[index + 4] == 'e')
                 {
                     index += 5;
                     return TOKEN_FALSE;
                 }
             }
-
             // true
             if (remainingLength >= 4)
             {
-                if (json[index] == 't' &&
-                    json[index + 1] == 'r' &&
-                    json[index + 2] == 'u' &&
-                    json[index + 3] == 'e')
+                if (json[index] == 't' && json[index + 1] == 'r' && json[index + 2] == 'u' && json[index + 3] == 'e')
                 {
                     index += 4;
                     return TOKEN_TRUE;
                 }
             }
-
             // null
             if (remainingLength >= 4)
             {
-                if (json[index] == 'n' &&
-                    json[index + 1] == 'u' &&
-                    json[index + 2] == 'l' &&
-                    json[index + 3] == 'l')
+                if (json[index] == 'n' && json[index + 1] == 'u' && json[index + 2] == 'l' && json[index + 3] == 'l')
                 {
                     index += 4;
                     return TOKEN_NULL;
                 }
             }
-
             return TOKEN_NONE;
         }
 
         protected static bool SerializeValue(IJsonSerializerStrategy jsonSerializerStrategy, object value, StringBuilder builder)
         {
             bool success = true;
-
             if (value is string)
                 success = SerializeString((string)value, builder);
             else if (value is IDictionary<string, object>)
@@ -1037,38 +988,30 @@ namespace SimpleJson
                 if (success)
                     SerializeValue(jsonSerializerStrategy, serializedObject, builder);
             }
-
             return success;
         }
 
         protected static bool SerializeObject(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable keys, IEnumerable values, StringBuilder builder)
         {
             builder.Append("{");
-
             IEnumerator ke = keys.GetEnumerator();
             IEnumerator ve = values.GetEnumerator();
-
             bool first = true;
             while (ke.MoveNext() && ve.MoveNext())
             {
                 object key = ke.Current;
                 object value = ve.Current;
-
                 if (!first)
                     builder.Append(",");
-
                 if (key is string)
                     SerializeString((string)key, builder);
                 else
                     if (!SerializeValue(jsonSerializerStrategy, value, builder)) return false;
-
                 builder.Append(":");
                 if (!SerializeValue(jsonSerializerStrategy, value, builder))
                     return false;
-
                 first = false;
             }
-
             builder.Append("}");
             return true;
         }
@@ -1076,19 +1019,15 @@ namespace SimpleJson
         protected static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
         {
             builder.Append("[");
-
             bool first = true;
             foreach (object value in anArray)
             {
                 if (!first)
                     builder.Append(",");
-
                 if (!SerializeValue(jsonSerializerStrategy, value, builder))
                     return false;
-
                 first = false;
             }
-
             builder.Append("]");
             return true;
         }
@@ -1096,7 +1035,6 @@ namespace SimpleJson
         protected static bool SerializeString(string aString, StringBuilder builder)
         {
             builder.Append("\"");
-
             char[] charArray = aString.ToCharArray();
             for (int i = 0; i < charArray.Length; i++)
             {
@@ -1118,7 +1056,6 @@ namespace SimpleJson
                 else
                     builder.Append(c);
             }
-
             builder.Append("\"");
             return true;
         }
@@ -1126,34 +1063,19 @@ namespace SimpleJson
         protected static bool SerializeNumber(object number, StringBuilder builder)
         {
             if (number is long)
-            {
                 builder.Append(((long)number).ToString(CultureInfo.InvariantCulture));
-            }
             else if (number is ulong)
-            {
                 builder.Append(((ulong)number).ToString(CultureInfo.InvariantCulture));
-            }
             else if (number is int)
-            {
                 builder.Append(((int)number).ToString(CultureInfo.InvariantCulture));
-            }
             else if (number is uint)
-            {
                 builder.Append(((uint)number).ToString(CultureInfo.InvariantCulture));
-            }
             else if (number is decimal)
-            {
                 builder.Append(((decimal)number).ToString(CultureInfo.InvariantCulture));
-            }
             else if (number is float)
-            {
                 builder.Append(((float)number).ToString(CultureInfo.InvariantCulture));
-            }
             else
-            {
                 builder.Append(Convert.ToDouble(number, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture));
-            }
-
             return true;
         }
 
@@ -1177,14 +1099,13 @@ namespace SimpleJson
             return false;
         }
 
-        private static IJsonSerializerStrategy currentJsonSerializerStrategy;
+        private static IJsonSerializerStrategy _currentJsonSerializerStrategy;
         public static IJsonSerializerStrategy CurrentJsonSerializerStrategy
         {
             get
             {
-                // todo: implement locking mechanism.
-                return currentJsonSerializerStrategy ??
-                    (currentJsonSerializerStrategy =
+                return _currentJsonSerializerStrategy ??
+                    (_currentJsonSerializerStrategy =
 #if SIMPLE_JSON_DATACONTRACT
  DataContractJsonSerializerStrategy
 #else
@@ -1192,34 +1113,31 @@ namespace SimpleJson
 #endif
 );
             }
-
             set
             {
-                currentJsonSerializerStrategy = value;
+                _currentJsonSerializerStrategy = value;
             }
         }
 
-        private static PocoJsonSerializerStrategy pocoJsonSerializerStrategy;
-        [System.ComponentModel.EditorBrowsable(EditorBrowsableState.Advanced)]
+        private static PocoJsonSerializerStrategy _pocoJsonSerializerStrategy;
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static PocoJsonSerializerStrategy PocoJsonSerializerStrategy
         {
             get
             {
-                // todo: implement locking mechanism.
-                return pocoJsonSerializerStrategy ?? (pocoJsonSerializerStrategy = new PocoJsonSerializerStrategy());
+                return _pocoJsonSerializerStrategy ?? (_pocoJsonSerializerStrategy = new PocoJsonSerializerStrategy());
             }
         }
 
 #if SIMPLE_JSON_DATACONTRACT
 
-        private static DataContractJsonSerializerStrategy dataContractJsonSerializerStrategy;
+        private static DataContractJsonSerializerStrategy _dataContractJsonSerializerStrategy;
         [System.ComponentModel.EditorBrowsable(EditorBrowsableState.Advanced)]
         public static DataContractJsonSerializerStrategy DataContractJsonSerializerStrategy
         {
             get
             {
-                // todo: implement locking mechanism.
-                return dataContractJsonSerializerStrategy ?? (dataContractJsonSerializerStrategy = new DataContractJsonSerializerStrategy());
+                return _dataContractJsonSerializerStrategy ?? (_dataContractJsonSerializerStrategy = new DataContractJsonSerializerStrategy());
             }
         }
 
@@ -1654,6 +1572,15 @@ namespace SimpleJson
                 return (genericDefinition == typeof(IList<>) || genericDefinition == typeof(ICollection<>) || genericDefinition == typeof(IEnumerable<>));
             }
 
+            public static bool IsAssignableFrom(Type type1, Type type2)
+            {
+#if SIMPLE_JSON_TYPEINFO
+                return type1.GetType().GetTypeInfo().IsAssignableFrom(type2.GetTypeInfo());
+#else
+                return type1.IsAssignableFrom(type2);
+#endif
+            }
+
             public static bool IsTypeDictionary(Type type)
             {
 #if SIMPLE_JSON_TYPEINFO
@@ -2083,3 +2010,5 @@ namespace SimpleJson
     }
 }
 // ReSharper restore LoopCanBeConvertedToQuery
+// ReSharper restore RedundantExplicitArrayCreation
+// ReSharper restore SuggestUseVarKeywordEvident
