@@ -64,6 +64,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using SimpleJson.Reflection;
 
+// ReSharper disable LoopCanBeConvertedToQuery
 namespace SimpleJson
 {
     /// <summary>
@@ -133,14 +134,11 @@ namespace SimpleJson
         {
             if (obj == null)
                 throw new ArgumentNullException("obj");
-
             if (index >= obj.Count)
                 throw new ArgumentOutOfRangeException("index");
-
             int i = 0;
             foreach (KeyValuePair<string, object> o in obj)
                 if (i++ == index) return o.Value;
-
             return null;
         }
 
@@ -255,7 +253,6 @@ namespace SimpleJson
             foreach (KeyValuePair<string, object> kvp in this)
             {
                 array[arrayIndex++] = kvp;
-
                 if (--num <= 0)
                     return;
             }
@@ -334,20 +331,15 @@ namespace SimpleJson
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
             // <pex>
-            if (binder == (ConvertBinder)null)
+            if (binder == null)
                 throw new ArgumentNullException("binder");
             // </pex>
             Type targetType = binder.Type;
 
             if ((targetType == typeof(IEnumerable)) ||
                 (targetType == typeof(IEnumerable<KeyValuePair<string, object>>)) ||
-                (targetType == typeof(IDictionary<string, object>)) ||
-#if NETFX_CORE
- (targetType == typeof(IDictionary<,>))
-#else
- (targetType == typeof(IDictionary))
-#endif
-)
+                (targetType == typeof(IDictionary<string, object>)) || 
+                (targetType == typeof(IDictionary)))
             {
                 result = this;
                 return true;
@@ -366,7 +358,7 @@ namespace SimpleJson
         public override bool TryDeleteMember(DeleteMemberBinder binder)
         {
             // <pex>
-            if (binder == (DeleteMemberBinder)null)
+            if (binder == null)
                 throw new ArgumentNullException("binder");
             // </pex>
             return _members.Remove(binder.Name);
@@ -388,7 +380,7 @@ namespace SimpleJson
                 result = ((IDictionary<string, object>)this)[(string)indexes[0]];
                 return true;
             }
-            result = (object)null;
+            result = null;
             return true;
         }
 
@@ -408,7 +400,7 @@ namespace SimpleJson
                 result = value;
                 return true;
             }
-            result = (object)null;
+            result = null;
             return true;
         }
 
@@ -428,7 +420,6 @@ namespace SimpleJson
                 ((IDictionary<string, object>)this)[(string)indexes[0]] = value;
                 return true;
             }
-
             return base.TrySetIndex(binder, indexes, value);
         }
 
@@ -443,7 +434,7 @@ namespace SimpleJson
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
             // <pex>
-            if (binder == (SetMemberBinder)null)
+            if (binder == null)
                 throw new ArgumentNullException("binder");
             // </pex>
             _members[binder.Name] = value;
@@ -2091,3 +2082,4 @@ namespace SimpleJson
         }
     }
 }
+// ReSharper restore LoopCanBeConvertedToQuery
