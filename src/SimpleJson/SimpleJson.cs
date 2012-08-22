@@ -1415,9 +1415,7 @@ namespace SimpleJson
             bool hasDataContract = ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
             if (!hasDataContract)
                 return base.GetterValueFactory(type);
-
             string jsonKey;
-
             IDictionary<string, ReflectionUtils.GetDelegate> result = new Dictionary<string, ReflectionUtils.GetDelegate>();
             foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
             {
@@ -1428,13 +1426,11 @@ namespace SimpleJson
                         result[jsonKey] = ReflectionUtils.GetGetMethod(propertyInfo);
                 }
             }
-
             foreach (FieldInfo fieldInfo in ReflectionUtils.GetFields(type))
             {
                 if (!fieldInfo.IsStatic && CanAdd(fieldInfo, out jsonKey))
                     result[jsonKey] = ReflectionUtils.GetGetMethod(fieldInfo);
             }
-
             return result;
         }
 
@@ -1443,9 +1439,7 @@ namespace SimpleJson
             bool hasDataContract = ReflectionUtils.GetAttribute(type, typeof(DataContractAttribute)) != null;
             if (!hasDataContract)
                 return base.SetterValueFactory(type);
-
             string jsonKey;
-
             IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> result = new Dictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>();
             foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
             {
@@ -1456,13 +1450,11 @@ namespace SimpleJson
                         result[jsonKey] = new KeyValuePair<Type, ReflectionUtils.SetDelegate>(propertyInfo.PropertyType, ReflectionUtils.GetSetMethod(propertyInfo));
                 }
             }
-
             foreach (FieldInfo fieldInfo in ReflectionUtils.GetFields(type))
             {
                 if (!fieldInfo.IsInitOnly && !fieldInfo.IsStatic && CanAdd(fieldInfo, out jsonKey))
                     result[jsonKey] = new KeyValuePair<Type, ReflectionUtils.SetDelegate>(fieldInfo.FieldType, ReflectionUtils.GetSetMethod(fieldInfo));
             }
-
             // todo implement sorting for DATACONTRACT.
             return result;
         }
@@ -1479,6 +1471,7 @@ namespace SimpleJson
             return true;
         }
     }
+
 #endif
 
     namespace Reflection
