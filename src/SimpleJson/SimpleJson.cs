@@ -66,8 +66,6 @@ using SimpleJson.Reflection;
 
 namespace SimpleJson
 {
-    #region JsonArray
-
     /// <summary>
     /// Represents the json array.
     /// </summary>
@@ -100,10 +98,6 @@ namespace SimpleJson
             return SimpleJson.SerializeObject(this) ?? string.Empty;
         }
     }
-
-    #endregion
-
-    #region JsonObject
 
     /// <summary>
     /// Represents the json object.
@@ -469,14 +463,10 @@ namespace SimpleJson
         }
 #endif
     }
-
-    #endregion
 }
 
 namespace SimpleJson
 {
-    #region JsonParser
-
     /// <summary>
     /// This class encodes and decodes JSON strings.
     /// Spec. details, see http://www.json.org/
@@ -1245,10 +1235,6 @@ namespace SimpleJson
 #endif
     }
 
-    #endregion
-
-    #region Simple Json Serializer Strategies
-
 #if SIMPLE_JSON_INTERNAL
     internal
 #else
@@ -1609,8 +1595,6 @@ namespace SimpleJson
         }
     }
 #endif
-
-    #endregion
 
     namespace Reflection
     {
