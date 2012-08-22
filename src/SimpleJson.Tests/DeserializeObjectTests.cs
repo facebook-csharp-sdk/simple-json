@@ -102,8 +102,6 @@ namespace SimpleJsonTests
             Assert.AreEqual("500 gigabyte hard drive", drives[1]);
         }
 
-
-
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !NETFX_CORE

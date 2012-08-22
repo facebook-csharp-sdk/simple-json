@@ -243,6 +243,12 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
+        public void EmptyObjectSerialization()
+        {
+            Assert.AreEqual("{}", SimpleJson.SerializeObject(new object()));
+        }
+
+        [TestMethod]
         public void CanParseWithUnicode()
         {
             var dog = new { Name = "Ăbbey" };
