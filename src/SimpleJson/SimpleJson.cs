@@ -1201,14 +1201,12 @@ namespace SimpleJson
                     result[propertyInfo.Name] = ReflectionUtils.GetGetMethod(propertyInfo);
                 }
             }
-
             foreach (FieldInfo fieldInfo in ReflectionUtils.GetFields(type))
             {
                 if (fieldInfo.IsStatic || !fieldInfo.IsPublic)
                     continue;
                 result[fieldInfo.Name] = ReflectionUtils.GetGetMethod(fieldInfo);
             }
-
             return result;
         }
 
@@ -1225,14 +1223,12 @@ namespace SimpleJson
                     result[propertyInfo.Name] = new KeyValuePair<Type, ReflectionUtils.SetDelegate>(propertyInfo.PropertyType, ReflectionUtils.GetSetMethod(propertyInfo));
                 }
             }
-
             foreach (FieldInfo fieldInfo in ReflectionUtils.GetFields(type))
             {
                 if (fieldInfo.IsInitOnly || fieldInfo.IsStatic || !fieldInfo.IsPublic)
                     continue;
                 result[fieldInfo.Name] = new KeyValuePair<Type, ReflectionUtils.SetDelegate>(fieldInfo.FieldType, ReflectionUtils.GetSetMethod(fieldInfo));
             }
-
             return result;
         }
 
@@ -1248,7 +1244,6 @@ namespace SimpleJson
             if (value is string)
             {
                 string str = value as string;
-
                 if (!string.IsNullOrEmpty(str))
                 {
                     if (type == typeof(DateTime) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTime)))
@@ -1337,13 +1332,7 @@ namespace SimpleJson
                         foreach (object o in jsonObject)
                             list[i++] = DeserializeObject(o, type.GetElementType());
                     }
-                    else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) ||
-#if NETFX_CORE
- typeof(IList).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
-#else
- typeof(IList).IsAssignableFrom(type)
-#endif
-)
+                    else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
                     {
                         Type innerType = ReflectionUtils.GetGenericTypeArguments(type)[0];
                         Type genericType = typeof(List<>).MakeGenericType(innerType);
@@ -1351,22 +1340,17 @@ namespace SimpleJson
                         foreach (object o in jsonObject)
                             list.Add(DeserializeObject(o, innerType));
                     }
-
                     obj = list;
                 }
-
                 return obj;
             }
-
             if (ReflectionUtils.IsNullableType(type))
                 return ReflectionUtils.ToNullableType(obj, type);
-
             if (obj == null)
             {
                 if (type == typeof(Guid))
                     return default(Guid);
             }
-
             return obj;
         }
 
@@ -1391,29 +1375,22 @@ namespace SimpleJson
                 returnValue = false;
                 output = null;
             }
-
             return returnValue;
         }
 
         protected virtual bool TrySerializeUnknownTypes(object input, out object output)
         {
             output = null;
-
-            // todo: implement caching for types
             Type type = input.GetType();
-
             if (type.FullName == null)
                 return false;
-
             IDictionary<string, object> obj = new JsonObject();
-
             IDictionary<string, ReflectionUtils.GetDelegate> getters = GetCache[type];
             foreach (KeyValuePair<string, ReflectionUtils.GetDelegate> getter in getters)
             {
                 if (getter.Value != null)
                     obj.Add(getter.Key, getter.Value(input));
             }
-
             output = obj;
             return true;
         }
