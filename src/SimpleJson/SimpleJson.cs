@@ -1152,7 +1152,6 @@ namespace SimpleJson
  interface IJsonSerializerStrategy
     {
         bool SerializeNonPrimitiveObject(object input, out object output);
-
         object DeserializeObject(object value, Type type);
     }
 
