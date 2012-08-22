@@ -29,7 +29,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\SL4\Debug\</OutputPath>
+    <OutputPath>..\..\bin\SL5\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHT;SIMPLE_JSON_DYNAMIC;</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
@@ -39,7 +39,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\SL4\Release\</OutputPath>
+    <OutputPath>..\..\bin\SL5\Release\</OutputPath>
     <DefineConstants>TRACE;SILVERLIGHT;SIMPLE_JSON_DYNAMIC;</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
