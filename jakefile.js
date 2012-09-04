@@ -29,6 +29,30 @@ task('default', ['clean', 'build', 'test', 'nuget:pack'])
 
 namespace('build', function () {
 
+    desc('Build Portble Class Library (with LINQ Expression)')
+    task('pcl', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Portable.csproj',
+            targets: ['Build']
+        })
+    }, { async: true })
+
+    desc('Build Portble Class Library (without LINQ Expression)')
+    task('pclnolinq', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Portable-NoLinqExpression.csproj',
+            targets: ['Build']
+        })
+    }, { async: true })
+
+    desc('Build .NET 4.5')
+    task('net45', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Net45.csproj',
+            targets: ['Build']
+        })
+    }, { async: true })
+
 	desc('Build .NET 4.0')
 	task('net40', function () {
 		msbuild({
@@ -69,14 +93,6 @@ namespace('build', function () {
 		})
 	}, { async: true })
 
-	desc('Build Silverlight 3')
-	task('sl3', function () {
-		msbuild({
-			file: 'src/SimpleJson/SimpleJson-SL3.csproj',
-			targets: ['Build']
-		})
-	}, { async: true })
-
 	desc('Build Windows Phone 7.0')
 	task('wp70', function () {
 		msbuild({
@@ -85,21 +101,50 @@ namespace('build', function () {
 		})
 	}, { async: true })
 
-	desc('Build WinRT(Metro)')
-	task('winrt', function () {
+	desc('Build Windows Phone 7.1')
+	task('wp71', function () {
+	    msbuild({
+	        file: 'src/SimpleJson/SimpleJson-WP71.csproj',
+	        targets: ['Build']
+	    })
+	}, { async: true })
+
+	desc('Build Windows Store')
+	task('store', function () {
 		msbuild({
-			file: 'src/SimpleJson/SimpleJson-WinRT.csproj',
+			file: 'src/SimpleJson/SimpleJson-WindowsStore.csproj',
 			targets: ['Build']
 		})
 	}, { async: true })
 
-	task('all', ['build:net40', 'build:net35', 'build:net20', 'build:sl5', 'build:sl4', 'build:sl3', 'build:wp70', 'build:winrt' ]);
+	task('all', ['build:net40', 'build:net35', 'build:net20', 'build:sl5', 'build:sl4', 'build:wp70', 'build:wp71', 'build:net45', 'build:store', 'build:pcl', 'build:pclnolinq']);
 
 })
 
 task('build', ['build:all'])
 
 namespace('clean', function () {
+
+    task('pcl', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Portable.csproj',
+            targets: ['Clean']
+        })
+    }, { async: true })
+
+    task('pclnolinq', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Portable-NoLinqExpression.csproj',
+            targets: ['Clean']
+        })
+    }, { async: true })
+
+    task('net45', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Net45.csproj',
+            targets: ['Clean']
+        })
+    }, { async: true })
 
 	task('net40', function () {
 		msbuild({
@@ -136,13 +181,6 @@ namespace('clean', function () {
 		})
 	}, { async: true })
 
-	task('sl3', function () {
-		msbuild({
-			file: 'src/SimpleJson/SimpleJson-SL3.csproj',
-			targets: ['Clean']
-		})
-	}, { async: true })
-
 	task('wp70', function () {
 		msbuild({
 			file: 'src/SimpleJson/SimpleJson-WP7.csproj',
@@ -150,14 +188,21 @@ namespace('clean', function () {
 		})
 	}, { async: true })
 
-	task('winrt', function () {
+	task('wp71', function () {
+	    msbuild({
+	        file: 'src/SimpleJson/SimpleJson-WP71.csproj',
+	        targets: ['Clean']
+	    })
+	}, { async: true })
+
+	task('store', function () {
 		msbuild({
-			file: 'src/SimpleJson/SimpleJson-WinRT.csproj',
+			file: 'src/SimpleJson/SimpleJson-WindowsStore.csproj',
 			targets: ['Clean']
 		})
 	}, { async: true })
 
-	task('all', ['clean:net40', 'clean:net35', 'clean:net20', 'clean:sl5', 'clean:sl4', 'clean:sl3', 'clean:wp70', 'clean:winrt' ]);
+	task('all', ['clean:net40', 'clean:net35', 'clean:net20', 'clean:sl5', 'clean:sl4', 'clean:wp70', 'clean:wp71', 'clean:net45', 'clean:store', 'clean:pcl', 'clean:pclnolinq']);
 
 })
 

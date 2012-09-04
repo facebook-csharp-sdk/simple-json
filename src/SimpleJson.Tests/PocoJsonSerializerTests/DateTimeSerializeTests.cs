@@ -20,6 +20,7 @@
 namespace SimpleJson.Tests.PocoJsonSerializerTests
 {
     using System;
+
 #if NUNIT
     using TestClass = NUnit.Framework.TestFixtureAttribute;
     using TestMethod = NUnit.Framework.TestAttribute;

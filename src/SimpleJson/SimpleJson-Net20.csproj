@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Net20\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET20;SIMPLE_JSON_REFLECTIONEMIT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_NO_LINQ_EXPRESSION;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -28,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\Net20\Release\</OutputPath>
-    <DefineConstants>TRACE;NET20;SIMPLE_JSON_REFLECTIONEMIT</DefineConstants>
+    <DefineConstants>TRACE;SIMPLE_JSON_NO_LINQ_EXPRESSION;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

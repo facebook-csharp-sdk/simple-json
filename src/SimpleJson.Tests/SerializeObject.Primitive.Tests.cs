@@ -17,9 +17,6 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Runtime.Serialization;
-
 namespace SimpleJsonTests
 {
     using System.Collections.Generic;
@@ -243,6 +240,12 @@ namespace SimpleJsonTests
             //Assert.AreEqual(JsonConvert.PositiveInfinity, SimpleJson.JsonEncode(double.PositiveInfinity));
             //Assert.AreEqual(JsonConvert.NegativeInfinity, SimpleJson.JsonEncode(double.NegativeInfinity));
             //Assert.AreEqual(JsonConvert.NaN, SimpleJson.JsonEncode(double.NaN));
+        }
+
+        [TestMethod]
+        public void EmptyObjectSerialization()
+        {
+            Assert.AreEqual("{}", SimpleJson.SerializeObject(new object()));
         }
 
         [TestMethod]

@@ -102,8 +102,6 @@ namespace SimpleJsonTests
             Assert.AreEqual("500 gigabyte hard drive", drives[1]);
         }
 
-
-
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !NETFX_CORE
@@ -123,6 +121,18 @@ namespace SimpleJsonTests
             Assert.AreEqual("h\0i", result);
         }
 
+        [TestMethod]
+        public void EmptyObjectDeserialize()
+        {
+            var result = SimpleJson.DeserializeObject("{}");
+#if NETFX_CORE
+            Assert.IsInstanceOfType(result, IDictionary<string,object>);
+#else
+            Assert.IsInstanceOf<IDictionary<string,object>>(result);
+#endif
+            var dict = (IDictionary<string, object>) result;
+            Assert.AreEqual(0, dict.Count);
+        }
 
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
