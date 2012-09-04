@@ -1,5 +1,6 @@
 # SimpleJson
-Small and fast JSON library for .NET 2.0+/SL4+/WP7+/WinRT and powershell. Includes support for dynamic in .NET 4.0+/SL4+/WinRT. Also includes support for DataContract and DataMember. 
+Small and fast JSON library for .NET 2.0+/SL4+/WP7+/Windows Store Apps/Portable Class Library and powershell.
+Includes support for dynamic in .NET 4.0+/SL4+/Windows Store Apps. Also includes support for DataContract and DataMember. 
 
 # Using SimpleJson
 
@@ -11,6 +12,19 @@ SimpleJson is not distributed as a compiled binary .dll file but rather as a sin
 Install-Package SimpleJson
 ```
 
-## Preparing Simple Json for your .NET Framework/Platform
-Depending on the .net framework or platform you might want to enable/disable certain features of SimpleJson. You can read
-more about it at https://github.com/facebook-csharp-sdk/simple-json/wiki/Conditional-Compilation-Symbols
+## Supported Platforms
+* .NET 2.0
+* .NET 3.0
+* .NET 3.5 (Client Profile and Full Profile)
+* .NET 4.0 (Client Profile and Full Profile)
+* .NET 4.5
+* Windows 8 Store Apps
+* Silverlight 4
+* Silverlight 5
+* Windows Phone 7.0
+* Windows Phone 7.1 (Mango)
+* Portable Class Libraries (PCL)
+
+**Note:** By default SimpleJson expects `System.Linq`. If you are targeting older version of .NET framework (.net < 3.0 or WP7.0) you will need to add `#define SIMPLE_JSON_NO_LINQ_EXPRESSION`.
+
+If you want to use `[DataContract]`, `[DataMember(Name = "name")]` or `[IgnoreDataMember]` make sure to add `#define SIMPLE_JSON_DATACONTRACT`.

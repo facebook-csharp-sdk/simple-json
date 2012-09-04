@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Tests\Net40\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NUNIT;SIMPLE_JSON_DATACONTRACT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NUNIT;SIMPLE_JSON_DATACONTRACT;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -98,13 +98,13 @@
     <Compile Include="SerializeObject.UnknownNonPrimitive.Tests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleJson\SimpleJson-Net40.csproj">
-      <Project>{4EE1BC6A-D96B-4BD6-A6F3-2E2135AA9B99}</Project>
-      <Name>SimpleJson-Net40</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\SimpleJson\SimpleJson-Portable.csproj">
+      <Project>{8264c25c-4195-4d37-b848-de6a5c4f27cc}</Project>
+      <Name>SimpleJson-Portable</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
