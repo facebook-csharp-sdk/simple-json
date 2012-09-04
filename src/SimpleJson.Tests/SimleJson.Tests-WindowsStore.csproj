@@ -180,7 +180,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SimleJson.Tests-WinRT_TemporaryKey.pfx" />
+    <None Include="SimleJson.Tests-WindowsStore_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleJson\SimpleJson-WindowsStore.csproj">

@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-Net45", "SimpleJ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-WP71", "SimpleJson\SimpleJson-WP71.csproj", "{954977A1-6134-4F60-A0B7-FF041828E267}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimleJson.Tests-WinRT", "SimpleJson.Tests\SimleJson.Tests-WinRT.csproj", "{257EBC11-3373-49B2-AD05-2054E8761961}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimleJson.Tests-WindowsStore", "SimpleJson.Tests\SimleJson.Tests-WindowsStore.csproj", "{257EBC11-3373-49B2-AD05-2054E8761961}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
