@@ -32,7 +32,11 @@ namespace SimpleJsonTests
     using ClassInitialize = NUnit.Framework.TestFixtureSetUpAttribute;
     using NUnit.Framework;
 #else
+#if NETFX_CORE
+    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+#else
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 #endif
 
     using SimpleJson;
@@ -119,6 +123,7 @@ namespace SimpleJsonTests
             Assert.AreEqual(1, j.Count);
         }
 
+#if !NETFX_CORE
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException),
 #if !NETFX_CORE
@@ -144,6 +149,7 @@ Parameter name: index")]
             JsonArray j = new JsonArray();
             j.RemoveAt(-1);
         }
+#endif
 
         [TestMethod]
         public void Insert()
@@ -191,6 +197,7 @@ Parameter name: index")]
             Assert.AreEqual(null, j[0]);
         }
 
+#if !NETFX_CORE
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException),
 #if !NETFX_CORE
@@ -216,6 +223,7 @@ Parameter name: index")]
             JsonArray j = new JsonArray();
             j.Insert(2, 1);
         }
+#endif
 
         [TestMethod]
         public void Item()

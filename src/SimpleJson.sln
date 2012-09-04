@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-Net45", "SimpleJ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJson-WP71", "SimpleJson\SimpleJson-WP71.csproj", "{954977A1-6134-4F60-A0B7-FF041828E267}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimleJson.Tests-WinRT", "SimpleJson.Tests\SimleJson.Tests-WinRT.csproj", "{257EBC11-3373-49B2-AD05-2054E8761961}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -238,11 +240,42 @@ Global
 		{954977A1-6134-4F60-A0B7-FF041828E267}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{954977A1-6134-4F60-A0B7-FF041828E267}.Release|x64.ActiveCfg = Release|Any CPU
 		{954977A1-6134-4F60-A0B7-FF041828E267}.Release|x86.ActiveCfg = Release|Any CPU
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|ARM.ActiveCfg = Debug|ARM
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|ARM.Build.0 = Debug|ARM
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|ARM.Deploy.0 = Debug|ARM
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|Mixed Platforms.Deploy.0 = Debug|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|x64.ActiveCfg = Debug|x64
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|x64.Build.0 = Debug|x64
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|x64.Deploy.0 = Debug|x64
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|x86.ActiveCfg = Debug|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|x86.Build.0 = Debug|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Debug|x86.Deploy.0 = Debug|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|Any CPU.Build.0 = Release|Any CPU
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|ARM.ActiveCfg = Release|ARM
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|ARM.Build.0 = Release|ARM
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|ARM.Deploy.0 = Release|ARM
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|Mixed Platforms.Build.0 = Release|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|Mixed Platforms.Deploy.0 = Release|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|x64.ActiveCfg = Release|x64
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|x64.Build.0 = Release|x64
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|x64.Deploy.0 = Release|x64
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|x86.ActiveCfg = Release|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|x86.Build.0 = Release|x86
+		{257EBC11-3373-49B2-AD05-2054E8761961}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A8993045-3923-488D-BCD5-F7C1F81ACDED} = {AEDAD4B4-9F2C-4992-8CD6-A43DFDFF7172}
+		{257EBC11-3373-49B2-AD05-2054E8761961} = {AEDAD4B4-9F2C-4992-8CD6-A43DFDFF7172}
 	EndGlobalSection
 EndGlobal

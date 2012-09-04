@@ -25,7 +25,11 @@ namespace SimpleJsonTests.PocoDeserializerTests
     using TestMethod = NUnit.Framework.TestAttribute;
     using NUnit.Framework;
 #else
+#if NETFX_CORE
+    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+#else
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 #endif
 
     using SimpleJson;

@@ -183,9 +183,9 @@
     <None Include="SimleJson.Tests-WinRT_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleJson\SimpleJson-WinRT.csproj">
-      <Project>{ffe44268-471b-4f55-9612-3367f5544f7e}</Project>
-      <Name>SimpleJson-WinRT</Name>
+    <ProjectReference Include="..\SimpleJson\SimpleJson-WindowsStore.csproj">
+      <Project>{95427de1-88b5-4679-9d96-b7ac4739a7fa}</Project>
+      <Name>SimpleJson-WindowsStore</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">

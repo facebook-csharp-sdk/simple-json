@@ -32,7 +32,11 @@ namespace SimpleJsonTests
     using ClassInitialize = NUnit.Framework.TestFixtureSetUpAttribute;
     using NUnit.Framework;
 #else
+#if NETFX_CORE
+    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+#else
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+#endif
 #endif
 
     using SimpleJson;
@@ -102,6 +106,7 @@ namespace SimpleJsonTests
             Assert.AreEqual("500 gigabyte hard drive", drives[1]);
         }
 
+#if !NETFX_CORE
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !NETFX_CORE
@@ -112,6 +117,7 @@ namespace SimpleJsonTests
         {
             var result = SimpleJson.DeserializeObject("hi");
         }
+#endif
 
         [TestMethod]
         public void ReadNullTerminiatorString()
@@ -126,7 +132,7 @@ namespace SimpleJsonTests
         {
             var result = SimpleJson.DeserializeObject("{}");
 #if NETFX_CORE
-            Assert.IsInstanceOfType(result, IDictionary<string,object>);
+            Assert.IsInstanceOfType(result, typeof(IDictionary<string,object>));
 #else
             Assert.IsInstanceOf<IDictionary<string,object>>(result);
 #endif
@@ -134,6 +140,7 @@ namespace SimpleJsonTests
             Assert.AreEqual(0, dict.Count);
         }
 
+#if !NETFX_CORE
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !NETFX_CORE
@@ -167,7 +174,7 @@ namespace SimpleJsonTests
         {
             var result = SimpleJson.DeserializeObject(@"{aww");
         }
-
+#endif
 
         [TestMethod]
         public void ParsingQuotedPropertyWithControlCharacters()
@@ -278,8 +285,7 @@ bye", pair.Key);
             //Assert.AreEqual("24352", Convert.ToInt32(Convert.ToChar(l[0])));
         }
 
-
-
+#if !NETFX_CORE
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !NETFX_CORE
@@ -311,7 +317,7 @@ bye", pair.Key);
 
             var o = SimpleJson.DeserializeObject(json);
         }
-
+#endif
 
         [TestMethod]
         public void ReadUnicode()
@@ -367,6 +373,7 @@ bye", pair.Key);
             var o = SimpleJson.DeserializeObject(json);
         }
 
+#if !NETFX_CORE
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !NETFX_CORE
@@ -377,6 +384,7 @@ bye", pair.Key);
         {
             var o = SimpleJson.DeserializeObject("[1");
         }
+#endif
 
         [TestMethod]
         public void DeserializeSurrogatePair()
@@ -406,6 +414,7 @@ bye", pair.Key);
             Assert.AreEqual("𩸽 is Arabesque greenling(fish)", o);
         }
 
+#if !NETFX_CORE
         [TestMethod]
         [ExpectedException(typeof(SerializationException),
 #if !NETFX_CORE
@@ -417,6 +426,7 @@ bye", pair.Key);
             string json = "\"\\uD867\\u0000 is Arabesque greenling(fish)\"";
             var o = SimpleJson.DeserializeObject(json);
         }
+#endif
 
         [TestMethod]
         public void DeserializeKnownJsonObjectType()
