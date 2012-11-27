@@ -8,7 +8,7 @@
     <licenseUrl>https://raw.github.com/facebook-csharp-sdk/simple-json/master/LICENSE.txt</licenseUrl>
     <projectUrl>https://raw.github.com/facebook-csharp-sdk/simple-json</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Super lightweight Json library for .NET 2.0+/SL4+/WP7/WindowsStore Apps/Portabl Class Libraries along with dynamic and DataContract support</description>
+    <description>Super lightweight Json library for .NET 2.0+/SL4+/WP7/WindowsStore Apps/Portable Class Libraries along with dynamic and DataContract support</description>
     <language>en-US</language>
     <tags>json</tags>
   </metadata>
