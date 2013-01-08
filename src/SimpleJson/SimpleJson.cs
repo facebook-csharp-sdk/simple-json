@@ -1325,9 +1325,10 @@ namespace SimpleJson
             }
             else
             {
-                if (value is IDictionary<string, object>)
+                IDictionary<string, object> objects = value as IDictionary<string, object>;
+                if (objects != null)
                 {
-                    IDictionary<string, object> jsonObject = (IDictionary<string, object>)value;
+                    IDictionary<string, object> jsonObject = objects;
 
                     if (ReflectionUtils.IsTypeDictionary(type))
                     {
@@ -1364,27 +1365,31 @@ namespace SimpleJson
                         }
                     }
                 }
-                else if (value is IList<object>)
+                else
                 {
-                    IList<object> jsonObject = (IList<object>)value;
-                    IList list = null;
+                    IList<object> valueAsList = value as IList<object>;
+                    if (valueAsList != null)
+                    {
+                        IList<object> jsonObject = valueAsList;
+                        IList list = null;
 
-                    if (type.IsArray)
-                    {
-                        list = (IList)ConstructorCache[type](jsonObject.Count);
-                        int i = 0;
-                        foreach (object o in jsonObject)
-                            list[i++] = DeserializeObject(o, type.GetElementType());
+                        if (type.IsArray)
+                        {
+                            list = (IList)ConstructorCache[type](jsonObject.Count);
+                            int i = 0;
+                            foreach (object o in jsonObject)
+                                list[i++] = DeserializeObject(o, type.GetElementType());
+                        }
+                        else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
+                        {
+                            Type innerType = ReflectionUtils.GetGenericTypeArguments(type)[0];
+                            Type genericType = typeof(List<>).MakeGenericType(innerType);
+                            list = (IList)ConstructorCache[genericType](jsonObject.Count);
+                            foreach (object o in jsonObject)
+                                list.Add(DeserializeObject(o, innerType));
+                        }
+                        obj = list;
                     }
-                    else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
-                    {
-                        Type innerType = ReflectionUtils.GetGenericTypeArguments(type)[0];
-                        Type genericType = typeof(List<>).MakeGenericType(innerType);
-                        list = (IList)ConstructorCache[genericType](jsonObject.Count);
-                        foreach (object o in jsonObject)
-                            list.Add(DeserializeObject(o, innerType));
-                    }
-                    obj = list;
                 }
                 return obj;
             }
