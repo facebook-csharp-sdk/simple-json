@@ -1271,39 +1271,32 @@ namespace SimpleJson
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         public virtual object DeserializeObject(object value, Type type)
         {
+            string str = value as string;
+
+            if (type == typeof (Guid) && String.IsNullOrEmpty(str))
+                return default(Guid);
+
             if (value == null)
-            {
-                if (type == typeof(Guid))
-                    return default(Guid);
                 return null;
-            }
+            
             object obj = null;
-            if (value is string)
+
+            if (str != null)
             {
-                string str = value as string;
-                if (!string.IsNullOrEmpty(str))
+                if (str.Length != 0) // We know it can't be null now.
                 {
                     if (type == typeof(DateTime) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTime)))
-                        obj = DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
-                    else if (type == typeof(Guid) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid)))
-                        obj = new Guid(str);
-                    else
-                        obj = str;
+                        return DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+                    if (type == typeof(Guid) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid)))
+                        return new Guid(str);
+                    return str;
                 }
-                else
-                {
-                    if (type == typeof(Guid))
-                        obj = default(Guid);
-                    else if (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid))
-                        obj = null;
-                    else
-                        obj = str;
-                }
+                // Empty string case
+                if (!ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid))
+                    return str;
             }
             else if (value is bool)
                 obj = value;
-            else if (value == null)
-                obj = null;
             else if ((value is long && type == typeof(long)) || (value is double && type == typeof(double)))
                 obj = value;
             else if ((value is double && type != typeof(double)) || (value is long && type != typeof(long)))
