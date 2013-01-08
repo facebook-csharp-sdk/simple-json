@@ -1528,14 +1528,15 @@ namespace SimpleJson
 #endif
  class ReflectionUtils
         {
+#if SIMPLE_JSON_DATACONTRACT || SIMPLE_JSON_NO_LINQ_EXPRESSION
             private static readonly object[] EmptyObjects = new object[] { };
-
+#endif
             public delegate object GetDelegate(object source);
             public delegate void SetDelegate(object source, object value);
             public delegate object ConstructorDelegate(params object[] args);
 
             public delegate TValue ThreadSafeDictionaryValueFactory<TKey, TValue>(TKey key);
-
+#if SIMPLE_JSON_DATACONTRACT
             public static Attribute GetAttribute(MemberInfo info, Type type)
             {
 #if SIMPLE_JSON_TYPEINFO
@@ -1562,7 +1563,7 @@ namespace SimpleJson
                 return Attribute.GetCustomAttribute(objectType, attributeType);
 #endif
             }
-
+#endif
             public static Type[] GetGenericTypeArguments(Type type)
             {
 #if SIMPLE_JSON_TYPEINFO
@@ -1712,7 +1713,7 @@ namespace SimpleJson
                 return propertyInfo.GetSetMethod(true);
 #endif
             }
-
+#if SIMPLE_JSON_DATACONTRACT
             public static ConstructorDelegate GetContructor(ConstructorInfo constructorInfo)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
@@ -1721,7 +1722,7 @@ namespace SimpleJson
                 return GetConstructorByExpression(constructorInfo);
 #endif
             }
-
+#endif
             public static ConstructorDelegate GetContructor(Type type, params Type[] argsType)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
@@ -1730,7 +1731,7 @@ namespace SimpleJson
                 return GetConstructorByExpression(type, argsType);
 #endif
             }
-
+#if SIMPLE_JSON_DATACONTRACT || SIMPLE_JSON_NO_LINQ_EXPRESSION
             public static ConstructorDelegate GetConstructorByReflection(ConstructorInfo constructorInfo)
             {
                 return delegate(object[] args) { return constructorInfo.Invoke(args); };
@@ -1741,7 +1742,7 @@ namespace SimpleJson
                 ConstructorInfo constructorInfo = GetConstructorInfo(type, argsType);
                 return constructorInfo == null ? null : GetConstructorByReflection(constructorInfo);
             }
-
+#endif
 #if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static ConstructorDelegate GetConstructorByExpression(ConstructorInfo constructorInfo)
@@ -1788,7 +1789,7 @@ namespace SimpleJson
                 return GetGetMethodByExpression(fieldInfo);
 #endif
             }
-
+#if SIMPLE_JSON_DATACONTRACT || SIMPLE_JSON_NO_LINQ_EXPRESSION
             public static GetDelegate GetGetMethodByReflection(PropertyInfo propertyInfo)
             {
                 MethodInfo methodInfo = GetGetterMethodInfo(propertyInfo);
@@ -1799,7 +1800,7 @@ namespace SimpleJson
             {
                 return delegate(object source) { return fieldInfo.GetValue(source); };
             }
-
+#endif
 #if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static GetDelegate GetGetMethodByExpression(PropertyInfo propertyInfo)
@@ -1838,7 +1839,7 @@ namespace SimpleJson
                 return GetSetMethodByExpression(fieldInfo);
 #endif
             }
-
+#if SIMPLE_JSON_DATACONTRACT || SIMPLE_JSON_NO_LINQ_EXPRESSION
             public static SetDelegate GetSetMethodByReflection(PropertyInfo propertyInfo)
             {
                 MethodInfo methodInfo = GetSetterMethodInfo(propertyInfo);
@@ -1849,7 +1850,7 @@ namespace SimpleJson
             {
                 return delegate(object source, object value) { fieldInfo.SetValue(source, value); };
             }
-
+#endif
 #if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 
             public static SetDelegate GetSetMethodByExpression(PropertyInfo propertyInfo)
