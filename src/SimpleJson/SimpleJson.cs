@@ -1271,6 +1271,12 @@ namespace SimpleJson
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         public virtual object DeserializeObject(object value, Type type)
         {
+            if (value == null)
+            {
+                if (type == typeof(Guid))
+                    return default(Guid);
+                return null;
+            }
             object obj = null;
             if (value is string)
             {
@@ -1379,11 +1385,6 @@ namespace SimpleJson
             }
             if (ReflectionUtils.IsNullableType(type))
                 return ReflectionUtils.ToNullableType(obj, type);
-            if (obj == null)
-            {
-                if (type == typeof(Guid))
-                    return default(Guid);
-            }
             return obj;
         }
 
