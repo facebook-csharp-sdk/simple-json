@@ -978,32 +978,45 @@ namespace SimpleJson
         static bool SerializeValue(IJsonSerializerStrategy jsonSerializerStrategy, object value, StringBuilder builder)
         {
             bool success = true;
-            if (value is string)
-                success = SerializeString((string)value, builder);
-            else if (value is IDictionary<string, object>)
-            {
-                IDictionary<string, object> dict = (IDictionary<string, object>)value;
-                success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
-            }
-            else if (value is IDictionary<string, string>)
-            {
-                IDictionary<string, string> dict = (IDictionary<string, string>)value;
-                success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
-            }
-            else if (value is IEnumerable)
-                success = SerializeArray(jsonSerializerStrategy, (IEnumerable)value, builder);
-            else if (IsNumeric(value))
-                success = SerializeNumber(value, builder);
-            else if (value is Boolean)
-                builder.Append((bool)value ? "true" : "false");
-            else if (value == null)
-                builder.Append("null");
+            string stringValue = value as string;
+            if (stringValue != null)
+                success = SerializeString(stringValue, builder);
             else
             {
-                object serializedObject;
-                success = jsonSerializerStrategy.SerializeNonPrimitiveObject(value, out serializedObject);
-                if (success)
-                    SerializeValue(jsonSerializerStrategy, serializedObject, builder);
+                IDictionary<string, object> objectDictionary = value as IDictionary<string, object>;
+                if (objectDictionary != null)
+                {
+                    IDictionary<string, object> dict = objectDictionary;
+                    success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
+                }
+                else
+                {
+                    IDictionary<string, string> stringDictionary = value as IDictionary<string, string>;
+                    if (stringDictionary != null)
+                    {
+                        IDictionary<string, string> dict = stringDictionary;
+                        success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
+                    }
+                    else
+                    {
+                        IEnumerable enumerableValue = value as IEnumerable;
+                        if (enumerableValue != null)
+                            success = SerializeArray(jsonSerializerStrategy, enumerableValue, builder);
+                        else if (IsNumeric(value))
+                            success = SerializeNumber(value, builder);
+                        else if (value is Boolean)
+                            builder.Append((bool)value ? "true" : "false");
+                        else if (value == null)
+                            builder.Append("null");
+                        else
+                        {
+                            object serializedObject;
+                            success = jsonSerializerStrategy.SerializeNonPrimitiveObject(value, out serializedObject);
+                            if (success)
+                                SerializeValue(jsonSerializerStrategy, serializedObject, builder);
+                        }
+                    }
+                }
             }
             return success;
         }
@@ -1020,8 +1033,9 @@ namespace SimpleJson
                 object value = ve.Current;
                 if (!first)
                     builder.Append(",");
-                if (key is string)
-                    SerializeString((string)key, builder);
+                string stringKey = key as string;
+                if (stringKey != null)
+                    SerializeString(stringKey, builder);
                 else
                     if (!SerializeValue(jsonSerializerStrategy, value, builder)) return false;
                 builder.Append(":");
@@ -1389,12 +1403,16 @@ namespace SimpleJson
                 output = ((Guid)input).ToString("D");
             else if (input is Uri)
                 output = input.ToString();
-            else if (input is Enum)
-                output = SerializeEnum((Enum)input);
             else
             {
-                returnValue = false;
-                output = null;
+                Enum inputEnum = input as Enum;
+                if (inputEnum != null)
+                    output = SerializeEnum(inputEnum);
+                else
+                {
+                    returnValue = false;
+                    output = null;
+                }
             }
             return returnValue;
         }
