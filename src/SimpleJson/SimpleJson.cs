@@ -528,6 +528,7 @@ namespace SimpleJson
         /// <returns>
         /// Returns true if successfull otherwise false.
         /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         public static bool TryDeserializeObject(string json, out object obj)
         {
             bool success = true;
@@ -1182,6 +1183,7 @@ namespace SimpleJson
 #endif
  interface IJsonSerializerStrategy
     {
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         bool SerializeNonPrimitiveObject(object input, out object output);
         object DeserializeObject(object value, Type type);
     }
@@ -1392,6 +1394,7 @@ namespace SimpleJson
             return Convert.ToDouble(p, CultureInfo.InvariantCulture);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         protected virtual bool TrySerializeKnownTypes(object input, out object output)
         {
             bool returnValue = true;
@@ -1414,7 +1417,7 @@ namespace SimpleJson
             }
             return returnValue;
         }
-
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         protected virtual bool TrySerializeUnknownTypes(object input, out object output)
         {
             output = null;
