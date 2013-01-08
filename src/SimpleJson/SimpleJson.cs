@@ -174,7 +174,7 @@ namespace SimpleJson
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns>
-        /// 	<c>true</c> if the specified key contains key; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified key contains key; otherwise, <c>false</c>.
         /// </returns>
         public bool ContainsKey(string key)
         {
@@ -487,7 +487,7 @@ namespace SimpleJson
 #else
     public
 #endif
- class SimpleJson
+ static class SimpleJson
     {
         private const int TOKEN_NONE = 0;
         private const int TOKEN_CURLY_OPEN = 1;
@@ -642,7 +642,7 @@ namespace SimpleJson
             return sb.ToString();
         }
 
-        protected static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
+        static IDictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
         {
             IDictionary<string, object> table = new JsonObject();
             int token;
@@ -695,7 +695,7 @@ namespace SimpleJson
             return table;
         }
 
-        protected static JsonArray ParseArray(char[] json, ref int index, ref bool success)
+        static JsonArray ParseArray(char[] json, ref int index, ref bool success)
         {
             JsonArray array = new JsonArray();
 
@@ -729,7 +729,7 @@ namespace SimpleJson
             return array;
         }
 
-        protected static object ParseValue(char[] json, ref int index, ref bool success)
+        static object ParseValue(char[] json, ref int index, ref bool success)
         {
             switch (LookAhead(json, index))
             {
@@ -757,7 +757,7 @@ namespace SimpleJson
             return null;
         }
 
-        protected static string ParseString(char[] json, ref int index, ref bool success)
+        static string ParseString(char[] json, ref int index, ref bool success)
         {
             StringBuilder s = new StringBuilder(BUILDER_CAPACITY);
             char c;
@@ -863,7 +863,7 @@ namespace SimpleJson
             return new string(new char[] { (char)((utf32 >> 10) + 0xD800), (char)(utf32 % 0x0400 + 0xDC00) });
         }
 
-        protected static object ParseNumber(char[] json, ref int index, ref bool success)
+        static object ParseNumber(char[] json, ref int index, ref bool success)
         {
             EatWhitespace(json, ref index);
             int lastIndex = GetLastIndexOfNumber(json, index);
@@ -886,7 +886,7 @@ namespace SimpleJson
             return returnNumber;
         }
 
-        protected static int GetLastIndexOfNumber(char[] json, int index)
+        static int GetLastIndexOfNumber(char[] json, int index)
         {
             int lastIndex;
             for (lastIndex = index; lastIndex < json.Length; lastIndex++)
@@ -894,20 +894,20 @@ namespace SimpleJson
             return lastIndex - 1;
         }
 
-        protected static void EatWhitespace(char[] json, ref int index)
+        static void EatWhitespace(char[] json, ref int index)
         {
             for (; index < json.Length; index++)
                 if (" \t\n\r\b\f".IndexOf(json[index]) == -1) break;
         }
 
-        protected static int LookAhead(char[] json, int index)
+        static int LookAhead(char[] json, int index)
         {
             int saveIndex = index;
             return NextToken(json, ref saveIndex);
         }
 
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        protected static int NextToken(char[] json, ref int index)
+        static int NextToken(char[] json, ref int index)
         {
             EatWhitespace(json, ref index);
             if (index == json.Length)
@@ -975,7 +975,7 @@ namespace SimpleJson
             return TOKEN_NONE;
         }
 
-        protected static bool SerializeValue(IJsonSerializerStrategy jsonSerializerStrategy, object value, StringBuilder builder)
+        static bool SerializeValue(IJsonSerializerStrategy jsonSerializerStrategy, object value, StringBuilder builder)
         {
             bool success = true;
             if (value is string)
@@ -1008,7 +1008,7 @@ namespace SimpleJson
             return success;
         }
 
-        protected static bool SerializeObject(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable keys, IEnumerable values, StringBuilder builder)
+        static bool SerializeObject(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable keys, IEnumerable values, StringBuilder builder)
         {
             builder.Append("{");
             IEnumerator ke = keys.GetEnumerator();
@@ -1033,7 +1033,7 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
+        static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
         {
             builder.Append("[");
             bool first = true;
@@ -1049,7 +1049,7 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeString(string aString, StringBuilder builder)
+        static bool SerializeString(string aString, StringBuilder builder)
         {
             builder.Append("\"");
             char[] charArray = aString.ToCharArray();
@@ -1077,7 +1077,7 @@ namespace SimpleJson
             return true;
         }
 
-        protected static bool SerializeNumber(object number, StringBuilder builder)
+        static bool SerializeNumber(object number, StringBuilder builder)
         {
             if (number is long)
                 builder.Append(((long)number).ToString(CultureInfo.InvariantCulture));
@@ -1100,7 +1100,7 @@ namespace SimpleJson
         /// Determines if a given object is numeric in any way
         /// (can be integer, double, null, etc).
         /// </summary>
-        protected static bool IsNumeric(object value)
+        static bool IsNumeric(object value)
         {
             if (value is sbyte) return true;
             if (value is byte) return true;
