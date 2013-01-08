@@ -1012,7 +1012,7 @@ namespace SimpleJson
                         else
                         {
                             object serializedObject;
-                            success = jsonSerializerStrategy.SerializeNonPrimitiveObject(value, out serializedObject);
+                            success = jsonSerializerStrategy.TrySerializeNonPrimitiveObject(value, out serializedObject);
                             if (success)
                                 SerializeValue(jsonSerializerStrategy, serializedObject, builder);
                         }
@@ -1184,7 +1184,7 @@ namespace SimpleJson
  interface IJsonSerializerStrategy
     {
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
-        bool SerializeNonPrimitiveObject(object input, out object output);
+        bool TrySerializeNonPrimitiveObject(object input, out object output);
         object DeserializeObject(object value, Type type);
     }
 
@@ -1265,7 +1265,7 @@ namespace SimpleJson
             return result;
         }
 
-        public virtual bool SerializeNonPrimitiveObject(object input, out object output)
+        public virtual bool TrySerializeNonPrimitiveObject(object input, out object output)
         {
             return TrySerializeKnownTypes(input, out output) || TrySerializeUnknownTypes(input, out output);
         }
