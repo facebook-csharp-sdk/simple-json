@@ -158,7 +158,7 @@ namespace SimpleJsonTests
 
         private class MyJsonSerializerStrategy : PocoJsonSerializerStrategy
         {
-            protected override string MapClrPropertyNameToJsonFieldName(string clrPropertyName)
+            protected override string MapClrMemberNameToJsonFieldName(string clrPropertyName)
             {
                 return clrPropertyName == "PropTypeKnown" ? "prop_type_known" : clrPropertyName == "PropTypeUnknown" ? "prop_type_unknown" : clrPropertyName;
             }

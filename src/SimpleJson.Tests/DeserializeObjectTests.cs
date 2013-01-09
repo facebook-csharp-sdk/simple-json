@@ -455,7 +455,7 @@ bye", pair.Key);
 
         private class MySerializationStrategy : PocoJsonSerializerStrategy
         {
-            protected override string MapClrPropertyNameToJsonFieldName(string jsonFieldName)
+            protected override string MapClrMemberNameToJsonFieldName(string jsonFieldName)
             {
                 return jsonFieldName == "FirstName" ? "first_name" : jsonFieldName;
             }
