@@ -46,6 +46,7 @@
 #endif
 
 using System;
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 #if !SIMPLE_JSON_NO_LINQ_EXPRESSION
@@ -1537,6 +1538,9 @@ namespace SimpleJson
 
     namespace Reflection
     {
+        // This class is meant to be copied into other libraries. So we want to exclude it from Code Analysis rules
+ 	    // that might be in place in the target project.
+        [GeneratedCode("reflection-utils", "1.0.0")]
 #if SIMPLE_JSON_REFLECTION_UTILS_PUBLIC
         public
 #else
