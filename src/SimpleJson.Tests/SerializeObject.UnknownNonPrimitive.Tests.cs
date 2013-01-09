@@ -137,5 +137,31 @@ namespace SimpleJsonTests
             var json = SimpleJson.SerializeObject(instance);
             Assert.AreEqual("{\"PropTypeKnown\":\"str\",\"PropTypeUnknown\":{\"unknown\":\"property\"}}", json);
         }
+
+        [TestMethod]
+        public void CanSerializeUnknownPropertyUsingNamingConvention()
+        {
+            var instance = new ObjProp { PropTypeKnown = "str", PropTypeUnknown = new { unknown = "property" } };
+            var json = SimpleJson.SerializeObject(instance, new MyJsonSerializerStrategy());
+            Assert.AreEqual("{\"prop_type_known\":\"str\",\"prop_type_unknown\":{\"unknown\":\"property\"}}", json);
+        }
+
+        [TestMethod]
+        public void CanRoundTrip()
+        {
+            var instance = new ObjProp { PropTypeKnown = "str", PropTypeUnknown = new { unknown = "property" } };
+            var json = SimpleJson.SerializeObject(instance, new MyJsonSerializerStrategy());
+            Assert.AreEqual("{\"prop_type_known\":\"str\",\"prop_type_unknown\":{\"unknown\":\"property\"}}", json);
+            var result = SimpleJson.DeserializeObject<ObjProp>(json, new MyJsonSerializerStrategy());
+            Assert.AreEqual("str", result.PropTypeKnown);
+        }
+
+        private class MyJsonSerializerStrategy : PocoJsonSerializerStrategy
+        {
+            protected override string MapClrPropertyNameToJsonFieldName(string clrPropertyName)
+            {
+                return clrPropertyName == "PropTypeKnown" ? "prop_type_known" : clrPropertyName == "PropTypeUnknown" ? "prop_type_unknown" : clrPropertyName;
+            }
+        }
     }
 }
