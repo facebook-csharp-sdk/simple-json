@@ -987,10 +987,9 @@ namespace SimpleJson
                 success = SerializeString(stringValue, builder);
             else
             {
-                IDictionary<string, object> objectDictionary = value as IDictionary<string, object>;
-                if (objectDictionary != null)
+                IDictionary<string, object> dict = value as IDictionary<string, object>;
+                if (dict != null)
                 {
-                    IDictionary<string, object> dict = objectDictionary;
                     success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
                 }
                 else
@@ -998,8 +997,7 @@ namespace SimpleJson
                     IDictionary<string, string> stringDictionary = value as IDictionary<string, string>;
                     if (stringDictionary != null)
                     {
-                        IDictionary<string, string> dict = stringDictionary;
-                        success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
+                        success = SerializeObject(jsonSerializerStrategy, stringDictionary.Keys, stringDictionary.Values, builder);
                     }
                     else
                     {
@@ -1008,7 +1006,7 @@ namespace SimpleJson
                             success = SerializeArray(jsonSerializerStrategy, enumerableValue, builder);
                         else if (IsNumeric(value))
                             success = SerializeNumber(value, builder);
-                        else if (value is Boolean)
+                        else if (value is bool)
                             builder.Append((bool)value ? "true" : "false");
                         else if (value == null)
                             builder.Append("null");
@@ -1279,7 +1277,7 @@ namespace SimpleJson
             if (type == null) throw new ArgumentNullException("type");
             string str = value as string;
 
-            if (type == typeof (Guid) && String.IsNullOrEmpty(str))
+            if (type == typeof (Guid) && string.IsNullOrEmpty(str))
                 return default(Guid);
 
             if (value == null)
