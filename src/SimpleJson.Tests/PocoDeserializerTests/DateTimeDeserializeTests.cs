@@ -92,5 +92,31 @@ namespace SimpleJson.Tests.PocoDeserializerTests
         {
             public DateTime Value { get; set; }
         }
+
+     
+    }
+
+    public class DateOffsetTimeDeserializeTests
+    {
+        [TestMethod]
+        public void TestWithMilliSecond()
+        {
+            var json = "{\"Value\":\"2004-01-20T05:03:06.012Z\"}";
+
+            var result = SimpleJson.DeserializeObject<SerializeDateTimeOffsetTypeClass>(json).Value;
+            Assert.AreEqual(2004, result.Year);
+            Assert.AreEqual(1, result.Month);
+            Assert.AreEqual(20, result.Day);
+            Assert.AreEqual(5, result.Hour);
+            Assert.AreEqual(3, result.Minute);
+            Assert.AreEqual(6, result.Second);
+            Assert.AreEqual(12, result.Millisecond);
+            Assert.AreEqual(TimeSpan.Zero, result.Offset);
+        }
+
+        public class SerializeDateTimeOffsetTypeClass
+        {
+            public DateTimeOffset Value { get; set; }
+        }
     }
 }
