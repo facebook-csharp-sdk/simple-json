@@ -61,6 +61,26 @@ namespace SimpleJsonTests.PocoJsonSerializerTests
         }
 
         [TestMethod]
+        public void TestNullDateTimeOffset()
+        {
+            DateTimeOffset? obj = null;
+
+            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+
+            Assert.AreEqual("null", json);
+        }
+
+        [TestMethod]
+        public void TestDateTimeOffsetWithValue()
+        {
+            DateTimeOffset? obj = new DateTimeOffset(2004, 1, 20, 5, 3, 6, 12, TimeSpan.Zero);
+
+            var json = SimpleJson.SimpleJson.SerializeObject(obj);
+
+            Assert.AreEqual("\"2004-01-20T05:03:06.012Z\"", json);
+        }
+
+        [TestMethod]
         public void SerializeNullableTypeThatIsNotNull()
         {
             var obj = new NullableTypeClass();
