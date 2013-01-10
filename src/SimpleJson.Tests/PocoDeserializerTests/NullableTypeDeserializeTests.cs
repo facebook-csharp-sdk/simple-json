@@ -88,6 +88,33 @@ namespace SimpleJson.Tests.PocoDeserializerTests
         }
 
         [TestMethod]
+        public void DateTimeOffsetAsNull()
+        {
+            var json = "null";
+
+            var result = SimpleJson.DeserializeObject<DateTimeOffset?>(json);
+
+            Assert.IsFalse(result.HasValue);
+        }
+
+        [TestMethod]
+        public void DateTimeOffsetWithValue()
+        {
+            var json = "\"2004-01-20T05:03:06Z\"";
+
+            var result = SimpleJson.DeserializeObject<DateTimeOffset?>(json).Value;
+
+            Assert.AreEqual(2004, result.Year);
+            Assert.AreEqual(1, result.Month);
+            Assert.AreEqual(20, result.Day);
+            Assert.AreEqual(5, result.Hour);
+            Assert.AreEqual(3, result.Minute);
+            Assert.AreEqual(6, result.Second);
+            Assert.AreEqual(0, result.Millisecond);
+            Assert.AreEqual(TimeSpan.Zero, result.Offset);
+        }
+
+        [TestMethod]
         public void NullableTypeClassNullTest()
         {
             var json = "{\"Value\":null}";
