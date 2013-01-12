@@ -443,6 +443,31 @@ bye", pair.Key);
         }
 
         [TestMethod]
+        public void DeserializeKnownJsonObjectTypeWithMapping()
+        {
+            const string json = "{\"first_name\":\"Bruno\",\"LastName\":\"Mars\"}";
+            var result = SimpleJson.DeserializeObject<Sample>(json, new MySerializationStrategy());
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Bruno", result.FirstName);
+            Assert.AreEqual("Mars", result.LastName);
+        }
+
+        private class MySerializationStrategy : PocoJsonSerializerStrategy
+        {
+            protected override string MapClrMemberNameToJsonFieldName(string jsonFieldName)
+            {
+                return jsonFieldName == "FirstName" ? "first_name" : jsonFieldName;
+            }
+        }
+
+        public class Sample
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+        }
+
+        [TestMethod]
         public void DeserializeKnownJsonArrayType()
         {
             var json = "[{\"name\":\"road cycling\",\"value\":11},{\"name\":\"football\",\"value\":9}]";
