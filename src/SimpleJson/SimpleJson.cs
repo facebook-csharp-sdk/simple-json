@@ -61,6 +61,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using SimpleJson.Reflection;
 
 // ReSharper disable LoopCanBeConvertedToQuery
@@ -1202,6 +1203,9 @@ namespace SimpleJson
 #endif
  class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
+        private static readonly long Date1970Ticks = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        private static readonly Regex DateSerializationRegex = new Regex(@"[\\/]+Date\((?<ticks>\d+)(?<direction>[-+]?)(?<offset>\d+)\)[\\/]+");
+
         internal IDictionary<Type, ReflectionUtils.ConstructorDelegate> ConstructorCache;
         internal IDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>> GetCache;
         internal IDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>> SetCache;
@@ -1301,7 +1305,16 @@ namespace SimpleJson
                 if (str.Length != 0) // We know it can't be null now.
                 {
                     if (type == typeof(DateTime) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTime)))
-                        return DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+                    {
+                        Match match = DateSerializationRegex.Match(str);
+
+                        if (match.Success)
+                            return new DateTime(Date1970Ticks + long.Parse(match.Groups["ticks"].Value) * 10000,
+                                                DateTimeKind.Utc).ToLocalTime();
+
+                        return DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture,
+                                                   DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+                    }
                     if (type == typeof(DateTimeOffset) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTimeOffset)))
                         return DateTimeOffset.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
                     if (type == typeof(Guid) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid)))
