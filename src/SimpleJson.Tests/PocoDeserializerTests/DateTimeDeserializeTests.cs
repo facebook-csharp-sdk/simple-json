@@ -59,7 +59,7 @@ namespace SimpleJson.Tests.PocoDeserializerTests
         [TestMethod]
         public void MsJsonDateTimeNotation()
         {
-            var json = @"""/Date(1074574986000)/"""; //@"[\\/]+Date\((?<ticks>\d+)(?<direction>[-+]?)(?<offset>\d*)[\)\\/]+"
+            var json = @"""/Date(1074574986000)/""";
 
             var result = SimpleJson.DeserializeObject<DateTime>(json);
             Assert.AreEqual(2004, result.Year);
@@ -71,6 +71,23 @@ namespace SimpleJson.Tests.PocoDeserializerTests
             Assert.AreEqual(0, result.Millisecond);
             Assert.AreEqual(DateTimeKind.Utc, result.Kind);
         }
+
+        [TestMethod]
+        public void MsJsonDateTimeNotationWithOffset()
+        {
+            var json = @"""/Date(1074578586000+0100)/""";
+
+            var result = SimpleJson.DeserializeObject<DateTime>(json);
+            Assert.AreEqual(2004, result.Year);
+            Assert.AreEqual(1, result.Month);
+            Assert.AreEqual(20, result.Day);
+            Assert.AreEqual(5, result.Hour);
+            Assert.AreEqual(3, result.Minute);
+            Assert.AreEqual(6, result.Second);
+            Assert.AreEqual(0, result.Millisecond);
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
+        }
+
 
 
         [TestMethod]

@@ -1309,8 +1309,20 @@ namespace SimpleJson
                         Match match = DateSerializationRegex.Match(str);
 
                         if (match.Success)
-                            return new DateTime(Date1970Ticks + long.Parse(match.Groups["ticks"].Value) * 10000,
-                                                DateTimeKind.Utc);
+                        {
+                            long ticksSince1970 = long.Parse(match.Groups["ticks"].Value)*10000;
+                            int offset;
+                            if (int.TryParse(match.Groups["offset"].Value, out offset))
+                            {
+                                TimeSpan tsoffset = new TimeSpan(offset/100, offset%100, offset%10);
+                                if (match.Groups["direction"].Value == "+")
+                                    ticksSince1970 -= tsoffset.Ticks;
+                                else
+                                    ticksSince1970 += tsoffset.Ticks;
+                            }
+
+                            return new DateTime(Date1970Ticks + ticksSince1970, DateTimeKind.Utc);
+                        }
 
                         return DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture,
                                                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
