@@ -1204,7 +1204,7 @@ namespace SimpleJson
  class PocoJsonSerializerStrategy : IJsonSerializerStrategy
     {
         private static readonly long Date1970Ticks = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        private static readonly Regex DateSerializationRegex = new Regex(@"[\\/]+Date\((?<ticks>\d+)(?<direction>[-+]?)(?<offset>\d+)\)[\\/]+");
+        private static readonly Regex DateSerializationRegex = new Regex(@"[\\/]+Date\((?<ticks>\d+)(?<direction>[-+]?)(?<offset>\d*)[\)\\/]+");
 
         internal IDictionary<Type, ReflectionUtils.ConstructorDelegate> ConstructorCache;
         internal IDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>> GetCache;
@@ -1310,7 +1310,7 @@ namespace SimpleJson
 
                         if (match.Success)
                             return new DateTime(Date1970Ticks + long.Parse(match.Groups["ticks"].Value) * 10000,
-                                                DateTimeKind.Utc).ToLocalTime();
+                                                DateTimeKind.Utc);
 
                         return DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture,
                                                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
