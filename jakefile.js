@@ -45,6 +45,14 @@ namespace('build', function () {
         })
     }, { async: true })
 
+    desc('Build Portble Class Library (WP8,WinStore,NET4.5)')
+    task('pclnet45', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Portable-WP8WinStoreNet45.csproj',
+            targets: ['Build']
+        })
+    }, { async: true })
+
     desc('Build .NET 4.5')
     task('net45', function () {
         msbuild({
@@ -117,7 +125,7 @@ namespace('build', function () {
 		})
 	}, { async: true })
 
-	task('all', ['build:net40', 'build:net35', 'build:net20', 'build:sl5', 'build:sl4', 'build:wp70', 'build:wp71', 'build:net45', 'build:store', 'build:pcl', 'build:pclnolinq']);
+	task('all', ['build:net40', 'build:net35', 'build:net20', 'build:sl5', 'build:sl4', 'build:wp70', 'build:wp71', 'build:net45', 'build:store', 'build:pcl', 'build:pclnolinq', 'build:pclnet45'])
 
 })
 
@@ -135,6 +143,13 @@ namespace('clean', function () {
     task('pclnolinq', function () {
         msbuild({
             file: 'src/SimpleJson/SimpleJson-Portable-NoLinqExpression.csproj',
+            targets: ['Clean']
+        })
+    }, { async: true })
+
+    task('pclnet45', function () {
+        msbuild({
+            file: 'src/SimpleJson/SimpleJson-Portable-WP8WinStoreNet45.csproj',
             targets: ['Clean']
         })
     }, { async: true })
@@ -202,7 +217,7 @@ namespace('clean', function () {
 		})
 	}, { async: true })
 
-	task('all', ['clean:net40', 'clean:net35', 'clean:net20', 'clean:sl5', 'clean:sl4', 'clean:wp70', 'clean:wp71', 'clean:net45', 'clean:store', 'clean:pcl', 'clean:pclnolinq']);
+	task('all', ['clean:net40', 'clean:net35', 'clean:net20', 'clean:sl5', 'clean:sl4', 'clean:wp70', 'clean:wp71', 'clean:net45', 'clean:store', 'clean:pcl', 'clean:pclnolinq', 'clean:pclnet45'])
 
 })
 
