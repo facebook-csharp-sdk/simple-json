@@ -1308,6 +1308,14 @@ namespace SimpleJson
                         return DateTimeOffset.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
                     if (type == typeof(Guid) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid)))
                         return new Guid(str);
+                    if (type == typeof(Uri))
+                    {
+                        bool isValid =  Uri.IsWellFormedUriString(str, UriKind.RelativeOrAbsolute);
+
+                        Uri result;
+                        if (isValid && Uri.TryCreate(str, UriKind.RelativeOrAbsolute, out result))
+                            return result;
+                    }
                     return str;
                 }
                 else
