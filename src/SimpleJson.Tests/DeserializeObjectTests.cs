@@ -496,15 +496,24 @@ bye", pair.Key);
             Assert.AreEqual("Hi \"Prabir\"", result["message"]);
         }
 
-        class MyClass { public Uri url { get; set; } }
+        class ClassWithUri { public Uri url { get; set; } }
 
         [TestMethod]
         public void DeserializeUriCorrectly()
         {
             var json = "{\"url\":\"https://github.com/shiftkey/simple-json/issues/1\"}";
-            var result = SimpleJson.DeserializeObject<MyClass>(json);
+            var result = SimpleJson.DeserializeObject<ClassWithUri>(json);
 
             Assert.AreEqual(new Uri("https://github.com/shiftkey/simple-json/issues/1"), result.url);
+        }
+
+        [TestMethod]
+        public void DeserializeInvalidUriCorrectly()
+        {
+            var json = "{\"url\":\"this is a broken uri\"}";
+            var result = SimpleJson.DeserializeObject<ClassWithUri>(json);
+
+            Assert.IsNull(result.url);
         }
 
         [TestMethod]
