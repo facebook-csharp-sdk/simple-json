@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Net45\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_DYNAMIC;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_READONLY_COLLECTIONS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\Net45\Release\</OutputPath>
-    <DefineConstants>TRACE;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_DYNAMIC;</DefineConstants>
+    <DefineConstants>TRACE;SIMPLE_JSON_DATACONTRACT;SIMPLE_JSON_DYNAMIC;SIMPLE_JSON_READONLY_COLLECTIONS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
