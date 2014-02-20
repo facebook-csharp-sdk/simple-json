@@ -31,6 +31,9 @@
 // NOTE: uncomment the following line to enable DataContract support.
 //#define SIMPLE_JSON_DATACONTRACT
 
+// NOTE: uncomment the following line to enable IReadOnlyCollection<T> and IReadOnlyList<T> support.
+//#define SIMPLE_JSON_READONLY_COLLECTIONS
+
 // NOTE: uncomment the following line to disable linq expressions/compiled lambda (better performance) instead of method.invoke().
 // define if you are using .net framework <= 3.0 or < WP7.5
 //#define SIMPLE_JSON_NO_LINQ_EXPRESSION
