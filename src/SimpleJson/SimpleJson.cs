@@ -519,7 +519,7 @@ namespace SimpleJson
 
         static SimpleJson()
         {
-            escapeTable = new char[128];
+            escapeTable = new char[93];
             escapeTable['"']  = '"';
             escapeTable['\\'] = '\\';
             escapeTable['\b'] = 'b';
@@ -1114,7 +1114,7 @@ namespace SimpleJson
                 // Non ascii characters are fine, buffer them up and send them to the builder
                 // in larger chunks if possible. The escape table is a 1:1 translation table
                 // with \0 [default(char)] denoting a safe character.
-                if (c >= 128 || escapeTable[c] == default(char))
+                if (c >= escapeTable.Length || escapeTable[c] == default(char))
                 {
                     safeCharacterCount++;
                 }
