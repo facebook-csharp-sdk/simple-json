@@ -1106,7 +1106,6 @@ namespace SimpleJson
             builder.Append('"');
             int safeCharacterCount = 0;
             char[] charArray = aString.ToCharArray();
-            char[] escapeBuf = new char[2] { '\\', '\0' };
 
             for (int i = 0; i < charArray.Length; i++)
             {
@@ -1127,8 +1126,8 @@ namespace SimpleJson
                     safeCharacterCount = 0;
                 }
 
-                escapeBuf[1] = escapeTable[c];
-                builder.Append(escapeBuf, 0, 2);
+                builder.Append('\\');
+                builder.Append(escapeTable[c]);
             }
 
             if (safeCharacterCount > 0)
