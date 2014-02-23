@@ -515,6 +515,20 @@ namespace SimpleJson
         private const int TOKEN_NULL = 11;
         private const int BUILDER_CAPACITY = 2000;
 
+        readonly static char[] escapeTable;
+
+        static SimpleJson()
+        {
+            escapeTable = new char[128];
+            escapeTable['"']  = '"';
+            escapeTable['\\'] = '\\';
+            escapeTable['\b'] = 'b';
+            escapeTable['\f'] = 'f';
+            escapeTable['\n'] = 'n';
+            escapeTable['\r'] = 'r';
+            escapeTable['\t'] = 't';
+        }
+
         /// <summary>
         /// Parses the string json into a value
         /// </summary>
@@ -1075,6 +1089,7 @@ namespace SimpleJson
         }
 
         static readonly char[] escapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
+        static readonly string escapeCharactersString = new string(escapeCharacters);
 
         static bool SerializeString(string aString, StringBuilder builder)
         {
@@ -1088,29 +1103,40 @@ namespace SimpleJson
                 return true;
             }
 
-            builder.Append("\"");
+            builder.Append('"');
+            int safeCharacterCount = 0;
             char[] charArray = aString.ToCharArray();
+            char[] escapeBuf = new char[2] { '\\', '\0' };
+
             for (int i = 0; i < charArray.Length; i++)
             {
                 char c = charArray[i];
-                if (c == '"')
-                    builder.Append("\\\"");
-                else if (c == '\\')
-                    builder.Append("\\\\");
-                else if (c == '\b')
-                    builder.Append("\\b");
-                else if (c == '\f')
-                    builder.Append("\\f");
-                else if (c == '\n')
-                    builder.Append("\\n");
-                else if (c == '\r')
-                    builder.Append("\\r");
-                else if (c == '\t')
-                    builder.Append("\\t");
-                else
-                    builder.Append(c);
+
+                // Non ascii characters are fine, buffer them up and send them to the builder
+                // in larger chunks if possible. The escape table is a 1:1 translation table
+                // with \0 [default(char)] denoting a safe character.
+                if (c >= 128 || escapeTable[c] == default(char))
+                {
+                    safeCharacterCount++;
+                    continue;
+                }
+
+                if (safeCharacterCount > 0)
+                {
+                    builder.Append(charArray, i - safeCharacterCount, safeCharacterCount);
+                    safeCharacterCount = 0;
+                }
+
+                escapeBuf[1] = escapeTable[c];
+                builder.Append(escapeBuf, 0, 2);
             }
-            builder.Append("\"");
+
+            if (safeCharacterCount > 0)
+            {
+                builder.Append(charArray, charArray.Length - safeCharacterCount, safeCharacterCount);
+            }
+
+            builder.Append('"');
             return true;
         }
 
