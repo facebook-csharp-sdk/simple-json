@@ -1117,17 +1117,18 @@ namespace SimpleJson
                 if (c >= 128 || escapeTable[c] == default(char))
                 {
                     safeCharacterCount++;
-                    continue;
                 }
-
-                if (safeCharacterCount > 0)
+                else
                 {
-                    builder.Append(charArray, i - safeCharacterCount, safeCharacterCount);
-                    safeCharacterCount = 0;
-                }
+                    if (safeCharacterCount > 0)
+                    {
+                        builder.Append(charArray, i - safeCharacterCount, safeCharacterCount);
+                        safeCharacterCount = 0;
+                    }
 
-                builder.Append('\\');
-                builder.Append(escapeTable[c]);
+                    builder.Append('\\');
+                    builder.Append(escapeTable[c]);
+                }
             }
 
             if (safeCharacterCount > 0)
