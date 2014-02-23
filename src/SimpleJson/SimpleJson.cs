@@ -1074,8 +1074,20 @@ namespace SimpleJson
             return true;
         }
 
+        static readonly char[] escapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
+
         static bool SerializeString(string aString, StringBuilder builder)
         {
+            // Happy path if there's nothing to be escaped. IndexOfAny is highly optimized (and unmanaged)
+            if (aString.IndexOfAny(escapeCharacters) == -1)
+            {
+                builder.Append('"');
+                builder.Append(aString);
+                builder.Append('"');
+
+                return true;
+            }
+
             builder.Append("\"");
             char[] charArray = aString.ToCharArray();
             for (int i = 0; i < charArray.Length; i++)
