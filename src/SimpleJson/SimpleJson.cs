@@ -516,6 +516,8 @@ namespace SimpleJson
         private const int BUILDER_CAPACITY = 2000;
 
         private static readonly char[] escapeTable;
+        private static readonly char[] escapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
+        private static readonly string escapeCharactersString = new string(escapeCharacters);
 
         static SimpleJson()
         {
@@ -1087,9 +1089,6 @@ namespace SimpleJson
             builder.Append("]");
             return true;
         }
-
-        private static readonly char[] escapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
-        private static readonly string escapeCharactersString = new string(escapeCharacters);
 
         static bool SerializeString(string aString, StringBuilder builder)
         {
