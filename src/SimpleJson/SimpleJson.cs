@@ -1773,7 +1773,7 @@ namespace SimpleJson
             public static IEnumerable<PropertyInfo> GetProperties(Type type)
             {
 #if SIMPLE_JSON_TYPEINFO
-                return type.GetTypeInfo().DeclaredProperties;
+                return type.GetRuntimeProperties();
 #else
                 return type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 #endif
