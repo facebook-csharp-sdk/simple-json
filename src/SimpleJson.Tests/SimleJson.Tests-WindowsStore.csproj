@@ -138,6 +138,7 @@
     <Compile Include="PocoDeserializerTests\ListOfPocoDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\NullableTypeDeserializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\DateTimeSerializeTests.cs" />
+    <Compile Include="PocoJsonSerializerTests\InheritanceSerializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\NullableSerializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\PrivateFieldsDeserializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\PrivateFieldsSerializeTests.cs" />
