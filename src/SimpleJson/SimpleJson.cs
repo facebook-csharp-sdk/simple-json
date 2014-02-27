@@ -515,20 +515,20 @@ namespace SimpleJson
         private const int TOKEN_NULL = 11;
         private const int BUILDER_CAPACITY = 2000;
 
-        private static readonly char[] escapeTable;
-        private static readonly char[] escapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
-        private static readonly string escapeCharactersString = new string(escapeCharacters);
+        private static readonly char[] EscapeTable;
+        private static readonly char[] EscapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
+        private static readonly string EscapeCharactersString = new string(EscapeCharacters);
 
         static SimpleJson()
         {
-            escapeTable = new char[93];
-            escapeTable['"']  = '"';
-            escapeTable['\\'] = '\\';
-            escapeTable['\b'] = 'b';
-            escapeTable['\f'] = 'f';
-            escapeTable['\n'] = 'n';
-            escapeTable['\r'] = 'r';
-            escapeTable['\t'] = 't';
+            EscapeTable = new char[93];
+            EscapeTable['"']  = '"';
+            EscapeTable['\\'] = '\\';
+            EscapeTable['\b'] = 'b';
+            EscapeTable['\f'] = 'f';
+            EscapeTable['\n'] = 'n';
+            EscapeTable['\r'] = 'r';
+            EscapeTable['\t'] = 't';
         }
 
         /// <summary>
@@ -1093,7 +1093,7 @@ namespace SimpleJson
         static bool SerializeString(string aString, StringBuilder builder)
         {
             // Happy path if there's nothing to be escaped. IndexOfAny is highly optimized (and unmanaged)
-            if (aString.IndexOfAny(escapeCharacters) == -1)
+            if (aString.IndexOfAny(EscapeCharacters) == -1)
             {
                 builder.Append('"');
                 builder.Append(aString);
@@ -1113,7 +1113,7 @@ namespace SimpleJson
                 // Non ascii characters are fine, buffer them up and send them to the builder
                 // in larger chunks if possible. The escape table is a 1:1 translation table
                 // with \0 [default(char)] denoting a safe character.
-                if (c >= escapeTable.Length || escapeTable[c] == default(char))
+                if (c >= EscapeTable.Length || EscapeTable[c] == default(char))
                 {
                     safeCharacterCount++;
                 }
@@ -1126,7 +1126,7 @@ namespace SimpleJson
                     }
 
                     builder.Append('\\');
-                    builder.Append(escapeTable[c]);
+                    builder.Append(EscapeTable[c]);
                 }
             }
 
