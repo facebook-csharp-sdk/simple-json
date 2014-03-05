@@ -537,5 +537,26 @@ bye", pair.Key);
             Assert.AreEqual(1, dict.Count);
             Assert.AreEqual("property", dict["unknown"]);
         }
+
+        public class BaseClass
+        {
+            public string B { get; set; }
+        }
+
+        public class SomeClass : BaseClass
+        {
+            public string A { get; set; }
+        }
+
+        [TestMethod]
+        public void DeserializePropertiesOnBaseClass()
+        {
+            var json = "{\"A\":\"first-value\",\"B\":\"another-value\"}";
+            var result = SimpleJson.DeserializeObject<SomeClass>(json);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("first-value", result.A);
+            Assert.AreEqual("another-value", result.B);
+        }
     }
 }
