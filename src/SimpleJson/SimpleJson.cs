@@ -1773,17 +1773,7 @@ namespace SimpleJson
             public static IEnumerable<PropertyInfo> GetProperties(Type type)
             {
 #if SIMPLE_JSON_TYPEINFO
-                var typeInfo = type.GetTypeInfo();
-                var properties = typeInfo.DeclaredProperties;
-
-                if (typeInfo.BaseType == null)
-                    return properties;
-
-                if (typeInfo.BaseType.FullName == typeof (Object).FullName)
-                    return properties;
-
-                var baseProperties = GetProperties(typeInfo.BaseType);
-                return System.Linq.Enumerable.Concat(properties, baseProperties);
+                return type.GetRuntimeProperties();
 #else
                 return type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 #endif
@@ -1792,7 +1782,7 @@ namespace SimpleJson
             public static IEnumerable<FieldInfo> GetFields(Type type)
             {
 #if SIMPLE_JSON_TYPEINFO
-                return type.GetTypeInfo().DeclaredFields;
+                return type.GetRuntimeFields();
 #else
                 return type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 #endif
