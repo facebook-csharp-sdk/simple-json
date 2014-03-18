@@ -1355,8 +1355,14 @@ namespace SimpleJson
                         Uri result;
                         if (isValid && Uri.TryCreate(str, UriKind.RelativeOrAbsolute, out result))
                             return result;
+
+												return null;
                     }
-                    return str;
+                  
+									if (type == typeof(string))  
+										return str;
+
+									return Convert.ChangeType(str, type, CultureInfo.InvariantCulture);
                 }
                 else
                 {
