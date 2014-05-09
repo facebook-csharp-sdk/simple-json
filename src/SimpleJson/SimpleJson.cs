@@ -1350,7 +1350,7 @@ namespace SimpleJson
                         return new Guid(str);
                     if (type == typeof(TimeSpan) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(TimeSpan)))
                         return TimeSpan.Parse(str);
-                      if (type == typeof(Uri))
+                    if (type == typeof(Uri))
                     {
                         bool isValid =  Uri.IsWellFormedUriString(str, UriKind.RelativeOrAbsolute);
 
