@@ -51,6 +51,49 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
+        public void TimeSpanSerialization()
+        {
+            TimeSpan timeSpan = TimeSpan.FromSeconds(3661);
+
+            var json = SimpleJson.SerializeObject(timeSpan);
+
+            Assert.AreEqual(@"""01:01:01""", json);
+        }
+
+        [TestMethod]
+        public void TimeSpanDaysSerialization()
+        {
+            TimeSpan timeSpan = TimeSpan.FromDays(2);
+
+            var json = SimpleJson.SerializeObject(timeSpan);
+
+            Assert.AreEqual(@"""2.00:00:00""", json);
+        }
+
+        [TestMethod]
+        public void TimeSpanDeSerialization()
+        {
+            TimeSpan timeSpan = TimeSpan.FromDays(2);
+
+            var json = SimpleJson.SerializeObject(timeSpan);
+
+            TimeSpan timeSpanOut = (TimeSpan)SimpleJson.DeserializeObject(json, typeof(TimeSpan));
+
+            Assert.AreEqual(timeSpan, timeSpanOut);
+        }
+
+
+        [TestMethod]
+        public void TimeSpanZeroSerialization()
+        {
+            TimeSpan timeSpan = TimeSpan.Zero;
+
+            var json = SimpleJson.SerializeObject(timeSpan);
+
+            Assert.AreEqual(@"""00:00:00""", json);
+        }
+
+        [TestMethod]
         public void EnumSerialization()
         {
             string json = SimpleJson.SerializeObject(StringComparison.CurrentCultureIgnoreCase);
