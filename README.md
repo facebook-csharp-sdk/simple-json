@@ -1,3 +1,6 @@
+# Fork Purpose
+Support for ```DataContract``` in Unity3d/Mono, as mono does not implement all WCF classes, this fork implements them in ```SimpleJson``` namespace if ```ALTERNATE_DATACONTRACT``` was defined.
+
 # SimpleJson
 Small and fast JSON library for .NET 2.0+/SL4+/WP7+/Windows Store Apps/Portable Class Library and powershell.
 Includes support for dynamic in .NET 4.0+/SL4+/Windows Store Apps. Also includes support for DataContract and DataMember. 
