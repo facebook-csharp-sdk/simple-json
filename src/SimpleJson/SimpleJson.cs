@@ -31,6 +31,10 @@
 // NOTE: uncomment the following line to enable DataContract support.
 //#define SIMPLE_JSON_DATACONTRACT
 
+// NOTE: uncomment the following line to use alternate definitions of DataContract/DataMember/IgnoreDataMember.
+// define if you want to use DataContract with Mono, which does not implement all WCF classes.
+//#define ALTERNATE_DATACONTRACT
+
 // NOTE: uncomment the following line to enable IReadOnlyCollection<T> and IReadOnlyList<T> support.
 //#define SIMPLE_JSON_READONLY_COLLECTIONS
 
@@ -486,6 +490,29 @@ namespace SimpleJson
 
 namespace SimpleJson
 {
+    #region Alternate DataContract for Unity/Mono
+
+#if ALTERNATE_DATACONTRACT
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, Inherited = false, AllowMultiple = false)]
+    public sealed class DataContractAttribute : Attribute
+    {
+        public string Name { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+    public sealed class DataMemberAttribute : Attribute
+    {
+        public string Name { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+    public sealed class IgnoreDataMemberAttribute : Attribute
+    {
+    }
+#endif
+
+    #endregion
+
     /// <summary>
     /// This class encodes and decodes JSON strings.
     /// Spec. details, see http://www.json.org/
