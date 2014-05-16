@@ -1010,6 +1010,8 @@ namespace SimpleJson
             string stringValue = value as string;
             if (stringValue != null)
                 success = SerializeString(stringValue, builder);
+            else if (IsChar(value))
+                success = SerializeString(((char)value).ToString(), builder);
             else
             {
                 IDictionary<string, object> dict = value as IDictionary<string, object>;
@@ -1156,6 +1158,15 @@ namespace SimpleJson
             else
                 builder.Append(Convert.ToDouble(number, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture));
             return true;
+        }
+
+        /// <summary>
+        /// Determines if a given object is a char.
+        /// </summary>
+        static bool IsChar(object value)
+        {
+            if (value is char) return true;
+            return false;
         }
 
         /// <summary>
