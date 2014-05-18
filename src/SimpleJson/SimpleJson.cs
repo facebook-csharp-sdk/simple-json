@@ -33,7 +33,7 @@
 
 // NOTE: uncomment the following line to use alternate definitions of DataContract/DataMember/IgnoreDataMember.
 // define if you want to use DataContract with Mono, which does not implement all WCF classes.
-//#define ALTERNATE_DATACONTRACT
+//#define SIMPLE_JSON_REDEFINE_DATACONTRACT_ATTRIBUTES
 
 // NOTE: uncomment the following line to enable IReadOnlyCollection<T> and IReadOnlyList<T> support.
 //#define SIMPLE_JSON_READONLY_COLLECTIONS
@@ -492,7 +492,7 @@ namespace SimpleJson
 {
     #region Alternate DataContract for Unity/Mono
 
-#if ALTERNATE_DATACONTRACT
+#if SIMPLE_JSON_REDEFINE_DATACONTRACT_ATTRIBUTES
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, Inherited = false, AllowMultiple = false)]
     public sealed class DataContractAttribute : Attribute
     {
