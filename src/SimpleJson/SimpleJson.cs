@@ -32,7 +32,7 @@
 //#define SIMPLE_JSON_DATACONTRACT
 
 // NOTE: uncomment the following line to use alternate definitions of DataContract/DataMember/IgnoreDataMember.
-// define if you want to use DataContract with Mono, which does not implement all WCF classes.
+// define if you want to use DataContract with Unity/Mono, which does not implement all WCF classes.
 //#define SIMPLE_JSON_REDEFINE_DATACONTRACT_ATTRIBUTES
 
 // NOTE: uncomment the following line to enable IReadOnlyCollection<T> and IReadOnlyList<T> support.
