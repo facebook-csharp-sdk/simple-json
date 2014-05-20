@@ -31,6 +31,10 @@
 // NOTE: uncomment the following line to enable DataContract support.
 //#define SIMPLE_JSON_DATACONTRACT
 
+// NOTE: uncomment the following line to use alternate definitions of DataContract/DataMember/IgnoreDataMember.
+// define if you want to use DataContract with Unity/Mono, which does not implement all WCF classes.
+//#define SIMPLE_JSON_REDEFINE_DATACONTRACT_ATTRIBUTES
+
 // NOTE: uncomment the following line to enable IReadOnlyCollection<T> and IReadOnlyList<T> support.
 //#define SIMPLE_JSON_READONLY_COLLECTIONS
 
@@ -486,6 +490,57 @@ namespace SimpleJson
 
 namespace SimpleJson
 {
+    #region Alternate DataContract for Unity/Mono
+
+#if SIMPLE_JSON_REDEFINE_DATACONTRACT_ATTRIBUTES
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, Inherited = false, AllowMultiple = false)]
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ sealed class DataContractAttribute : Attribute
+    {
+        public string Name { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ sealed class DataMemberAttribute : Attribute
+    {
+        public DataMemberAttribute()
+        {
+        }
+
+        /// <summary>
+        /// this constructor simplifies declaring this attribute by writing [DataMember("name")] instead of [DataMember(Name = "name")]
+        /// </summary>
+        /// <param name="name"></param>
+        public DataMemberAttribute(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ sealed class IgnoreDataMemberAttribute : Attribute
+    {
+    }
+#endif
+
+    #endregion
+
     /// <summary>
     /// This class encodes and decodes JSON strings.
     /// Spec. details, see http://www.json.org/
