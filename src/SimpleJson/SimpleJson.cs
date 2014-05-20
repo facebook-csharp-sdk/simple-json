@@ -494,19 +494,47 @@ namespace SimpleJson
 
 #if SIMPLE_JSON_REDEFINE_DATACONTRACT_ATTRIBUTES
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, Inherited = false, AllowMultiple = false)]
-    public sealed class DataContractAttribute : Attribute
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ sealed class DataContractAttribute : Attribute
     {
         public string Name { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    public sealed class DataMemberAttribute : Attribute
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ sealed class DataMemberAttribute : Attribute
     {
+        public DataMemberAttribute()
+        {
+        }
+
+        /// <summary>
+        /// this constructor simplifies declaring this attribute by writing [DataMember("name")] instead of [DataMember(Name = "name")]
+        /// </summary>
+        /// <param name="name"></param>
+        public DataMemberAttribute(string name)
+        {
+            Name = name;
+        }
+
         public string Name { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    public sealed class IgnoreDataMemberAttribute : Attribute
+#if SIMPLE_JSON_INTERNAL
+    internal
+#else
+    public
+#endif
+ sealed class IgnoreDataMemberAttribute : Attribute
     {
     }
 #endif
