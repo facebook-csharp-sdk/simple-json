@@ -96,5 +96,16 @@ namespace SimpleJsonTests
             Assert.AreEqual("bar0", result[0].SomeProperty);
             Assert.AreEqual("bar1", result[1].SomeProperty);
         }
+
+        [TestMethod]
+        public void Can_Deserialize_Root_Json_Array_To_Inherited_List_With_Single_Object()
+        {
+            var json = @"{""SomeProperty"":""bar0""}";
+            var result = SimpleJson.DeserializeObject<ItemList>(json);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("bar0", result[0].SomeProperty);
+        }
     }
 }

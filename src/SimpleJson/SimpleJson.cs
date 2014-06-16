@@ -1413,6 +1413,16 @@ namespace SimpleJson
 
                         obj = dict;
                     }
+                    if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
+                    {
+                        IList list = null;
+
+                        Type innerType = ReflectionUtils.GetGenericListElementType(type);
+                        list = (IList)(ConstructorCache[type] ?? ConstructorCache[typeof(List<>).MakeGenericType(innerType)])(jsonObject.Count);
+                        list.Add(DeserializeObject(objects, innerType));
+
+                        obj = list;
+                    }
                     else
                     {
                         if (type == typeof(object))
