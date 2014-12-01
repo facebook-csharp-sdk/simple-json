@@ -71,11 +71,13 @@
     <Compile Include="JsonDecodeTypeTests.cs" />
     <Compile Include="JsonDataContractSerializeObjectTests.cs" />
     <Compile Include="PocoDeserializerTests\ArrayTests.cs" />
+    <Compile Include="PocoDeserializerTests\EnumDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\NullableTypeDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\DateTimeDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\DictionaryDeserializeTests.cs" />
     <Compile Include="PocoDeserializerTests\ListOfPocoDeserializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\DateTimeSerializeTests.cs" />
+    <Compile Include="PocoJsonSerializerTests\EnumSerializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\NullableSerializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\PrivateFieldsDeserializeTests.cs" />
     <Compile Include="PocoJsonSerializerTests\PrivateFieldsSerializeTests.cs" />

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="<file>.cs" company="The Outercurve Foundation">
 //    Copyright (c) 2011, The Outercurve Foundation.
 //
@@ -17,9 +17,10 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-namespace SimpleJsonTests
+namespace SimpleJson.Tests.PocoDeserializerTests
 {
     using System;
+
 #if NUNIT
     using TestClass = NUnit.Framework.TestFixtureAttribute;
     using TestMethod = NUnit.Framework.TestAttribute;
@@ -36,32 +37,66 @@ namespace SimpleJsonTests
 #endif
 #endif
 
-    using SimpleJson;
-
     [TestClass]
-    public class SerializeObject_KnownNonPrimitive_Tests
+    public class EnumDeserializeTests
     {
         [TestMethod]
-        public void GuidSerialization()
+        public void DeserializeEnumStringValue()
         {
-            Guid guid = new Guid("BED7F4EA-1A96-11d2-8F08-00A0C9A6186D");
-            var json = SimpleJson.SerializeObject(guid);
+            var json = "{\"Value\":\"Two\"}";
 
-            Assert.AreEqual(@"""bed7f4ea-1a96-11d2-8f08-00a0c9a6186d""", json);
+            var result = SimpleJson.DeserializeObject<X>(json);
+            Assert.AreEqual(Values.Two, result.Value);
         }
 
-        [TestMethod]
-        public void EnumSerialization()
+        public class X
         {
-            string json = SimpleJson.SerializeObject(StringComparison.CurrentCultureIgnoreCase);
-            Assert.AreEqual("\"CurrentCultureIgnoreCase\"", json);
-        }
-
-        [TestMethod]
-        public void UriSerialization()
-        {
-            string json = SimpleJson.SerializeObject(new Uri("http://simplejson.codeplex.com/"));
-            Assert.AreEqual("\"http://simplejson.codeplex.com/\"", json);
+            public Values Value { get; set; }
         }
     }
+
+
+    [TestClass]
+    public class NullableEnumDeserializeTests
+    {
+        [TestMethod]
+        public void DeserializeNullEnumValue()
+        {
+            var json = "{}";
+
+            var result = SimpleJson.DeserializeObject<X>(json);
+
+            Assert.IsNull(result.Value);
+        }
+
+        [TestMethod]
+        public void DeserializeNullValue()
+        {
+            var json = "{\"Value\":null}";
+
+            var result = SimpleJson.DeserializeObject<X>(json);
+            Assert.IsNull(result.Value);
+        }
+
+        [TestMethod]
+        public void DeserializeNullableEnumWithValue()
+        {
+            var json = "{\"Value\":\"Two\"}";
+            var result = SimpleJson.DeserializeObject<X>(json);
+            Assert.AreEqual(Values.Two, result.Value);
+        }
+
+        public class X
+        {
+            public Values? Value { get; set; }
+        }
+    }
+
+    public enum Values
+    {
+        One,
+        Two,
+        Three
+    }
+
 }
