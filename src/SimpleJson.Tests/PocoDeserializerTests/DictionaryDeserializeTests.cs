@@ -17,9 +17,13 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
+
 namespace SimpleJsonTests.PocoDeserializerTests
 {
     using System.Collections.Generic;
+#if SIMPLE_JSON_READONLY_COLLECTIONS
+    using System.Collections.ObjectModel;
+#endif
 
 #if NUNIT
     using TestMethod = NUnit.Framework.TestAttribute;
@@ -74,6 +78,35 @@ namespace SimpleJsonTests.PocoDeserializerTests
             Assert.AreEqual(1L, result["key1"]);
             Assert.AreEqual(5L, result["key2"]);
         }
+
+#if SIMPLE_JSON_READONLY_COLLECTIONS
+        // Running these next two tests requires recompiling the tests against the SimpleJson-Net45 project
+        [TestMethod]
+        public void DeserializeToIReadOnlyDictionaryStringLong()
+        {
+            string json = @"{""key1"":1,""key2"":5}";   
+
+            var result = SimpleJson.DeserializeObject<IReadOnlyDictionary<string, long>>(json);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(1L, result["key1"]);
+            Assert.AreEqual(5L, result["key2"]);
+        }
+
+        [TestMethod]
+        public void DeserializeToReadOnlyDictionaryStringLong()
+        {
+            string json = @"{""key1"":1,""key2"":5}";
+
+            var result = SimpleJson.DeserializeObject<ReadOnlyDictionary<string, long>>(json);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(1L, result["key1"]);
+            Assert.AreEqual(5L, result["key2"]);
+        }
+#endif
 
         [TestMethod]
         public void DeserializeToDictionaryStringLong()
