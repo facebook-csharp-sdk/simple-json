@@ -1424,7 +1424,7 @@ namespace SimpleJson
                         {
                             var ctorType = typeof(IDictionary<,>).MakeGenericType(keyType, valueType);
                             var genericReadonlyType = typeof(ReadOnlyDictionary<,>).MakeGenericType(keyType, valueType);
-                            var ctor = genericReadonlyType.GetConstructor(new Type[] { ctorType });
+                            var ctor = ReflectionUtils.GetContructor(genericReadonlyType, new Type[] { ctorType });
                             System.Diagnostics.Debug.Assert(ctor != null);
                             obj = ctor.Invoke(new[] { obj });
                         }
