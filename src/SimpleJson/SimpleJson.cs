@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="SimpleJson.cs" company="The Outercurve Foundation">
 //    Copyright (c) 2011, The Outercurve Foundation.
 //
@@ -515,21 +515,12 @@ namespace SimpleJson
         private const int TOKEN_NULL = 11;
         private const int BUILDER_CAPACITY = 2000;
 
-        private static readonly char[] EscapeTable;
-        private static readonly char[] EscapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
-        private static readonly string EscapeCharactersString = new string(EscapeCharacters);
-
-        static SimpleJson()
-        {
-            EscapeTable = new char[93];
-            EscapeTable['"']  = '"';
-            EscapeTable['\\'] = '\\';
-            EscapeTable['\b'] = 'b';
-            EscapeTable['\f'] = 'f';
-            EscapeTable['\n'] = 'n';
-            EscapeTable['\r'] = 'r';
-            EscapeTable['\t'] = 't';
-        }
+        private static readonly char[] EscapeCharacters = new char[] { '"', '\\',
+            '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07',
+            '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f',
+            '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17',
+            '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f'
+        };
 
         /// <summary>
         /// Parses the string json into a value
@@ -1111,13 +1102,8 @@ namespace SimpleJson
                 char c = charArray[i];
 
                 // Non ascii characters are fine, buffer them up and send them to the builder
-                // in larger chunks if possible. The escape table is a 1:1 translation table
-                // with \0 [default(char)] denoting a safe character.
-                if (c >= EscapeTable.Length || EscapeTable[c] == default(char))
-                {
-                    safeCharacterCount++;
-                }
-                else
+                // in larger chunks if possible.
+                if (Char.IsControl(c) || c == '\"' || c == '\\')
                 {
                     if (safeCharacterCount > 0)
                     {
@@ -1126,7 +1112,37 @@ namespace SimpleJson
                     }
 
                     builder.Append('\\');
-                    builder.Append(EscapeTable[c]);
+                    switch (c)
+                    {
+                        case '\\':
+                            builder.Append('\\');
+                            break;
+                        case '\"':
+                            builder.Append('\"');
+                            break;
+                        case '\b':
+                            builder.Append('b');
+                            break;
+                        case '\f':
+                            builder.Append('f');
+                            break;
+                        case '\r':
+                            builder.Append('r');
+                            break;
+                        case '\t':
+                            builder.Append('t');
+                            break;
+                        case '\n':
+                            builder.Append('n');
+                            break;
+                        default:
+                            builder.AppendFormat("u{0:X4}", (int)c);
+                            break;
+                    }
+                }
+                else
+                {
+                    safeCharacterCount++;
                 }
             }
 
