@@ -613,6 +613,17 @@ namespace SimpleJson
             return SerializeObject(json, CurrentJsonSerializerStrategy);
         }
 
+        /// <summary>
+        /// minify(compress) the JSON string.
+        /// inspired by http://stackoverflow.com/questions/8913138/minify-indented-json-string-in-net
+        /// </summary>
+        /// <param name="json">JSON string to compress</param>
+        /// <returns>minified JSON string</returns>
+        public static string Minify(string json)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(json, "(\"(?:[^\"\\\\]|\\\\.)*\")|\\s+", "$1");
+        }
+
         public static string EscapeToJavascriptString(string jsonString)
         {
             if (string.IsNullOrEmpty(jsonString))
