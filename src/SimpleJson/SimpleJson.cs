@@ -1029,7 +1029,13 @@ namespace SimpleJson
                         IEnumerable enumerableValue = value as IEnumerable;
                         if (enumerableValue != null)
                             success = SerializeArray(jsonSerializerStrategy, enumerableValue, builder);
-                        else if (IsNumeric(value))
+                        else if (IsNaNorInfinite(value)) {
+                            object coerced = jsonSerializerStrategy.CoerceInfiniteOrNaN(value);
+                            if (IsNumeric(coerced))
+                                success = SerializeNumber(value, builder);
+                            else
+                                success = SerializeValue(jsonSerializerStrategy, coerced, builder);
+                        } else if (IsNumeric(value))
                             success = SerializeNumber(value, builder);
                         else if (value is bool)
                             builder.Append((bool)value ? "true" : "false");
@@ -1178,6 +1184,25 @@ namespace SimpleJson
             return false;
         }
 
+        /// <summary>
+        /// Determines if a given object is a floating point representation,
+        /// (e.g. double or float) and that object is Infinity or NaN
+        /// </summary>
+        static bool IsNaNorInfinite(object value)
+        {
+            if (value is float)
+            {
+                if (float.IsInfinity((float)value)) return true;
+                if (float.IsNaN((float)value)) return true;
+            }
+            else if (value is double)
+            {
+                if (double.IsInfinity((double)value)) return true;
+                if (double.IsNaN((double)value)) return true;
+            }
+            return false;
+        }
+
         private static IJsonSerializerStrategy _currentJsonSerializerStrategy;
         public static IJsonSerializerStrategy CurrentJsonSerializerStrategy
         {
@@ -1234,6 +1259,7 @@ namespace SimpleJson
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         bool TrySerializeNonPrimitiveObject(object input, out object output);
         object DeserializeObject(object value, Type type);
+        object CoerceInfiniteOrNaN(object value);
     }
 
     [GeneratedCode("simple-json", "1.0.0")]
@@ -1512,6 +1538,11 @@ namespace SimpleJson
             output = obj;
             return true;
         }
+
+        public virtual object CoerceInfiniteOrNaN(object value)
+        {
+            return value;
+        }
     }
 
 #if SIMPLE_JSON_DATACONTRACT
@@ -1590,9 +1621,16 @@ namespace SimpleJson
             return true;
         }
     }
-
+ 
 #endif
 
+    class InfinityAsStringJsonSerializerStrategy : PocoJsonSerializerStrategy
+    {
+        public override object CoerceInfiniteOrNaN(object value)
+        {
+            return value.ToString();
+        }
+    }
     namespace Reflection
     {
         // This class is meant to be copied into other libraries. So we want to exclude it from Code Analysis rules
