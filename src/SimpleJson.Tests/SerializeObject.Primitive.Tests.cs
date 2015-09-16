@@ -206,6 +206,11 @@ namespace SimpleJsonTests
         public void DoubleSerialization()
         {
             Assert.AreEqual("1.1", SimpleJson.SerializeObject(1.1));
+            Assert.AreEqual("NaN", SimpleJson.SerializeObject(double.NaN));
+            Assert.AreEqual("-Infinity", SimpleJson.SerializeObject(double.NegativeInfinity));
+            // Check with a strategy that does other things to Infinity/NaN
+            Assert.AreEqual("\"-Infinity\"", SimpleJson.SerializeObject(double.NegativeInfinity, new InfinityAsStringJsonSerializerStrategy()));
+            Assert.AreEqual("\"NaN\"", SimpleJson.SerializeObject(double.NaN, new InfinityAsStringJsonSerializerStrategy()));
         }
 
         [TestMethod]
