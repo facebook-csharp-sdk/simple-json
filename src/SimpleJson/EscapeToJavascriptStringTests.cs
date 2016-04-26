@@ -44,8 +44,8 @@ namespace SimpleJsonTests
         [TestMethod]
         public void BackSlash()
         {
-            var serialized = SimpleJson.SerializeObject("c:\\haha.pl");
-            var result = SimpleJson.EscapeToJavascriptString(serialized);
+            string serialized = SimpleJson.SerializeObject("c:\\haha.pl");
+            string result = SimpleJson.EscapeToJavascriptString(serialized);
 
             Assert.AreEqual("\"c:\\haha.pl\"", result);
         }
@@ -53,8 +53,8 @@ namespace SimpleJsonTests
         [TestMethod]
         public void BackSlashWithT()
         {
-            var serialized = SimpleJson.SerializeObject("c:\\taha.pl");
-            var result = SimpleJson.EscapeToJavascriptString(serialized);
+            string serialized = SimpleJson.SerializeObject("c:\\taha.pl");
+            string result = SimpleJson.EscapeToJavascriptString(serialized);
 
             Assert.AreEqual("\"c:\\taha.pl\"", result);
         }

@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="SimpleJson.Tests\SimleJson.Tests-WindowsStore.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="SimpleJson\SimpleJson.cs">
+    <Files>
+      <File FileName="SimpleJson\SimpleJson.cs" Line="1397" Column="14" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
