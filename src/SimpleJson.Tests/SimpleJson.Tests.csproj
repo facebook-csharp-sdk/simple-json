@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataContractTests\EmitDefaultValueSerializeTests.cs" />
     <Compile Include="DeserializeGenericListTests.cs" />
     <Compile Include="DataContractTests\DataContractSampleClassess.cs" />
     <Compile Include="DataContractTests\PrivateFieldsSerializeTests.cs" />
