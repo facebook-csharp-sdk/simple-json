@@ -157,6 +157,26 @@ namespace SimpleJsonTests.DataContractTests
     #endregion
 
     #region Getter/Setters
+    [DataContract]
+    public class DataContractEmitDefaultValuePublicGetterSetters
+    {
+        public DataContractEmitDefaultValuePublicGetterSetters()
+        {
+            DataMemberWithoutName = "dmv";
+            DatMemberWithName = "dmnv";
+    }
+
+        [DataMember]
+        public string DataMemberWithoutName { get; set; }
+
+        [DataMember(Name = "name", EmitDefaultValue = false)]
+        public string DatMemberWithName { get; set; }
+
+        [IgnoreDataMember]
+        public string IgnoreDataMember { get; set; }
+
+        public string NoDataMember { get; set; }
+    }
 
     [DataContract]
     public class DataContractPublicGetterSetters
