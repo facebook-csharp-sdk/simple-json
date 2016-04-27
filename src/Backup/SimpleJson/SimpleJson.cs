@@ -1382,19 +1382,6 @@ namespace SimpleJson
             
             bool valueIsLong = value is long;
             bool valueIsDouble = value is double;
-
-			// type.IsEnum lacks support on metro/WP8WinStore
-			if (ReflectionUtils.IsAssignableFrom(typeof(Enum), type))
-            {
-                if (value is double || value is int || value is long)
-                {
-                    return Enum.ToObject(type, Convert.ToInt32(value.ToString()));
-                }
-                else if (value is string)
-                {
-                    return Enum.Parse(type, value.ToString(), false);
-                }
-            }
             if ((valueIsLong && type == typeof(long)) || (valueIsDouble && type == typeof(double)))
                 return value;
             if ((valueIsDouble && type != typeof(double)) || (valueIsLong && type != typeof(long)))
