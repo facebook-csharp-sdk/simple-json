@@ -45,17 +45,29 @@ namespace SimpleJsonTests.DataContractTests
         public EmitDefaultValueSerializeTests()
         {
             _dataContractEmitDefaultValuePublicGetterSetters = new DataContractEmitDefaultValuePublicGetterSetters();
-            _dataContractEmitDefaultValuePublicGetterSetters.DatMemberWithName = null;
         }
 
         [TestMethod]
-        public void SerializesCorrectly()
+        public void SerializesCorrectlyWithDefaultValue()
         {
+            _dataContractEmitDefaultValuePublicGetterSetters.DatMemberWithName = null;
             var result = SimpleJson.SerializeObject(_dataContractEmitDefaultValuePublicGetterSetters, SimpleJson.DataContractJsonSerializerStrategy);
 
             // As the property has a DataMemberAttribute and EmitDefaultValue = false, and the value is false
             // there should be a name property in there. (The case is important here)
             Assert.IsFalse(result.Contains("name"));
+            Assert.IsTrue(result.Contains("DataMemberWithoutName"));
+        }
+
+        [TestMethod]
+        public void SerializesCorrectlyWithoutDefaultValue()
+        {
+            _dataContractEmitDefaultValuePublicGetterSetters.DatMemberWithName = "SimpleJson";
+            var result = SimpleJson.SerializeObject(_dataContractEmitDefaultValuePublicGetterSetters, SimpleJson.DataContractJsonSerializerStrategy);
+
+            // As the property has a DataMemberAttribute and EmitDefaultValue = false, and the value is false
+            // there should be a name property in there. (The case is important here)
+            Assert.IsTrue(result.Contains("SimpleJson"));
             Assert.IsTrue(result.Contains("DataMemberWithoutName"));
         }
     }
