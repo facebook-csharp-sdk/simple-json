@@ -156,6 +156,34 @@ namespace SimpleJsonTests
         }
 
         [TestMethod]
+        public void GivenNumberWithoutDecimalTooLargeForLongTypeIsDecimal()
+        {
+            decimal veryLargeInteger = long.MaxValue + 1M;
+            var json = veryLargeInteger.ToString();
+            object result = SimpleJson.DeserializeObject(json);
+
+#if NETFX_CORE
+            Assert.IsInstanceOfType(result, typeof(decimal));
+#else
+            Assert.IsInstanceOf<decimal>(result);
+#endif
+        }
+
+        [TestMethod]
+        public void GivenNumberWithoutDecimalTooLargeForDecimalTypeIsDouble()
+        {
+            decimal veryVeryLargeInteger = decimal.MaxValue;
+            var json = veryVeryLargeInteger + "0"; // Tack a zero onto the end -- multiply by 10
+            object result = SimpleJson.DeserializeObject(json);
+
+#if NETFX_CORE
+            Assert.IsInstanceOfType(result, typeof(double));
+#else
+            Assert.IsInstanceOf<double>(result);
+#endif
+        }
+
+        [TestMethod]
         public void GivenGuidAsNull()
         {
             var json = "null";
