@@ -25,6 +25,7 @@ Install-Package SimpleJson
 * Windows Phone 7.1 (Mango)
 * Windows Phone 8
 * Portable Class Libraries (PCL)
+* Unity
 
 **Note:** By default SimpleJson expects `System.Linq`. If you are targeting older version of .NET framework (.net < 3.0 or WP7.0) you will need to add `#define SIMPLE_JSON_NO_LINQ_EXPRESSION`.
 
