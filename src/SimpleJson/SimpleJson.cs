@@ -1450,7 +1450,12 @@ namespace SimpleJson
                         else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
                         {
                             Type innerType = ReflectionUtils.GetGenericListElementType(type);
+                            //Modity By Zhang Minglin
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+                            list = (IList)(ConstructorCache[type] ?? ConstructorCache[typeof(List<>).MakeGenericType(innerType)])();
+#else
                             list = (IList)(ConstructorCache[type] ?? ConstructorCache[typeof(List<>).MakeGenericType(innerType)])(jsonObject.Count);
+#endif
                             foreach (object o in jsonObject)
                                 list.Add(DeserializeObject(o, innerType));
                         }
