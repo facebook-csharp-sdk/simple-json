@@ -1450,7 +1450,7 @@ namespace SimpleJson
                         else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
                         {
                             Type innerType = ReflectionUtils.GetGenericListElementType(type);
-                            //Modity By Zhang Minglin
+                            //Modify by xtqqksszml@163.com
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
                             list = (IList)(ConstructorCache[type] ?? ConstructorCache[typeof(List<>).MakeGenericType(innerType)])();
 #else
@@ -1460,6 +1460,30 @@ namespace SimpleJson
                                 list.Add(DeserializeObject(o, innerType));
                         }
                         obj = list;
+
+                        //Modify by xtqqksszml@163.com
+                        //Support Dictionary Formats([{"Key":?,"Value":?},])
+                        if (ReflectionUtils.IsTypeDictionary(type))
+                        {
+                            Type[] types = ReflectionUtils.GetGenericTypeArguments(type);
+                            Type keyType = types[0];
+                            Type valueType = types[1];
+
+                            Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
+
+                            IDictionary dict = (IDictionary)ConstructorCache[genericType]();
+
+                            foreach (object o in jsonObject)
+                            {
+                                IDictionary<string, object> element = o as IDictionary<string, object>;
+                                if (element != null)
+                                {
+                                    dict.Add(DeserializeObject(element["Key"], keyType)
+                                    , DeserializeObject(element["Value"], valueType));
+                                }
+                            }
+                            obj = dict;
+                        }
                     }
                 }
                 return obj;
