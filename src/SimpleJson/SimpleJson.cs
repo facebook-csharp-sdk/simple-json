@@ -907,9 +907,18 @@ namespace SimpleJson
             }
             else
             {
+                //Modify by xtqqksszml@163.com
+                //Support uint, ulong
                 long number;
                 success = long.TryParse(new string(json, index, charLength), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
-                returnNumber = number;
+                if (success)
+                    returnNumber = number;
+                else
+                {
+                    ulong unsign_number;
+                    success = ulong.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out unsign_number);
+                    returnNumber = unsign_number;
+                }
             }
             index = lastIndex + 1;
             return returnNumber;
@@ -1379,14 +1388,17 @@ namespace SimpleJson
             }
             else if (value is bool)
                 return value;
-            
+
+            //Modify by xtqqksszml@163.com
+            //Support uint, ulong
             bool valueIsLong = value is long;
+            bool valueIsULong = value is ulong;
             bool valueIsDouble = value is double;
-            if ((valueIsLong && type == typeof(long)) || (valueIsDouble && type == typeof(double)))
+            if ((valueIsLong && type == typeof(long)) || (valueIsDouble && type == typeof(double)) || (valueIsULong && type == typeof(ulong)))
                 return value;
-            if ((valueIsDouble && type != typeof(double)) || (valueIsLong && type != typeof(long)))
+            if ((valueIsDouble && type != typeof(double)) || (valueIsLong && type != typeof(long)) || (valueIsULong && type != typeof(ulong)))
             {
-                obj = type == typeof(int) || type == typeof(long) || type == typeof(double) || type == typeof(float) || type == typeof(bool) || type == typeof(decimal) || type == typeof(byte) || type == typeof(short)
+                obj = type == typeof(int) || type == typeof(long) || type == typeof(uint) || type == typeof(ulong) || type == typeof(double) || type == typeof(float) || type == typeof(bool) || type == typeof(decimal) || type == typeof(byte) || type == typeof(short)
                             ? Convert.ChangeType(value, type, CultureInfo.InvariantCulture)
                             : value;
             }
