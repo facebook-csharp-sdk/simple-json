@@ -1420,8 +1420,10 @@ namespace SimpleJson
 
                         IDictionary dict = (IDictionary)ConstructorCache[genericType]();
 
+                        // Modify by xtqqksszml@163.com
+                        // Key support the other types
                         foreach (KeyValuePair<string, object> kvp in jsonObject)
-                            dict.Add(kvp.Key, DeserializeObject(kvp.Value, valueType));
+                            dict.Add(DeserializeObject(kvp.Key, keyType), DeserializeObject(kvp.Value, valueType));
 
                         obj = dict;
                     }
