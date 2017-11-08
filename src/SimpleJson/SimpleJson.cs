@@ -826,7 +826,7 @@ namespace SimpleJson
         }
 
         [ThreadStatic]
-        static StringBuilder tempStringBuilder = new StringBuilder(BUILDER_CAPACITY);
+        static StringBuilder tempStringBuilder;
         static string ParseString(char[] json, ref int index, ref bool success)
         {
             ///修改为使用一个静态缓存StringBuilder,减少堆内存分配，不过此处会引起一个长驻的堆内存
@@ -835,7 +835,14 @@ namespace SimpleJson
             /// Old:
             ///StringBuilder s = new StringBuilder(BUILDER_CAPACITY);
             /// Now:
-            tempStringBuilder.Length = 0;
+            if(tempStringBuilder == null)
+            {
+                tempStringBuilder = new StringBuilder(BUILDER_CAPACITY);
+            }
+            else
+            {
+                tempStringBuilder.Length = 0;
+            }
             StringBuilder s = tempStringBuilder;
 
             char c;
