@@ -825,9 +825,19 @@ namespace SimpleJson
             return null;
         }
 
+        [ThreadStatic]
+        static StringBuilder tempStringBuilder = new StringBuilder(BUILDER_CAPACITY);
         static string ParseString(char[] json, ref int index, ref bool success)
         {
-            StringBuilder s = new StringBuilder(BUILDER_CAPACITY);
+            ///修改为使用一个静态缓存StringBuilder,减少堆内存分配，不过此处会引起一个长驻的堆内存
+            ///Modify by ZhangMinglin
+            ///
+            /// Old:
+            ///StringBuilder s = new StringBuilder(BUILDER_CAPACITY);
+            /// Now:
+            tempStringBuilder.Length = 0;
+            StringBuilder s = tempStringBuilder;
+
             char c;
 
             EatWhitespace(json, ref index);
