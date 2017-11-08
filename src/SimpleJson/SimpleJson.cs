@@ -579,7 +579,25 @@ namespace SimpleJson
                        ? jsonObject
                        : (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(jsonObject, type);
         }
-
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+        public static object DeserializeObject(ref object target,string json, Type type, IJsonSerializerStrategy jsonSerializerStrategy)
+        {
+            object jsonObject = DeserializeObject(json);
+            return type == null || jsonObject != null && ReflectionUtils.IsAssignableFrom(jsonObject.GetType(), type)
+                ? jsonObject
+                : (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(ref target, jsonObject,
+                    type);
+        }     
+#else
+        public static object DeserializeObject(object target, string json, Type type, IJsonSerializerStrategy jsonSerializerStrategy)
+        {
+            object jsonObject = DeserializeObject(json);
+            return type == null || jsonObject != null && ReflectionUtils.IsAssignableFrom(jsonObject.GetType(), type)
+                ? jsonObject
+                : (jsonSerializerStrategy ?? CurrentJsonSerializerStrategy).DeserializeObject(target, jsonObject,
+                    type);
+        }
+#endif
         public static object DeserializeObject(string json, Type type)
         {
             return DeserializeObject(json, type, null);
@@ -594,7 +612,14 @@ namespace SimpleJson
         {
             return (T)DeserializeObject(json, typeof(T), null);
         }
-
+        public static T DeserializeObject<T>(object target,string json)
+        {
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+            return (T)DeserializeObject(ref target, json, typeof(T), null);
+#else
+            return (T)DeserializeObject(target, json, typeof(T), null);
+#endif
+        }
         /// <summary>
         /// Converts a IDictionary&lt;string,object> / IList&lt;object> object into a JSON string
         /// </summary>
@@ -611,6 +636,20 @@ namespace SimpleJson
         public static string SerializeObject(object json)
         {
             return SerializeObject(json, CurrentJsonSerializerStrategy);
+        }
+
+        /// <summary>
+        /// 避免堆内存分配的解析方式
+        /// Modify By ZhangMinglin
+        /// </summary>
+        public static StringBuilder SerializeObject(object json, StringBuilder builder)
+        {
+            if (builder == null)
+            {
+                return null;
+            }
+            bool success = SerializeValue(CurrentJsonSerializerStrategy, json, builder);
+            return (success ? builder : null);
         }
 
         public static string EscapeToJavascriptString(string jsonString)
@@ -1243,6 +1282,12 @@ namespace SimpleJson
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
         bool TrySerializeNonPrimitiveObject(object input, out object output);
         object DeserializeObject(object value, Type type);
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+        object DeserializeObject(ref object target, object value, Type type);
+#else
+        object DeserializeObject(object target,object value, Type type);
+#endif
+
     }
 
     [GeneratedCode("simple-json", "1.0.0")]
@@ -1433,14 +1478,21 @@ namespace SimpleJson
                             obj = value;
                         else
                         {
-                            obj = ConstructorCache[type]();
+                            if(type.IsClass)
+                                obj = ConstructorCache[type]();
+                            else
+                                obj = Activator.CreateInstance(type);
                             foreach (KeyValuePair<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> setter in SetCache[type])
                             {
                                 object jsonValue;
                                 if (jsonObject.TryGetValue(setter.Key, out jsonValue))
                                 {
                                     jsonValue = DeserializeObject(jsonValue, setter.Value.Key);
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+                                    setter.Value.Value(ref obj, jsonValue);
+#else
                                     setter.Value.Value(obj, jsonValue);
+#endif
                                 }
                             }
                         }
@@ -1506,7 +1558,197 @@ namespace SimpleJson
                 return ReflectionUtils.ToNullableType(obj, type);
             return obj;
         }
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+        public virtual object DeserializeObject(ref object target, object value, Type type)
+#else
+        public virtual object DeserializeObject(object target, object value, Type type)
+#endif
+        {
+            if (type == null) throw new ArgumentNullException("type");
+            string str = value as string;
 
+            if (type == typeof(Guid) && string.IsNullOrEmpty(str))
+                return default(Guid);
+
+            if (value == null)
+                return null;
+
+            object obj = null;
+
+            if (str != null)
+            {
+                if (str.Length != 0) // We know it can't be null now.
+                {
+                    if (type == typeof(DateTime) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTime)))
+                        return DateTime.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+                    if (type == typeof(DateTimeOffset) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(DateTimeOffset)))
+                        return DateTimeOffset.ParseExact(str, Iso8601Format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+                    if (type == typeof(Guid) || (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid)))
+                        return new Guid(str);
+                    if (type == typeof(Uri))
+                    {
+                        bool isValid = Uri.IsWellFormedUriString(str, UriKind.RelativeOrAbsolute);
+
+                        Uri result;
+                        if (isValid && Uri.TryCreate(str, UriKind.RelativeOrAbsolute, out result))
+                            return result;
+
+                        return null;
+                    }
+
+                    if (type == typeof(string))
+                        return str;
+
+                    return Convert.ChangeType(str, type, CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    if (type == typeof(Guid))
+                        obj = default(Guid);
+                    else if (ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid))
+                        obj = null;
+                    else
+                        obj = str;
+                }
+                // Empty string case
+                if (!ReflectionUtils.IsNullableType(type) && Nullable.GetUnderlyingType(type) == typeof(Guid))
+                    return str;
+            }
+            else if (value is bool)
+                return value;
+
+            //Modify by xtqqksszml@163.com
+            //Support uint, ulong
+            bool valueIsLong = value is long;
+            bool valueIsULong = value is ulong;
+            bool valueIsDouble = value is double;
+            if ((valueIsLong && type == typeof(long)) || (valueIsDouble && type == typeof(double)) || (valueIsULong && type == typeof(ulong)))
+                return value;
+            if ((valueIsDouble && type != typeof(double)) || (valueIsLong && type != typeof(long)) || (valueIsULong && type != typeof(ulong)))
+            {
+                obj = type == typeof(int) || type == typeof(long) || type == typeof(uint) || type == typeof(ulong) || type == typeof(double) || type == typeof(float) || type == typeof(bool) || type == typeof(decimal) || type == typeof(byte) || type == typeof(short)
+                    ? Convert.ChangeType(value, type, CultureInfo.InvariantCulture)
+                    : value;
+            }
+            else
+            {
+                IDictionary<string, object> objects = value as IDictionary<string, object>;
+                if (objects != null)
+                {
+                    IDictionary<string, object> jsonObject = objects;
+
+                    if (ReflectionUtils.IsTypeDictionary(type))
+                    {
+                        // if dictionary then
+                        Type[] types = ReflectionUtils.GetGenericTypeArguments(type);
+                        Type keyType = types[0];
+                        Type valueType = types[1];
+
+                        Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
+
+                        IDictionary dict = (IDictionary)ConstructorCache[genericType]();
+
+                        // Modify by xtqqksszml@163.com
+                        // Key support the other types
+                        foreach (KeyValuePair<string, object> kvp in jsonObject)
+                            dict.Add(DeserializeObject(kvp.Key, keyType), DeserializeObject(kvp.Value, valueType));
+
+                        obj = dict;
+                    }
+                    else
+                    {
+                        if (type == typeof(object))
+                            obj = value;
+                        else
+                        {
+
+                            if (target.GetType() == type && target != null)
+                                obj = target;
+                            else
+                            {
+                                if (type.IsClass)
+                                    obj = ConstructorCache[type]();
+                                else
+                                    obj = Activator.CreateInstance(type);
+                            }
+                            
+                            foreach (KeyValuePair<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>> setter in SetCache[type])
+                            {
+                                object jsonValue;
+                                if (jsonObject.TryGetValue(setter.Key, out jsonValue))
+                                {
+                                    jsonValue = DeserializeObject(jsonValue, setter.Value.Key);
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+                                    setter.Value.Value(ref obj, jsonValue);
+#else
+                                    setter.Value.Value(obj, jsonValue);
+#endif
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    IList<object> valueAsList = value as IList<object>;
+                    if (valueAsList != null)
+                    {
+                        IList<object> jsonObject = valueAsList;
+                        IList list = null;
+
+                        if (type.IsArray)
+                        {
+                            list = (IList)ConstructorCache[type](jsonObject.Count);
+                            int i = 0;
+                            foreach (object o in jsonObject)
+                                list[i++] = DeserializeObject(o, type.GetElementType());
+                        }
+                        else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
+                        {
+                            Type innerType = ReflectionUtils.GetGenericListElementType(type);
+                            //Modify by xtqqksszml@163.com
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+                            list = (IList)(ConstructorCache[type] ?? ConstructorCache[typeof(List<>).MakeGenericType(innerType)])();
+#else
+                            list = (IList)(ConstructorCache[type] ?? ConstructorCache[typeof(List<>).MakeGenericType(innerType)])(jsonObject.Count);
+#endif
+                            foreach (object o in jsonObject)
+                                list.Add(DeserializeObject(o, innerType));
+                        }
+                        obj = list;
+
+                        //Modify by xtqqksszml@163.com
+                        //Support Dictionary Formats([{"Key":?,"Value":?},])
+                        if (ReflectionUtils.IsTypeDictionary(type))
+                        {
+                            Type[] types = ReflectionUtils.GetGenericTypeArguments(type);
+                            Type keyType = types[0];
+                            Type valueType = types[1];
+
+                            Type genericType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
+
+                            IDictionary dict = (IDictionary)ConstructorCache[genericType]();
+
+                            foreach (object o in jsonObject)
+                            {
+                                IDictionary<string, object> element = o as IDictionary<string, object>;
+                                if (element != null)
+                                {
+                                    dict.Add(DeserializeObject(element["Key"], keyType)
+                                        , DeserializeObject(element["Value"], valueType));
+                                }
+                            }
+                            obj = dict;
+                        }
+                    }
+                }
+                return obj;
+            }
+            if (ReflectionUtils.IsNullableType(type))
+                return ReflectionUtils.ToNullableType(obj, type);
+            return obj;
+        }
         protected virtual object SerializeEnum(Enum p)
         {
             return Convert.ToDouble(p, CultureInfo.InvariantCulture);
@@ -1651,7 +1893,11 @@ namespace SimpleJson
             private static readonly object[] EmptyObjects = new object[] { };
 
             public delegate object GetDelegate(object source);
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+            public delegate void SetDelegate(ref object source, object value);
+#else
             public delegate void SetDelegate(object source, object value);
+#endif
             public delegate object ConstructorDelegate(params object[] args);
 
             public delegate TValue ThreadSafeDictionaryValueFactory<TKey, TValue>(TKey key);
@@ -1984,12 +2230,21 @@ namespace SimpleJson
             public static SetDelegate GetSetMethodByReflection(PropertyInfo propertyInfo)
             {
                 MethodInfo methodInfo = GetSetterMethodInfo(propertyInfo);
-                return delegate(object source, object value) { methodInfo.Invoke(source, new object[] { value }); };
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+                return delegate (ref object source, object value) { methodInfo.Invoke(source, new object[] { value }); };
+#else
+                return delegate (object source, object value) { methodInfo.Invoke(source, new object[] { value }); };
+#endif
             }
 
             public static SetDelegate GetSetMethodByReflection(FieldInfo fieldInfo)
             {
-                return delegate(object source, object value) { fieldInfo.SetValue(source, value); };
+#if SIMPLE_JSON_NO_LINQ_EXPRESSION
+               return delegate (ref object source, object value) { fieldInfo.SetValue(source, value); };
+#else
+                return delegate (object source, object value) { fieldInfo.SetValue(source, value); };
+#endif
+
             }
 
 #if !SIMPLE_JSON_NO_LINQ_EXPRESSION
