@@ -1260,7 +1260,7 @@ namespace SimpleJson
 
         public PocoJsonSerializerStrategy()
         {
-            ConstructorCache = new ReflectionUtils.ThreadSafeDictionary<Type, ReflectionUtils.ConstructorDelegate>(ContructorDelegateFactory);
+            ConstructorCache = new ReflectionUtils.ThreadSafeDictionary<Type, ReflectionUtils.ConstructorDelegate>(ConstructorDelegateFactory);
             GetCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, ReflectionUtils.GetDelegate>>(GetterValueFactory);
             SetCache = new ReflectionUtils.ThreadSafeDictionary<Type, IDictionary<string, KeyValuePair<Type, ReflectionUtils.SetDelegate>>>(SetterValueFactory);
         }
@@ -1270,9 +1270,9 @@ namespace SimpleJson
             return clrPropertyName;
         }
 
-        internal virtual ReflectionUtils.ConstructorDelegate ContructorDelegateFactory(Type key)
+        internal virtual ReflectionUtils.ConstructorDelegate ConstructorDelegateFactory(Type key)
         {
-            return ReflectionUtils.GetContructor(key, key.IsArray ? ArrayConstructorParameterTypes : EmptyTypes);
+            return ReflectionUtils.GetConstructor(key, key.IsArray ? ArrayConstructorParameterTypes : EmptyTypes);
         }
 
         internal virtual IDictionary<string, ReflectionUtils.GetDelegate> GetterValueFactory(Type type)
@@ -1447,7 +1447,7 @@ namespace SimpleJson
                             foreach (object o in jsonObject)
                                 list[i++] = DeserializeObject(o, type.GetElementType());
                         }
-                        else if (ReflectionUtils.IsTypeGenericeCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
+                        else if (ReflectionUtils.IsTypeGenericCollectionInterface(type) || ReflectionUtils.IsAssignableFrom(typeof(IList), type))
                         {
                             Type innerType = ReflectionUtils.GetGenericListElementType(type);
                             list = (IList)(ConstructorCache[type] ?? ConstructorCache[typeof(List<>).MakeGenericType(innerType)])(jsonObject.Count);
@@ -1685,7 +1685,7 @@ namespace SimpleJson
                 return GetTypeInfo(type).IsGenericType;
             }
 
-            public static bool IsTypeGenericeCollectionInterface(Type type)
+            public static bool IsTypeGenericCollectionInterface(Type type)
             {
                 if (!IsTypeGeneric(type))
                     return false;
@@ -1812,7 +1812,7 @@ namespace SimpleJson
 #endif
             }
 
-            public static ConstructorDelegate GetContructor(ConstructorInfo constructorInfo)
+            public static ConstructorDelegate GetConstructor(ConstructorInfo constructorInfo)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
                 return GetConstructorByReflection(constructorInfo);
@@ -1821,7 +1821,7 @@ namespace SimpleJson
 #endif
             }
 
-            public static ConstructorDelegate GetContructor(Type type, params Type[] argsType)
+            public static ConstructorDelegate GetConstructor(Type type, params Type[] argsType)
             {
 #if SIMPLE_JSON_NO_LINQ_EXPRESSION
                 return GetConstructorByReflection(type, argsType);
