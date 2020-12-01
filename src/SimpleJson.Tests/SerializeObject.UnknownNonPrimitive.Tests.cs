@@ -156,6 +156,27 @@ namespace SimpleJsonTests
             Assert.AreEqual("str", result.PropTypeKnown);
         }
 
+        [TestMethod]
+        public void CanSerializeThrownException()
+        {
+            var exception = new Exception();
+            try
+            {
+                throw exception;
+            }
+            catch
+            {
+                /*Do nothing, the exception only happens on caught exceptions.*/
+            }
+
+            var instance = exception;
+            var json = SimpleJson.SerializeObject(instance, new MyJsonSerializerStrategy());
+            // Note that changes to this test file will probably break this test - it has the try/catch stacktrace nature
+            Assert.AreEqual("{\"Message\":\"Exception of type 'System.Exception' was thrown.\",\"Data\":[],\"InnerException\":null,\"TargetSite\":{},\"StackTrace\":\"   at SimpleJsonTests.SerializeObject_UnknownNonPrimitive_Tests.CanSerializeThrownException() in C:\\\\Users\\\\keith.barrow\\\\source\\\\repos\\\\simple-json\\\\src\\\\SimpleJson.Tests\\\\SerializeObject.UnknownNonPrimitive.Tests.cs:line 165\",\"HelpLink\":null,\"Source\":\"SimpleJson.Tests\",\"HResult\":-2146233088}", json);
+
+            // Not Can't deserialize.
+        }
+
         private class MyJsonSerializerStrategy : PocoJsonSerializerStrategy
         {
             protected override string MapClrMemberNameToJsonFieldName(string clrPropertyName)

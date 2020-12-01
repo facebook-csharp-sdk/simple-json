@@ -1278,6 +1278,10 @@ namespace SimpleJson
         internal virtual IDictionary<string, ReflectionUtils.GetDelegate> GetterValueFactory(Type type)
         {
             IDictionary<string, ReflectionUtils.GetDelegate> result = new Dictionary<string, ReflectionUtils.GetDelegate>();
+            if (type.FullName== "System.Reflection.RuntimeMethodInfo" && type.IsSealed && type.IsNotPublic)
+            {
+                return result;
+            }
             foreach (PropertyInfo propertyInfo in ReflectionUtils.GetProperties(type))
             {
                 if (propertyInfo.CanRead)
